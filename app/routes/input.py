@@ -34,7 +34,7 @@ def user_input():
             
             # Environment
             "places.primaryType",           # Cuisine
-            "places.generativeSummary",     # AI summary of review
+            "places.generativeSummary.overview",     # AI summary of review
             
             # Service options
             "places.dineIn",
@@ -50,8 +50,9 @@ def user_input():
 
             #Basic Meta Data
             "places.formattedAddress",
-            "places.displayName",
-            "places.id"
+            "places.displayName.text",
+            "places.id",
+            "places.currentOpeningHours.openNow"
         ]
 
 
