@@ -1,0 +1,63 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Places Near You</title>
+</head>
+<body>
+    <h1>Put your parameters</h1>
+
+    <form id="locationForm">
+        <input type="number" name="max_price" placeholder="Enter Max Cost" required>
+        <input type="number" name="max_distance" placeholder="Enter Max Distance" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="results"></div>
+
+    <script>
+        let userLat, userLng;
+
+        // Get location when page loads
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    userLat = position.coords.latitude;
+                    userLng = position.coords.longitude;
+                    console.log(`Location: ${userLat}, ${userLng}`);
+                },
+                (error) => {
+                    alert("Please enable location to use this feature");
+                }
+            );
+        } else {
+            alert("Geolocation not supported by your browser");
+        }
+
+        // Handle form submission
+        document.getElementById('locationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!userLat || !userLng) {
+                alert("Getting your location... please try again");
+                return;
+            }
+
+            const formData = new FormData(this);
+            const maxPrice = formData.get('max_price');
+            const maxDistance = formData.get('max_distance');
+
+            // Send to Flask with location data
+            fetch(`/?lat=${userLat}&lng=${userLng}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('results').innerHTML = JSON.stringify(data);
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
