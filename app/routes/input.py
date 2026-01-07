@@ -50,7 +50,8 @@ def user_input():
 
             #Basic Meta Data
             "places.formattedAddress",
-            "places.displayName"
+            "places.displayName",
+            "places.id"
         ]
 
 
