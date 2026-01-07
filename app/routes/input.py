@@ -15,22 +15,48 @@ def user_input():
         return render_template("input.html")
     
     else:
-        url = 'https://places.googleapis.com/v1/places:searchNearby'
+        url = 'https://places.googleapis.com/v1/places:searchNearby'        #Url for Google Places
 
+        #User's request/data
         lat = request.form.get('lat')
         lng = request.form.get('lng')
         max_price = request.form.get("max_price")
         max_distance = request.form.get("max_distance")
 
-        distance = round((1609.34 * int(max_distance)), 2)
-
-        print(f"latitude {lat} | longditiude {lng} | distance {distance} | max price {max_price}")
+        distance = round((1609.34 * int(max_distance)), 2)      #Convert from miles to meters
         
+        #Returned data from API request
+        fields = [
+            # Rep and cost
+            "places.rating",
+            "places.userRatingCount",
+            "places.priceLevel",
+            
+            # Environment
+            "places.primaryType",           # Cuisine
+            "places.generativeSummary",     # AI summary of review
+            
+            # Service options
+            "places.dineIn",
+            "places.takeout",
+            "places.servesVegetarianFood",  # Vegan
+            
+            # Atmosphere & Crowds
+            "places.goodForGroups",
+            "places.goodForChildren",
+            
+            # Distance (Requires routingParameters in the body)
+            "routingSummaries",      # Drive Distance
+
+            #Basic Meta Data
+            ""
+        ]
+
 
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": GOOGLE_API_KEY,
-            "X-Goog-FieldMask": "places.currentOpeningHours.openNow,places.priceLevel,places.displayName,places.formattedAddress,places.id"
+            "X-Goog-FieldMask": ",".join(fields)
         }
 
         params = {
@@ -42,7 +68,14 @@ def user_input():
                 "radius": distance
                 }
             },
-            "rankPreference": "DISTANCE"
+            "rankPreference": "DISTANCE",
+            "routingParameters": {
+                "origin": {
+                    "latitude": float(lat),
+                    "longitude": float(lng)
+                },
+                "travelMode": "DRIVE"
+            } 
 
         }
 
@@ -50,10 +83,12 @@ def user_input():
 
         if response.status_code == 200:
             print(json.dumps(response.json(), indent=2))
+            return render_template("output.html")
         else:
             print(f"Error {response.status_code}: {response.text}")
+            return redirect(request.referrer)
         
-        return render_template("output.html")
+        
         
 
     
