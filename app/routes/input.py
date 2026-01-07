@@ -49,7 +49,8 @@ def user_input():
             "routingSummaries",      # Drive Distance
 
             #Basic Meta Data
-            ""
+            "places.formattedAddress",
+            "places.displayName"
         ]
 
 
