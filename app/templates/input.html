@@ -7,57 +7,41 @@
 <body>
     <h1>Put your parameters</h1>
 
-    <form id="locationForm">
+    <div id="locationPrompt">
+        <p>This app needs your location to find places near you.</p>
+        <button onclick="getLocation()">Allow Location</button>
+    </div>
+
+    <form action="/" method="POST" id="locationForm" style="display: none;">
+        <input type="hidden" name="lat" id="lat">
+        <input type="hidden" name="lng" id="lng">
         <input type="number" name="max_price" placeholder="Enter Max Cost" required>
         <input type="number" name="max_distance" placeholder="Enter Max Distance" required>
         <button type="submit">Submit</button>
     </form>
 
-    <div id="results"></div>
-
     <script>
-        let userLat, userLng;
-
-        // Get location when page loads
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    userLat = position.coords.latitude;
-                    userLng = position.coords.longitude;
-                    console.log(`Location: ${userLat}, ${userLng}`);
-                },
-                (error) => {
-                    alert("Please enable location to use this feature");
-                }
-            );
-        } else {
-            alert("Geolocation not supported by your browser");
-        }
-
-        // Handle form submission
-        document.getElementById('locationForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (!userLat || !userLng) {
-                alert("Getting your location... please try again");
-                return;
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        document.getElementById('lat').value = position.coords.latitude;
+                        document.getElementById('lng').value = position.coords.longitude;
+                        
+                        // Hide prompt, show form
+                        document.getElementById('locationPrompt').style.display = 'none';
+                        document.getElementById('locationForm').style.display = 'block';
+                        
+                        console.log('Location set:', position.coords.latitude, position.coords.longitude);
+                    },
+                    (error) => {
+                        alert("Location access denied. Please enable location to use this app.");
+                    }
+                );
+            } else {
+                alert("Geolocation not supported by your browser");
             }
-
-            const formData = new FormData(this);
-            const maxPrice = formData.get('max_price');
-            const maxDistance = formData.get('max_distance');
-
-            // Send to Flask with location data
-            fetch(`/?lat=${userLat}&lng=${userLng}`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('results').innerHTML = JSON.stringify(data);
-            })
-            .catch(error => console.error('Error:', error));
-        });
+        }
     </script>
 </body>
 </html>

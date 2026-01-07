@@ -17,20 +17,20 @@ def user_input():
     else:
         url = 'https://places.googleapis.com/v1/places:searchNearby'
 
-        lat = request.args.get('lat')
-        lng = request.args.get('lng')
+        lat = request.form.get('lat')
+        lng = request.form.get('lng')
         max_price = request.form.get("max_price")
-
         max_distance = request.form.get("max_distance")
 
         distance = round((1609.34 * int(max_distance)), 2)
 
         print(f"latitude {lat} | longditiude {lng} | distance {distance} | max price {max_price}")
+        
 
-        '''headers = {
+        headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": GOOGLE_API_KEY,
-            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.id"
+            "X-Goog-FieldMask": "places.currentOpeningHours.openNow,places.priceLevel,places.displayName,places.formattedAddress,places.id"
         }
 
         params = {
@@ -51,10 +51,10 @@ def user_input():
         if response.status_code == 200:
             print(json.dumps(response.json(), indent=2))
         else:
-            print(f"Error {response.status_code}: {response.text}")'''
-        
+            print(f"Error {response.status_code}: {response.text}")
         
         return render_template("output.html")
+        
 
     
 
