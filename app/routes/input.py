@@ -93,7 +93,8 @@ def user_input():
         
         
         
-
+def extract_api_data(response):
+    pass
     
 
 
