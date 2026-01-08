@@ -41,10 +41,6 @@ def user_input():
             "places.takeout",
             "places.servesVegetarianFood",  # Vegan
             
-            # Atmosphere & Crowds
-            "places.goodForGroups",
-            "places.goodForChildren",
-            
             # Distance (Requires routingParameters in the body)
             "routingSummaries",      # Drive Distance
 
@@ -63,15 +59,15 @@ def user_input():
         }
 
         params = {
-            "maxResultCount": 10,
-            "includedTypes": ["restaurant"],
+            "maxResultCount": 2,
+            "includedPrimaryTypes": ["restaurant"],
             "locationRestriction": {
                 "circle": {
                 "center": {"latitude": str(lat), "longitude": str(lng)},
                 "radius": distance
                 }
             },
-            "rankPreference": "DISTANCE",
+            "rankPreference": "POPULARITY",
             "routingParameters": {
                 "origin": {
                     "latitude": float(lat),
@@ -85,16 +81,56 @@ def user_input():
         response = requests.post(url, headers= headers, json=params)
 
         if response.status_code == 200:
-            print(json.dumps(response.json(), indent=2))
+            data = response.json()
+            print(extract_api_data(data))
             return render_template("output.html")
         else:
             print(f"Error {response.status_code}: {response.text}")
             return redirect(request.referrer)
         
         
-        
-def extract_api_data(response):
-    pass
+#Extract important data so it can be easily accessable
+def extract_api_data(data):
+    if "places" in data:
+        information = []
+        for place in data["places"]:
+
+            rating = place["rating"]
+
+            rating_count = place["userRatingCount"]
+
+            takeout = 0
+            if place["takeout"]:
+                takeout = 1
+
+            dineIn = 0
+            if place["dineIn"]:
+                dineIn = 1
+
+            vegan = 0
+            if place["servesVegetarianFood"]:
+                vegan = 1
+
+            open = 0
+            if place["currentOpeningHours"]["openNow"]:
+                open = 1
+            
+            resturant = [rating, rating_count, takeout, dineIn, vegan, open]
+            information.append(resturant)
+
+        for index, value in enumerate(data["routingSummaries"]):
+            drive_time = value["legs"][0]["duration"]
+            drive_time = drive_time[:len(drive_time)-1]
+            information[index].append(int(drive_time))
+
+    return information      #[avg rating, num ratings, takeout, dinein, vegan option, open, drive time]
+
+            
+            
+            
+            
+            
+            
     
 
 
