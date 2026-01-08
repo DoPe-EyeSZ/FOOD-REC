@@ -4,17 +4,17 @@ import json
 import os
 
 
-input = Blueprint("input", __name__, template_folder="templates")
+submission = Blueprint("submission", __name__, template_folder="templates")
 
 GOOGLE_API_KEY = os.environ.get("google_api_key")
 
 cuisine_stats = {}
 
-@input.route("/", methods = ["POST", "GET"])
-def user_input():
+@submission.route("/", methods = ["POST", "GET"])
+def user_submission():
     if request.method == "GET":     #For after user logs in
         print()
-        return render_template("input.html")
+        return render_template("submission.html")
     
     else:
         url = 'https://places.googleapis.com/v1/places:searchNearby'        #Url for Google Places
@@ -86,7 +86,7 @@ def user_input():
 
             
             data = response.json()
-            print(json.dumps(response.json(), indent=2))
+            #print(json.dumps(response.json(), indent=2))
             print(extract_api_data(data, cuisine_stats))
             print(cuisine_stats)
             return render_template("output.html")
@@ -104,6 +104,18 @@ def extract_api_data(data, cuisine_stats):
         information = []
         for place in data["places"]:
 
+            #TEST PURPOSES---------------------
+            print(place)
+            answer = input("yes or no to resturant?")
+
+            ans = None
+
+            if answer == "yes":
+                ans = 1
+            else:
+                ans = 0
+
+            #-----------------------------
             id = place["id"]
 
             rating = place["rating"]
@@ -130,7 +142,7 @@ def extract_api_data(data, cuisine_stats):
                 if place["currentOpeningHours"]["openNow"]:
                     open = 1
             
-            resturant = [id, rating, rating_count, takeout, dineIn, vegan, open]
+            resturant = [ans, id, rating, rating_count, takeout, dineIn, vegan, open]
             information.append(resturant)
 
             #Updates cuisine stats (accepted/shown)
