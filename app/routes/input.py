@@ -8,10 +8,12 @@ input = Blueprint("input", __name__, template_folder="templates")
 
 GOOGLE_API_KEY = os.environ.get("google_api_key")
 
+cuisine_stats = {}
 
 @input.route("/", methods = ["POST", "GET"])
 def user_input():
     if request.method == "GET":     #For after user logs in
+        print()
         return render_template("input.html")
     
     else:
@@ -82,10 +84,10 @@ def user_input():
 
         if response.status_code == 200:
 
-            cuisine_stats = {}
+            
             data = response.json()
-            print(extract_api_data(data, cuisine_stats))
             print(json.dumps(response.json(), indent=2))
+            print(extract_api_data(data, cuisine_stats))
             print(cuisine_stats)
             return render_template("output.html")
         
