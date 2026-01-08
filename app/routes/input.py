@@ -59,7 +59,7 @@ def user_input():
         }
 
         params = {
-            "maxResultCount": 2,
+            "maxResultCount": 20,
             "includedPrimaryTypes": ["restaurant"],
             "locationRestriction": {
                 "circle": {
@@ -95,27 +95,33 @@ def extract_api_data(data):
         information = []
         for place in data["places"]:
 
+            id = place["id"]
+
             rating = place["rating"]
 
             rating_count = place["userRatingCount"]
 
             takeout = 0
-            if place["takeout"]:
-                takeout = 1
+            if "takeout" in place:
+                if place["takeout"]:
+                    takeout = 1
 
             dineIn = 0
-            if place["dineIn"]:
-                dineIn = 1
+            if "dineIn" in place:
+                if place["dineIn"]:
+                    dineIn = 1
 
             vegan = 0
-            if place["servesVegetarianFood"]:
-                vegan = 1
+            if "servesVegetarianFood" in place:
+                if place["servesVegetarianFood"]:
+                    vegan = 1
 
             open = 0
-            if place["currentOpeningHours"]["openNow"]:
-                open = 1
+            if "openNow" in place["currentOpeningHours"]:
+                if place["currentOpeningHours"]["openNow"]:
+                    open = 1
             
-            resturant = [rating, rating_count, takeout, dineIn, vegan, open]
+            resturant = [id, rating, rating_count, takeout, dineIn, vegan, open]
             information.append(resturant)
 
         for index, value in enumerate(data["routingSummaries"]):
