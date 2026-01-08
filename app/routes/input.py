@@ -81,16 +81,23 @@ def user_input():
         response = requests.post(url, headers= headers, json=params)
 
         if response.status_code == 200:
+
+            cuisine_stats = {}
             data = response.json()
-            print(extract_api_data(data))
+            print(extract_api_data(data, cuisine_stats))
+            print(json.dumps(response.json(), indent=2))
+            print(cuisine_stats)
             return render_template("output.html")
+        
+
         else:
+
             print(f"Error {response.status_code}: {response.text}")
             return redirect(request.referrer)
         
         
 #Extract important data so it can be easily accessable
-def extract_api_data(data):
+def extract_api_data(data, cuisine_stats):
     if "places" in data:
         information = []
         for place in data["places"]:
@@ -123,6 +130,14 @@ def extract_api_data(data):
             
             resturant = [id, rating, rating_count, takeout, dineIn, vegan, open]
             information.append(resturant)
+
+            #Updates cuisine stats (accepted/shown)
+            if "primaryType" in place:
+                cuisine = place["primaryType"]
+                if cuisine in cuisine_stats:
+                    cuisine_stats[cuisine]["shown"] += 1
+                else:
+                    cuisine_stats[cuisine] = {"shown": 1, "accepted": 0}
 
         for index, value in enumerate(data["routingSummaries"]):
             drive_time = value["legs"][0]["duration"]
