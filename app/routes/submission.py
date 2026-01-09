@@ -61,7 +61,7 @@ def user_submission():
         }
 
         params = {
-            "maxResultCount": 20,
+            "maxResultCount": 10,
             "includedPrimaryTypes": ["restaurant"],
             "locationRestriction": {
                 "circle": {
@@ -87,8 +87,9 @@ def user_submission():
             
             data = response.json()
             #print(json.dumps(response.json(), indent=2))
-            print(extract_api_data(data, cuisine_stats))
-            print(cuisine_stats)
+            print(f"All resturant info: {extract_api_data(data, cuisine_stats)}")
+            print("==================================================")
+            print(f"All cuisine accept/reject: {cuisine_stats}")
             return render_template("output.html")
         
 
@@ -108,12 +109,10 @@ def extract_api_data(data, cuisine_stats):
             print(place)
             answer = input("yes or no to resturant?")
 
-            ans = None
+            accept = False
 
-            if answer == "yes":
-                ans = 1
-            else:
-                ans = 0
+            if answer == "y":
+                accept = True
 
             #-----------------------------
             id = place["id"]
@@ -142,16 +141,22 @@ def extract_api_data(data, cuisine_stats):
                 if place["currentOpeningHours"]["openNow"]:
                     open = 1
             
-            resturant = [ans, id, rating, rating_count, takeout, dineIn, vegan, open]
+            resturant = [id, rating, rating_count, takeout, dineIn, vegan, open]
+            print(resturant)    #TEST
+            print("----------------------------------------")   #TEST
             information.append(resturant)
 
             #Updates cuisine stats (accepted/shown)
             if "primaryType" in place:
                 cuisine = place["primaryType"]
                 if cuisine in cuisine_stats:
-                    cuisine_stats[cuisine]["shown"] += 1
+                    cuisine_stats[cuisine]["shown"] = cuisine_stats[cuisine].get("shown", 0) + 1
                 else:
                     cuisine_stats[cuisine] = {"shown": 1, "accepted": 0}
+
+                if accept:
+                        cuisine_stats[cuisine]["accepted"] = cuisine_stats[cuisine].get("accepted", 0) + 1
+        
 
         for index, value in enumerate(data["routingSummaries"]):
             drive_time = value["legs"][0]["duration"]
