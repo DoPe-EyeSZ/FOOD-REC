@@ -13,7 +13,6 @@ cuisine_stats = {}
 @submission.route("/", methods = ["POST", "GET"])
 def user_submission():
     if request.method == "GET":     #For after user logs in
-        print()
         return render_template("submission.html")
     
     else:
@@ -61,22 +60,22 @@ def user_submission():
         }
 
         params = {
-            "maxResultCount": 10,
-            "includedPrimaryTypes": ["restaurant"],
+            "maxResultCount": 20,
+            "includedPrimaryTypes": ["restaurant", "cafe", "fast_food_restaurant", "fine_dining_restaurant", "bar"],
             "locationRestriction": {
                 "circle": {
                 "center": {"latitude": str(lat), "longitude": str(lng)},
                 "radius": distance
                 }
             },
-            "rankPreference": "POPULARITY",
             "routingParameters": {
                 "origin": {
                     "latitude": float(lat),
                     "longitude": float(lng)
                 },
                 "travelMode": "DRIVE"
-            } 
+            },
+            "minRating": 0.0 
 
         }
 
@@ -89,7 +88,6 @@ def user_submission():
             #print(json.dumps(response.json(), indent=2))
             print(f"All resturant info: {extract_api_data(data, cuisine_stats)}")
             print("==================================================")
-            print(f"All cuisine accept/reject: {cuisine_stats}")
             return render_template("output.html")
         
 
@@ -102,12 +100,46 @@ def user_submission():
 #Extract important data so it can be easily accessable
 def extract_api_data(data, cuisine_stats):
     if "places" in data:
-        information = []
+        information = [[],[]]
         for place in data["places"]:
 
+            id = place["id"]
+
+            if "rating" in place:
+                rating = place["rating"]
+                rating_count = place["userRatingCount"]
+                print(f"Rating: {rating}")
+                print(f"Rating Count: {rating_count}")
+
+            takeout = 0
+            if "takeout" in place:
+                if place["takeout"]:
+                    takeout = 1
+                    print(f"Allows Takeout")
+
+            dineIn = 0
+            if "dineIn" in place:
+                if place["dineIn"]:
+                    dineIn = 1
+                    print(f"Allows Dine in")
+
+            vegan = 0
+            if "servesVegetarianFood" in place:
+                if place["servesVegetarianFood"]:
+                    vegan = 1
+                    print(f"Has Vegitarian Options")
+
+            open = 0
+            if "currentOpeningHours" in place:
+                if "openNow" in place["currentOpeningHours"]:
+                    if place["currentOpeningHours"]["openNow"]:
+                        open = 1
+                        print(f"Currently Open")
+
             #TEST PURPOSES---------------------
-            print(place)
-            answer = input("yes or no to resturant?")
+            print(f"Name: {place["displayName"]["text"]}")
+            print(f"Rating: {place["rating"]}")
+            answer = input("yes or no to resturant?\n")
 
             accept = False
 
@@ -115,36 +147,11 @@ def extract_api_data(data, cuisine_stats):
                 accept = True
 
             #-----------------------------
-            id = place["id"]
-
-            rating = place["rating"]
-
-            rating_count = place["userRatingCount"]
-
-            takeout = 0
-            if "takeout" in place:
-                if place["takeout"]:
-                    takeout = 1
-
-            dineIn = 0
-            if "dineIn" in place:
-                if place["dineIn"]:
-                    dineIn = 1
-
-            vegan = 0
-            if "servesVegetarianFood" in place:
-                if place["servesVegetarianFood"]:
-                    vegan = 1
-
-            open = 0
-            if "openNow" in place["currentOpeningHours"]:
-                if place["currentOpeningHours"]["openNow"]:
-                    open = 1
             
             resturant = [id, rating, rating_count, takeout, dineIn, vegan, open]
-            print(resturant)    #TEST
+                #TEST
             print("----------------------------------------")   #TEST
-            information.append(resturant)
+
 
             #Updates cuisine stats (accepted/shown)
             if "primaryType" in place:
@@ -155,13 +162,19 @@ def extract_api_data(data, cuisine_stats):
                     cuisine_stats[cuisine] = {"shown": 1, "accepted": 0}
 
                 if accept:
-                        cuisine_stats[cuisine]["accepted"] = cuisine_stats[cuisine].get("accepted", 0) + 1
-        
+                    cuisine_stats[cuisine]["accepted"] = cuisine_stats[cuisine].get("accepted", 0) + 1
+                    information[1].append(1)
+                else:
+                    information[1].append(0)
 
+            print(resturant)
+            information[0].append(resturant)
+        
+        #appends drive time to restaurant info
         for index, value in enumerate(data["routingSummaries"]):
             drive_time = value["legs"][0]["duration"]
             drive_time = drive_time[:len(drive_time)-1]
-            information[index].append(int(drive_time))
+            information[0][index].insert(len(information[0][index])-1,int(drive_time))
 
     return information      #[avg rating, num ratings, takeout, dinein, vegan option, open, drive time]
 
