@@ -24,7 +24,6 @@ def user_submission():
         return render_template("submission.html")
     
     else:
-        url = 'https://places.googleapis.com/v1/places:searchNearby'        #Url for Google Places
 
         #User's request/data
         lat = request.form.get('lat')
@@ -32,70 +31,7 @@ def user_submission():
         max_price = request.form.get("max_price")
         max_distance = request.form.get("max_distance")
 
-        distance = round((1609.34 * int(max_distance)), 2)      #Convert from miles to meters
-        
-        #Returned data from API request
-        fields = [
-            # Rep and cost
-            "places.rating",
-            "places.userRatingCount",
-            "places.priceLevel",
-            
-            # Environment
-            "places.primaryType",           # Cuisine
-            "places.generativeSummary.overview",     # AI summary of review
-            
-            # Service options
-            "places.dineIn",
-            "places.takeout",
-            "places.servesVegetarianFood",  # Vegan
-            
-            # Distance (Requires routingParameters in the body)
-            "routingSummaries",      # Drive Distance
-
-            #Basic Meta Data
-            "places.formattedAddress",
-            "places.displayName.text",
-            "places.id",
-            "places.currentOpeningHours.openNow"
-        ]
-
-
-        headers = {
-            "Content-Type": "application/json",
-            "X-Goog-Api-Key": GOOGLE_API_KEY,
-            "X-Goog-FieldMask": ",".join(fields)
-        }
-
-        params = {
-            "maxResultCount": 5,
-            "includedPrimaryTypes": ["restaurant", "cafe", "fast_food_restaurant", "fine_dining_restaurant", "bar"],
-            "locationRestriction": {
-                "circle": {
-                "center": {"latitude": str(lat), "longitude": str(lng)},
-                "radius": distance
-                }
-            },
-            "routingParameters": {
-                "origin": {
-                    "latitude": float(lat),
-                    "longitude": float(lng)
-                },
-                "travelMode": "DRIVE"
-            },
-            "minRating": 0.0,
-
-            "priceLevels": [
-                "PRICE_LEVEL_FREE",
-                "PRICE_LEVEL_INEXPENSIVE",
-                "PRICE_LEVEL_MODERATE",
-                "PRICE_LEVEL_EXPENSIVE",
-                "PRICE_LEVEL_VERY_EXPENSIVE"
-            ] 
-
-        }
-
-        response = requests.post(url, headers= headers, json=params)
+        response = use_api(lat, lng, max_price, max_distance)
 
         if response.status_code == 200:
 
@@ -103,9 +39,16 @@ def user_submission():
             data = response.json()
             #print(json.dumps(response.json(), indent=2))
             info = extract_api_data(data, cuisine_stats)
-            print(f"feature data {info[0]}")
-            print(f"result: {info[1]}")
-            print(f"Clean Data: {remove_id(info[0])}")
+            all_feature_data = info[0]
+            result = info[1]
+            clean_feature_data = remove_id(all_feature_data)
+            '''x_train, x_test, y_train, y_test = train_test_split(clean_feature_data, result, test_size=0.2)
+            from sklearn.linear_model import LinearRegression
+            clf = LinearRegression()
+            clf.fit(x_train, y_train)
+            print(clf.predict(x_test))
+            print(y_test)
+            print(f"Accuracy: {clf.score(x_test, y_test)}")'''#ML Part
             return render_template("output.html")
         
 
@@ -122,6 +65,9 @@ def extract_api_data(data, cuisine_stats):
         for place in data["places"]:
 
             print(place)
+            print("===============================================")
+            if "generativeSummary" in place:
+                print(f"Summary: {place["generativeSummary"]["overview"]["text"]}")
 
             id = place["id"]
 
@@ -165,7 +111,6 @@ def extract_api_data(data, cuisine_stats):
 
             #TEST PURPOSES---------------------
             print(f"Name: {place["displayName"]["text"]}")
-            print(f"Rating: {place["rating"]}")
             answer = input("yes or no to resturant?\n")
 
             accept = False
@@ -176,7 +121,6 @@ def extract_api_data(data, cuisine_stats):
             #-----------------------------
             
             resturant = [id, rating, rating_count, price_level, takeout, dineIn, vegan, open]
-                #TEST
             print("----------------------------------------")   #TEST
 
 
@@ -211,6 +155,77 @@ def remove_id(data):
     for i in range(len(data)):
         data[i] = data[i][1:]
     return data
+
+
+
+def use_api(lat, lng, max_price, max_distance):
+
+    url = 'https://places.googleapis.com/v1/places:searchNearby'        #Url for Google Places
+
+    distance = round((1609.34 * int(max_distance)), 2)      #Convert from miles to meters
+        
+    #Returned data from API request
+    fields = [
+        # Rep and cost
+        "places.rating",
+        "places.userRatingCount",
+        "places.priceLevel",
+        
+        # Environment
+        "places.primaryType",           # Cuisine
+        "places.generativeSummary.overview",     # AI summary of review
+        
+        # Service options
+        "places.dineIn",
+        "places.takeout",
+        "places.servesVegetarianFood",  # Vegan
+        
+        # Distance (Requires routingParameters in the body)
+        "routingSummaries",      # Drive Distance
+
+        #Basic Meta Data
+        "places.formattedAddress",
+        "places.displayName.text",
+        "places.id",
+        "places.currentOpeningHours.openNow"
+    ]
+
+
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": GOOGLE_API_KEY,
+        "X-Goog-FieldMask": ",".join(fields)
+    }
+
+    params = {
+        "maxResultCount": 5,
+        "includedPrimaryTypes": ["restaurant"],
+        "locationRestriction": {
+            "circle": {
+            "center": {"latitude": str(lat), "longitude": str(lng)},
+            "radius": distance
+            }
+        },
+        "routingParameters": {
+            "origin": {
+                "latitude": float(lat),
+                "longitude": float(lng)
+            },
+            "travelMode": "DRIVE"
+        },
+        "minRating": 0.0,
+
+        "priceLevels": [
+            "PRICE_LEVEL_FREE",
+            "PRICE_LEVEL_INEXPENSIVE",
+            "PRICE_LEVEL_MODERATE",
+            "PRICE_LEVEL_EXPENSIVE",
+            "PRICE_LEVEL_VERY_EXPENSIVE"
+        ] 
+
+    }
+
+    return requests.post(url, headers= headers, json=params)
     
 
 
