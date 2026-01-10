@@ -1,4 +1,5 @@
 from flask import Blueprint, redirect, url_for, render_template, request, session, flash, jsonify
+from sklearn.model_selection import train_test_split
 import requests
 import json
 import os
@@ -9,6 +10,13 @@ submission = Blueprint("submission", __name__, template_folder="templates")
 GOOGLE_API_KEY = os.environ.get("google_api_key")
 
 cuisine_stats = {}
+price_levels = {
+    "PRICE_LEVEL_FREE": 5,
+    "PRICE_LEVEL_INEXPENSIVE": 4,
+    "PRICE_LEVEL_MODERATE": 3,
+    "PRICE_LEVEL_EXPENSIVE": 2,
+    "PRICE_LEVEL_VERY_EXPENSIVE": 1
+}
 
 @submission.route("/", methods = ["POST", "GET"])
 def user_submission():
@@ -60,7 +68,7 @@ def user_submission():
         }
 
         params = {
-            "maxResultCount": 20,
+            "maxResultCount": 5,
             "includedPrimaryTypes": ["restaurant", "cafe", "fast_food_restaurant", "fine_dining_restaurant", "bar"],
             "locationRestriction": {
                 "circle": {
@@ -75,7 +83,15 @@ def user_submission():
                 },
                 "travelMode": "DRIVE"
             },
-            "minRating": 0.0 
+            "minRating": 0.0,
+
+            "priceLevels": [
+                "PRICE_LEVEL_FREE",
+                "PRICE_LEVEL_INEXPENSIVE",
+                "PRICE_LEVEL_MODERATE",
+                "PRICE_LEVEL_EXPENSIVE",
+                "PRICE_LEVEL_VERY_EXPENSIVE"
+            ] 
 
         }
 
@@ -86,8 +102,10 @@ def user_submission():
             
             data = response.json()
             #print(json.dumps(response.json(), indent=2))
-            print(f"All resturant info: {extract_api_data(data, cuisine_stats)}")
-            print("==================================================")
+            info = extract_api_data(data, cuisine_stats)
+            print(f"feature data {info[0]}")
+            print(f"result: {info[1]}")
+            print(f"Clean Data: {remove_id(info[0])}")
             return render_template("output.html")
         
 
@@ -103,6 +121,8 @@ def extract_api_data(data, cuisine_stats):
         information = [[],[]]
         for place in data["places"]:
 
+            print(place)
+
             id = place["id"]
 
             if "rating" in place:
@@ -110,6 +130,13 @@ def extract_api_data(data, cuisine_stats):
                 rating_count = place["userRatingCount"]
                 print(f"Rating: {rating}")
                 print(f"Rating Count: {rating_count}")
+
+            if "priceLevel" in place:
+                price_level = price_levels.get(place["priceLevel"], 0)
+            else:
+                price_level = 0
+
+            print(f"price level: {price_level}")
 
             takeout = 0
             if "takeout" in place:
@@ -148,7 +175,7 @@ def extract_api_data(data, cuisine_stats):
 
             #-----------------------------
             
-            resturant = [id, rating, rating_count, takeout, dineIn, vegan, open]
+            resturant = [id, rating, rating_count, price_level, takeout, dineIn, vegan, open]
                 #TEST
             print("----------------------------------------")   #TEST
 
@@ -176,14 +203,14 @@ def extract_api_data(data, cuisine_stats):
             drive_time = drive_time[:len(drive_time)-1]
             information[0][index].insert(len(information[0][index])-1,int(drive_time))
 
-    return information      #[avg rating, num ratings, takeout, dinein, vegan option, open, drive time]
+    return information      #[[id, rating, num ratings, price level, takeout, dinein, vegan option, open, drive time], [accept/rejection]]
 
             
-            
-            
-            
-            
-            
+
+def remove_id(data):
+    for i in range(len(data)):
+        data[i] = data[i][1:]
+    return data
     
 
 
