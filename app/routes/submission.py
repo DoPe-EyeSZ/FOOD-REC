@@ -42,6 +42,7 @@ def user_submission():
             all_feature_data = info[0]
             result = info[1]
             clean_feature_data = remove_id(all_feature_data)
+
             '''x_train, x_test, y_train, y_test = train_test_split(clean_feature_data, result, test_size=0.2)
             from sklearn.linear_model import LinearRegression
             clf = LinearRegression()
@@ -49,6 +50,7 @@ def user_submission():
             print(clf.predict(x_test))
             print(y_test)
             print(f"Accuracy: {clf.score(x_test, y_test)}")'''#ML Part
+            
             return render_template("output.html")
         
 
