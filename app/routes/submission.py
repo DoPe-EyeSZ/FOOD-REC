@@ -38,12 +38,21 @@ def user_submission():
             
             data = response.json()
             #print(json.dumps(response.json(), indent=2))
-            info = extract_api_data(data, cuisine_stats)
+            info = extract_api_data(data, cuisine_stats)        #[[Feature data], [Acceptances/Rejections]]
             all_feature_data = info[0]
             result = info[1]
-            print(f"RESULTS: {result}")
-            clean_feature_data = remove_id(all_feature_data)
-            print(f"CLEAN DATA: {clean_feature_data}")
+            print(f"RESULTS: {result} \n")
+
+            clean_feature_data = remove_id(all_feature_data)        #Removes id from index 0
+            print(f"CLEAN DATA: {clean_feature_data} \n")
+
+            print(f"{cuisine_stats} \n")
+
+            frequencies = find_frequency(cuisine_stats)     #Calculates ratio of acceptances/rejections
+            
+            print(f"FREQUENCIES: {frequencies} \n")
+            new_data = insert_frequency(clean_feature_data, frequencies)        #Replaces ratio of accept/reject into clean data
+            print(f"NEW DATA: {new_data} \n")
 
             '''x_train, x_test, y_train, y_test = train_test_split(clean_feature_data, result, test_size=0.2)
             from sklearn.linear_model import LinearRegression
@@ -156,9 +165,24 @@ def extract_api_data(data, cuisine_stats):
 
             
 
-def remove_id(data):
+def remove_id(data):        #Removes resturant ID from feature data to feed to ML
     for i in range(len(data)):
         data[i] = data[i][1:]
+    return data
+
+def find_frequency(data):       #Find how often user accept/skips food
+    for cuisine, frequency in data.items():
+        accepted = frequency["accepted"]
+        shown = frequency["shown"]
+        frequency = round(float(accepted/shown), 2)
+        data[cuisine] = frequency
+    return data
+
+def insert_frequency(data, freq):       #Insert frequency into cleaned data
+    for place in data:
+        cuisine = place[-1]
+        place[-1] = freq[cuisine]
+
     return data
 
 
@@ -203,7 +227,7 @@ def use_api(lat, lng, max_price, max_distance):
     }
 
     params = {
-        "maxResultCount": 3,
+        "maxResultCount": 20,
         "includedPrimaryTypes": ["restaurant"],
         "locationRestriction": {
             "circle": {
