@@ -41,7 +41,9 @@ def user_submission():
             info = extract_api_data(data, cuisine_stats)
             all_feature_data = info[0]
             result = info[1]
+            print(f"RESULTS: {result}")
             clean_feature_data = remove_id(all_feature_data)
+            print(f"CLEAN DATA: {clean_feature_data}")
 
             '''x_train, x_test, y_train, y_test = train_test_split(clean_feature_data, result, test_size=0.2)
             from sklearn.linear_model import LinearRegression
@@ -129,6 +131,7 @@ def extract_api_data(data, cuisine_stats):
             #Updates cuisine stats (accepted/shown)
             if "primaryType" in place:
                 cuisine = place["primaryType"]
+                resturant.append(cuisine)
                 if cuisine in cuisine_stats:
                     cuisine_stats[cuisine]["shown"] = cuisine_stats[cuisine].get("shown", 0) + 1
                 else:
@@ -200,7 +203,7 @@ def use_api(lat, lng, max_price, max_distance):
     }
 
     params = {
-        "maxResultCount": 5,
+        "maxResultCount": 3,
         "includedPrimaryTypes": ["restaurant"],
         "locationRestriction": {
             "circle": {
