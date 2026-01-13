@@ -1,0 +1,151 @@
+# test_model.py
+import time
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import confusion_matrix
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+# Import from your Flask app file
+from app.routes.submission import use_api, extract_api_data, cuisine_stats, remove_id, find_frequency, insert_frequency
+
+# SoCal locations with food options (lat, lng, location_name)
+locations = [
+    (34.0381, -117.8648, "The Village at Walnut"),
+    (33.9533, -117.7320, "The Shoppes at Chino Hills"),
+    (33.6846, -117.8265, "Irvine Spectrum Center"),
+    #(34.0689, -118.4452, "Century City Westfield"),
+    #(33.7701, -118.1937, "Long Beach Downtown"),
+    #(34.1478, -118.1445, "Pasadena Old Town"),
+    #(33.5427, -117.7854, "The Crossroads at Mission Viejo"),
+    #(33.8366, -117.9143, "The Outlets at Orange"),
+    #(34.1808, -118.3090, "Universal CityWalk"),
+    #(33.5950, -117.8620, "Laguna Hills Mall Area"),
+    #(34.0195, -118.4912, "Santa Monica Third Street Promenade"),
+    #(33.8303, -118.3416, "Del Amo Fashion Center"),
+    #(34.1416, -117.9227, "Monrovia Downtown"),
+    #(33.7175, -117.9542, "The District at Tustin Legacy"),
+    #(34.0407, -117.5098, "Victoria Gardens, Rancho Cucamonga")
+]
+
+# Initialize data storage
+all_feature_data = []
+result = []
+
+# Run 15 API calls
+for i in range(15):
+    location = locations[i]
+    lat = location[0]
+    lng = location[1]
+    location_name = location[2]
+    max_distance = 8
+    
+    print(f"\n{'='*60}")
+    print(f"Loop {i+1}/15: {location_name}")
+    print(f"Coordinates: ({lat}, {lng})")
+    print(f"Max Distance: {max_distance} miles")
+    print(f"{'='*60}")
+    
+    response = use_api(lat, lng, None, max_distance)
+    
+    if response.status_code == 200:
+        data = response.json()
+        info = extract_api_data(data, cuisine_stats)
+        feature_data = info[0]
+        results = info[1]
+        
+        all_feature_data.extend(feature_data)
+        result.extend(results)
+        
+        print(f"Retrieved {len(feature_data)} restaurants")
+        print(f"Feature data sample: {feature_data[:2]}")
+    else:
+        print(f"ERROR {response.status_code}: {response.text}")
+    
+    if i < 14:
+        time.sleep(1)
+
+print(f"\n{'='*60}")
+print(f"DATA COLLECTION COMPLETE")
+print(f"{'='*60}")
+print(f"Total restaurants: {len(all_feature_data)}")
+print(f"Total results: {len(result)}")
+print(f"Cuisine stats: {cuisine_stats}")
+
+# Process data
+print(f"\n{'='*60}")
+print("PROCESSING DATA")
+print(f"{'='*60}")
+
+clean_feature_data = remove_id(all_feature_data)
+print(f"IDs removed. Clean data length: {len(clean_feature_data)}")
+
+frequencies = find_frequency(cuisine_stats)
+print(f"Frequencies: {frequencies}")
+
+new_data = insert_frequency(clean_feature_data, frequencies)
+print(f"Frequencies inserted. New data length: {len(new_data)}")
+print(f"Sample: {new_data[:3]}")
+
+# Train model
+print(f"\n{'='*60}")
+print("TRAINING MODEL")
+print(f"{'='*60}")
+
+x_train, x_test, y_train, y_test = train_test_split(new_data, result, test_size=0.2, random_state=42)
+
+print(f"Training set: {len(x_train)}")
+print(f"Test set: {len(x_test)}")
+
+clf = LinearRegression()
+clf.fit(x_train, y_train)
+
+predictions = clf.predict(x_test)
+print(f"\nPredictions (first 10): {predictions[:10]}")
+print(f"Actual (first 10): {y_test[:10]}")
+print(f"Accuracy: {clf.score(x_test, y_test)}")
+
+# VISUALIZATION
+print(f"\n{'='*60}")
+print("CREATING VISUALIZATIONS")
+print(f"{'='*60}")
+
+# Scatter plot
+plt.figure(figsize=(10, 6))
+plt.scatter(range(len(y_test)), y_test, label='Actual', alpha=0.6, color='blue')
+plt.scatter(range(len(predictions)), predictions, label='Predicted', alpha=0.6, color='red')
+plt.axhline(y=0.5, color='green', linestyle='--', label='Decision Boundary (0.5)')
+plt.xlabel('Test Sample Index')
+plt.ylabel('Value')
+plt.title('Predictions vs Actual Values')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+# Confusion matrix
+binary_predictions = [1 if p >= 0.5 else 0 for p in predictions]
+cm = confusion_matrix(y_test, binary_predictions)
+
+plt.figure(figsize=(8, 6))
+plt.imshow(cm, interpolation='nearest', cmap='Blues')
+plt.title('Confusion Matrix')
+plt.colorbar()
+plt.xticks([0, 1], ['Rejected (0)', 'Accepted (1)'])
+plt.yticks([0, 1], ['Rejected (0)', 'Accepted (1)'])
+
+for i in range(2):
+    for j in range(2):
+        plt.text(j, i, str(cm[i, j]), ha='center', va='center', color='red', fontsize=20)
+
+plt.ylabel('Actual')
+plt.xlabel('Predicted')
+plt.tight_layout()
+plt.show()
+
+print(f"\n{'='*60}")
+print("TEST COMPLETE")
+print(f"{'='*60}")

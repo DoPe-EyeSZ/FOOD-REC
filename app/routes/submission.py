@@ -7,7 +7,6 @@ import os
 
 submission = Blueprint("submission", __name__, template_folder="templates")
 
-GOOGLE_API_KEY = os.environ.get("google_api_key")
 
 cuisine_stats = {}
 price_levels = {
@@ -182,7 +181,7 @@ def insert_frequency(data, freq):       #Insert frequency into cleaned data
 
 
 def use_api(lat, lng, max_price, max_distance):
-
+    GOOGLE_API_KEY = os.environ.get("google_api_key")
     url = 'https://places.googleapis.com/v1/places:searchNearby'        #Url for Google Places
 
     distance = round((1609.34 * int(max_distance)), 2)      #Convert from miles to meters
