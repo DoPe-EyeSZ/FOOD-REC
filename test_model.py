@@ -10,7 +10,8 @@ load_dotenv()
 
 
 # Import from your Flask app file
-from app.routes.submission import use_api, extract_api_data, cuisine_stats, remove_id, find_frequency, insert_frequency
+from api import api_function
+cuisine_stats = {}
 
 # SoCal locations with food options (lat, lng, location_name)
 locations = [
@@ -49,11 +50,11 @@ for i in range(len(locations)):
     print(f"Max Distance: {max_distance} miles")
     print(f"{'='*60}")
     
-    response = use_api(lat, lng, None, max_distance)
+    response = api_function.use_api(lat, lng, None, max_distance)
     
     if response.status_code == 200:
         data = response.json()
-        info = extract_api_data(data, cuisine_stats)
+        info = api_function.extract_api_data(data, cuisine_stats)
         feature_data = info[0]
         results = info[1]
         
@@ -80,13 +81,13 @@ print(f"\n{'='*60}")
 print("PROCESSING DATA")
 print(f"{'='*60}")
 
-clean_feature_data = remove_id(all_feature_data)
+clean_feature_data = api_function.remove_id(all_feature_data)
 print(f"IDs removed. Clean data length: {len(clean_feature_data)}")
 
-frequencies = find_frequency(cuisine_stats)
+frequencies = api_function.find_frequency(cuisine_stats)
 print(f"Frequencies: {frequencies}")
 
-new_data = insert_frequency(clean_feature_data, frequencies)
+new_data = api_function.insert_frequency(clean_feature_data, frequencies)
 print(f"Frequencies inserted. New data length: {len(new_data)}")
 print(f"Sample: {new_data[:3]}")
 
