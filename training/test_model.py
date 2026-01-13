@@ -41,7 +41,7 @@ for i in range(len(locations)):
     lat = location[0]
     lng = location[1]
     location_name = location[2]
-    max_distance = 8
+    max_distance = 5
     
     print(f"\n{'='*60}")
     print(f"Loop {i+1}/15: {location_name}")
