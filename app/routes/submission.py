@@ -71,9 +71,9 @@ def extract_api_data(data, cuisine_stats):
         for place in data["places"]:
 
             print(place)
-            print("===============================================")
+            print(f"\n{'='*60}")
             if "generativeSummary" in place:
-                print(f"Summary: {place["generativeSummary"]["overview"]["text"]}")
+                print(f"Summary: {place["generativeSummary"]["overview"]["text"]} \n")
 
             id = place["id"]
 
@@ -81,43 +81,66 @@ def extract_api_data(data, cuisine_stats):
                 rating = place["rating"]
                 rating_count = place["userRatingCount"]
                 print(f"Rating: {rating}")
-                print(f"Rating Count: {rating_count}")
+                print(f"Rating Count: {rating_count}\n")
 
             if "priceLevel" in place:
                 price_level = price_levels.get(place["priceLevel"], 0)
             else:
                 price_level = 0
 
-            print(f"price level: {price_level}")
+            print(f"Price: {price_level} \n")
 
             takeout = 0
             if "takeout" in place:
                 if place["takeout"]:
                     takeout = 1
-                    print(f"Allows Takeout")
+                    print("Allows Takeout")
 
             dineIn = 0
             if "dineIn" in place:
                 if place["dineIn"]:
                     dineIn = 1
-                    print(f"Allows Dine in")
+                    print("Allows Dine in")
 
             vegan = 0
             if "servesVegetarianFood" in place:
                 if place["servesVegetarianFood"]:
                     vegan = 1
-                    print(f"Has Vegitarian Options")
+                    print(f"Has Vegitarian Options \n")
 
             open = 0
             if "currentOpeningHours" in place:
                 if "openNow" in place["currentOpeningHours"]:
                     if place["currentOpeningHours"]["openNow"]:
                         open = 1
-                        print(f"Currently Open")
+                        print(f"Currently Open \n")
+                    else:
+                        print(f"Currently CLOSED \n")
+
+            
+            
+            resturant = [id, rating, rating_count, price_level, takeout, dineIn, vegan, open]
+            
+
+
+            #Updates cuisine stats (accepted/shown)
+            if "primaryType" in place:
+                cuisine = place["primaryType"]
+                print(f"Cuisine: {cuisine}")
+                resturant.append(cuisine)
+                if cuisine in cuisine_stats:
+                    cuisine_stats[cuisine]["shown"] = cuisine_stats[cuisine].get("shown", 0) + 1
+                else:
+                    cuisine_stats[cuisine] = {"shown": 1, "accepted": 0}
+
+                
+
+            
+            information[0].append(resturant)
 
             #TEST PURPOSES---------------------
             print(f"Name: {place["displayName"]["text"]}")
-            answer = input("yes or no to resturant?\n")
+            answer = input("y/n?")
 
             accept = False
 
@@ -125,30 +148,16 @@ def extract_api_data(data, cuisine_stats):
                 accept = True
 
             #-----------------------------
-            
-            resturant = [id, rating, rating_count, price_level, takeout, dineIn, vegan, open]
-            print("----------------------------------------")   #TEST
-
-
-            #Updates cuisine stats (accepted/shown)
-            if "primaryType" in place:
-                cuisine = place["primaryType"]
-                resturant.append(cuisine)
-                if cuisine in cuisine_stats:
-                    cuisine_stats[cuisine]["shown"] = cuisine_stats[cuisine].get("shown", 0) + 1
-                else:
-                    cuisine_stats[cuisine] = {"shown": 1, "accepted": 0}
-
-                if accept:
-                    cuisine_stats[cuisine]["accepted"] = cuisine_stats[cuisine].get("accepted", 0) + 1
-                    information[1].append(1)
-                else:
-                    information[1].append(0)
-
             print(resturant)
-            information[0].append(resturant)
+            print(f"\n{'='*60}")
+
+            if accept:
+                cuisine_stats[cuisine]["accepted"] = cuisine_stats[cuisine].get("accepted", 0) + 1
+                information[1].append(1)
+            else:
+                information[1].append(0)
         
-        #appends drive time to restaurant info
+        #Appends drive time to restaurant info
         for index, value in enumerate(data["routingSummaries"]):
             drive_time = value["legs"][0]["duration"]
             drive_time = drive_time[:len(drive_time)-1]
@@ -179,7 +188,7 @@ def insert_frequency(data, freq):       #Insert frequency into cleaned data
     return data
 
 
-
+#Calls on API and returns data from fieldmask
 def use_api(lat, lng, max_price, max_distance):
     GOOGLE_API_KEY = os.environ.get("google_api_key")
     url = 'https://places.googleapis.com/v1/places:searchNearby'        #Url for Google Places
@@ -220,7 +229,7 @@ def use_api(lat, lng, max_price, max_distance):
     }
 
     params = {
-        "maxResultCount": 20,
+        "maxResultCount": 5,
         "includedPrimaryTypes": ["restaurant"],
         "locationRestriction": {
             "circle": {
