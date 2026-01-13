@@ -41,26 +41,20 @@ def user_submission():
             info = extract_api_data(data, cuisine_stats)        #[[Feature data], [Acceptances/Rejections]]
             all_feature_data = info[0]
             result = info[1]
-            print(f"RESULTS: {result} \n")
 
             clean_feature_data = remove_id(all_feature_data)        #Removes id from index 0
-            print(f"CLEAN DATA: {clean_feature_data} \n")
-
-            print(f"{cuisine_stats} \n")
 
             frequencies = find_frequency(cuisine_stats)     #Calculates ratio of acceptances/rejections
             
-            print(f"FREQUENCIES: {frequencies} \n")
             new_data = insert_frequency(clean_feature_data, frequencies)        #Replaces ratio of accept/reject into clean data
-            print(f"NEW DATA: {new_data} \n")
 
-            '''x_train, x_test, y_train, y_test = train_test_split(clean_feature_data, result, test_size=0.2)
+            x_train, x_test, y_train, y_test = train_test_split(new_data, result, test_size=0.2)
             from sklearn.linear_model import LinearRegression
             clf = LinearRegression()
             clf.fit(x_train, y_train)
             print(clf.predict(x_test))
             print(y_test)
-            print(f"Accuracy: {clf.score(x_test, y_test)}")'''#ML Part
+            print(f"Accuracy: {clf.score(x_test, y_test)}")
             
             return render_template("output.html")
         
