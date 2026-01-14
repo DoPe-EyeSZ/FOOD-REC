@@ -7,7 +7,7 @@ def get_connection(db_name):
     except Exception as e:
         print(f"Error: {e}")
 
-#Creating separate multiple tables
+#Creating Table
 def create_cuisine_table(connection):
     query = f'''
         CREATE TABLE IF NOT EXISTS cuisine(
@@ -23,3 +23,28 @@ def create_cuisine_table(connection):
             connection.execute(query)
     except Exception as e:
         print(f"Error: {e}")
+
+#Add row to table
+def insert_cuisine(connection, cuisine, shown, accepted):
+    query = '''INSERT INTO cuisine (cuisine, shown, accepted) VALUES (?,?,?)'''
+
+    try:
+        with connection:
+            connection.execute(query, (cuisine, shown, accepted))
+    except Exception as e:
+        print(f"Error: {e}")
+
+#Query through all rows
+def fetch_cuisine(connection):
+    query = "SELECT * FROM cuisine"
+
+    try:
+        with connection:
+            rows = connection.execute(query).fetchall()
+            return rows
+    except Exception as e:
+        print(f"Error: {e}")
+
+#Delete row
+def delete_cuisine(connection):
+    query = ""
