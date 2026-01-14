@@ -5,19 +5,16 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 import os
 from dotenv import load_dotenv
+from api import api_function
 
 load_dotenv()
-
-
-# Import from your Flask app file
-from api import api_function
 cuisine_stats = {}
 
 # SoCal locations with food options (lat, lng, location_name)
 locations = [
     (34.0381, -117.8648, "The Village at Walnut"),
     (33.9533, -117.7320, "The Shoppes at Chino Hills"),
-    '''(33.6846, -117.8265, "Irvine Spectrum Center"),
+    (33.6846, -117.8265, "Irvine Spectrum Center"),
     (34.0689, -118.4452, "Century City Westfield"),
     (33.7701, -118.1937, "Long Beach Downtown"),
     (34.1478, -118.1445, "Pasadena Old Town"),
@@ -29,7 +26,7 @@ locations = [
     (33.8303, -118.3416, "Del Amo Fashion Center"),
     (34.1416, -117.9227, "Monrovia Downtown"),
     (33.7175, -117.9542, "The District at Tustin Legacy"),
-    (34.0407, -117.5098, "Victoria Gardens, Rancho Cucamonga")'''
+    (34.0407, -117.5098, "Victoria Gardens, Rancho Cucamonga")
 ]
 
 # Initialize data storage
@@ -45,7 +42,7 @@ for i in range(len(locations)):
     max_distance = 5
     
     print(f"\n{'='*60}")
-    print(f"Loop {i+1}/{len(locations)}5: {location_name}")
+    print(f"Loop {i+1}/{len(locations)}: {location_name}")
     print(f"Coordinates: ({lat}, {lng})")
     print(f"Max Distance: {max_distance} miles")
     print(f"{'='*60}")
@@ -81,15 +78,16 @@ print(f"\n{'='*60}")
 print("PROCESSING DATA")
 print(f"{'='*60}")
 
-clean_feature_data = api_function.remove_id(all_feature_data)
-print(f"IDs removed. Clean data length: {len(clean_feature_data)}")
 
 frequencies = api_function.find_frequency(cuisine_stats)
 print(f"Frequencies: {frequencies}")
 
-new_data = api_function.insert_frequency(clean_feature_data, frequencies)
-print(f"Frequencies inserted. New data length: {len(new_data)}")
-print(f"Sample: {new_data[:3]}")
+update_data = api_function.insert_frequency(all_feature_data, frequencies)
+print(f"Frequencies inserted. New data length: {len(update_data)}")
+print(f"Sample: {update_data[:3]}")
+
+new_data = api_function.remove_nameid(update_data)
+print(new_data)
 
 # Train model
 print(f"\n{'='*60}")

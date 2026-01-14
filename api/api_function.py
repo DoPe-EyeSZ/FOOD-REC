@@ -1,5 +1,6 @@
 import os
 import requests
+import sqlite3
 
 
 price_levels = {
@@ -22,6 +23,7 @@ def extract_api_data(data, cuisine_stats):
                 print(f"Summary: {place["generativeSummary"]["overview"]["text"]} \n")
 
             id = place["id"]
+            name = place["displayName"]["text"]
 
             if "rating" in place:
                 rating = place["rating"]
@@ -65,7 +67,15 @@ def extract_api_data(data, cuisine_stats):
 
             
             
-            resturant = [id, rating, rating_count, price_level, takeout, dineIn, vegan, open]
+            resturant = {"id": id, 
+                         "name": name, 
+                         "rating": rating, 
+                         "rating_count": rating_count, 
+                         "price_level": price_level, 
+                         "takeout":takeout, 
+                         "dineIn": dineIn, 
+                         "vegan": vegan,
+                          "open": open}
             
 
 
@@ -73,7 +83,7 @@ def extract_api_data(data, cuisine_stats):
             if "primaryType" in place:
                 cuisine = place["primaryType"]
                 print(f"Cuisine: {cuisine}")
-                resturant.append(cuisine)
+                resturant["cuisine"] = cuisine
                 if cuisine in cuisine_stats:
                     cuisine_stats[cuisine]["shown"] = cuisine_stats[cuisine].get("shown", 0) + 1
                 else:
@@ -85,7 +95,7 @@ def extract_api_data(data, cuisine_stats):
             information[0].append(resturant)
 
             #TEST PURPOSES---------------------
-            print(f"Name: {place["displayName"]["text"]}")
+            print(f"Name: {name}")
             answer = input("y/n?")
 
             accept = False
@@ -107,32 +117,33 @@ def extract_api_data(data, cuisine_stats):
         for index, value in enumerate(data["routingSummaries"]):
             drive_time = value["legs"][0]["duration"]
             drive_time = drive_time[:len(drive_time)-1]
-            information[0][index].insert(len(information[0][index])-1,int(drive_time))
-            print(information[0])
+            information[0][index]["drive_time"] = int(drive_time)
 
-    #[[ID, Rating, Review Count, Price Level, Takeout, Dinein, Vegan, Open?, Drive, Cuisine], [Accept/Reject]]
+    #[[{ID, Name, Rating, Review Count, Price Level, Takeout, Dinein, Vegan, Open?, Drive, Cuisine}], [Accept/Reject]]
     return information      
 
 
-def remove_id(data):        #Removes resturant ID from feature data to feed to ML
-    for i in range(len(data)):
-        data[i] = data[i][1:]
-    return data
-
-def find_frequency(data):       #Find how often user accept/skips food
-    for cuisine, frequency in data.items():
+def find_frequency(cuisine_dict):       #Find how often user accept/skips food
+    for cuisine, frequency in cuisine_dict.items():
         accepted = frequency["accepted"]
         shown = frequency["shown"]
         frequency = round(float(accepted/shown), 2)
-        data[cuisine] = frequency
-    return data
+        cuisine_dict[cuisine] = frequency
+    return cuisine_dict
 
-def insert_frequency(data, freq):       #Insert frequency into cleaned data
-    for place in data:
-        cuisine = place[-1]
-        place[-1] = freq[cuisine]
+def insert_frequency(feature_data, freq):       #Insert frequency into cleaned data
+    for place_dict in feature_data:
+        cuisine = place_dict["cuisine"]
+        place_dict["cuisine"] = freq[cuisine]
 
-    return data
+    return feature_data
+
+def remove_nameid(feature_data):        #Converts all the values of a restaurant to list; remove name/id
+    clean_data = []
+    for place in feature_data:
+        data = list(place.values())
+        clean_data.append(data[2:])
+    return clean_data
 
 
 #Calls on API and returns data from fieldmask
@@ -176,7 +187,7 @@ def use_api(lat, lng, max_price, max_distance):
     }
 
     params = {
-        "maxResultCount": 5,
+        "maxResultCount": 1,
         "includedPrimaryTypes": ["restaurant"],
         "locationRestriction": {
             "circle": {
