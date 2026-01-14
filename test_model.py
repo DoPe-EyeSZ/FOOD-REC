@@ -52,10 +52,10 @@ for i in range(len(locations)):
     if response.status_code == 200:
         data = response.json()
         info = api_function.extract_api_data(data, cuisine_stats)
-        feature_data = info[0]
+        feature_data = info[0]      
         results = info[1]
         
-        all_feature_data.extend(feature_data)
+        all_feature_data.extend(feature_data)       #Populated into a list of dictionaries
         result.extend(results)
         
         print(f"Retrieved {len(feature_data)} restaurants")
