@@ -62,5 +62,11 @@ def fetch_cuisine(connection, cuisine):
 
 
 #Delete row
-def delete_cuisine(connection):
-    query = "DELETE FROM cuisine WHERE"
+def delete_cuisine(connection, id):
+    query = "DELETE FROM cuisine WHERE id = ?"
+
+    try:
+        with connection:
+            connection.execute(query, (id))
+    except Exception as e:
+        print(f"Error: {e}")
