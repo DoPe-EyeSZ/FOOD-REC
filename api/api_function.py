@@ -1,6 +1,6 @@
 import os
 import requests
-import sqlite3
+from data import cuisine_data, data_functions
 
 
 price_levels = {
@@ -12,8 +12,9 @@ price_levels = {
 }
 
 #Extract important data so it can be easily accessable
-def extract_api_data(data, cuisine_stats):
+def extract_api_data(data, connection):
     if "places" in data:
+        cuisine_data.create_cuisine_table(connection)
         information = [[],[]]
         for place in data["places"]:
 
@@ -84,11 +85,6 @@ def extract_api_data(data, cuisine_stats):
                 cuisine = place["primaryType"]
                 print(f"Cuisine: {cuisine}")
                 resturant["cuisine"] = cuisine
-                if cuisine in cuisine_stats:
-                    cuisine_stats[cuisine]["shown"] = cuisine_stats[cuisine].get("shown", 0) + 1
-                else:
-                    cuisine_stats[cuisine] = {"shown": 1, "accepted": 0}
-
                 
 
             
@@ -108,9 +104,10 @@ def extract_api_data(data, cuisine_stats):
             print(f"\n{'='*60}")
 
             if accept:
-                cuisine_stats[cuisine]["accepted"] = cuisine_stats[cuisine].get("accepted", 0) + 1
+                cuisine_data.update_cuisine_stats(connection, cuisine, 1)
                 information[1].append(1)
             else:
+                cuisine_data.update_cuisine_stats(connection, cuisine, 0)
                 information[1].append(0)
         
         #Appends drive time to restaurant info
@@ -123,12 +120,16 @@ def extract_api_data(data, cuisine_stats):
     return information      
 
 
-def find_frequency(cuisine_dict):       #Find how often user accept/skips food
-    for cuisine, frequency in cuisine_dict.items():
-        accepted = frequency["accepted"]
-        shown = frequency["shown"]
-        frequency = round(float(accepted/shown), 2)
-        cuisine_dict[cuisine] = frequency
+def find_frequency(connection):       #Find how often user accept/skips food
+    cuisine_dict = {}
+    cuisine_stats = cuisine_data.fetch_all_cuisine(connection)
+
+    for cuisine in cuisine_stats:
+        c = cuisine[0]
+        shown = cuisine[1]
+        accepted = cuisine[2]
+        cuisine_dict[c] = float(accepted/shown)
+
     return cuisine_dict
 
 def insert_frequency(feature_data, freq):       #Insert frequency into cleaned data

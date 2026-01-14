@@ -6,9 +6,13 @@ from sklearn.linear_model import LinearRegression
 import os
 from dotenv import load_dotenv
 from api import api_function
+from data import cuisine_data, data_functions
 
 load_dotenv()
 cuisine_stats = {}
+
+connection = data_functions.get_connection("test_data.db")
+cuisine_data.create_cuisine_table(connection)
 
 # SoCal locations with food options (lat, lng, location_name)
 locations = [
@@ -34,7 +38,7 @@ all_feature_data = []
 result = []
 
 # Run 15 API calls
-for i in range(len(locations)):
+for i in range(3):
     location = locations[i]
     lat = location[0]
     lng = location[1]
@@ -51,7 +55,7 @@ for i in range(len(locations)):
     
     if response.status_code == 200:
         data = response.json()
-        info = api_function.extract_api_data(data, cuisine_stats)
+        info = api_function.extract_api_data(data, connection)
         feature_data = info[0]      
         results = info[1]
         
@@ -79,7 +83,7 @@ print("PROCESSING DATA")
 print(f"{'='*60}")
 
 
-frequencies = api_function.find_frequency(cuisine_stats)
+frequencies = api_function.find_frequency(connection)
 print(f"Frequencies: {frequencies}")
 
 update_data = api_function.insert_frequency(all_feature_data, frequencies)
@@ -123,3 +127,6 @@ plt.title('Predictions vs Actual Values')
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.show()
+
+
+connection.close()
