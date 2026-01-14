@@ -10,6 +10,7 @@ def create_restaurant_table(connection):
             take_out INTEGER CHECK (take_out IN (0, 1)),
             vegan_option INTEGER CHECK (vegan_option IN (0, 1)),
             price_level INTEGER CHECK (price_level >=0 AND price_level<=5),
+            cuisine TEXT, 
             name TEXT
         )
     '''
@@ -23,15 +24,15 @@ def create_restaurant_table(connection):
 
 
 #Add restaurnt
-def insert_restaurant(connection, place_id, dine, togo, vegan, price, name):
+def insert_restaurant(connection, place_id, dine, togo, vegan, price, cuisine, name):
     query = '''
-        INSERT INTO restaurants (place_id, dine_in, take_out, vegan_option, price_level, name)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO restaurants (place_id, dine_in, take_out, vegan_option, price_level, cuisine, name)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     '''
 
     try:
         with connection:
-            connection.execute(query, (place_id, dine, togo, vegan, price, name,))
+            connection.execute(query, (place_id, dine, togo, vegan, price, cuisine, name,))
             connection.commit()
     
     except Exception as e:
