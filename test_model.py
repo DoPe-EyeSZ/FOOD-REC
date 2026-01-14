@@ -93,7 +93,7 @@ print(f"Sample: {update_data[:3]}")
 new_data = api_function.remove_nameid(update_data)
 print(new_data)
 
-# Train model
+# ======================================================================Train model
 print(f"\n{'='*60}")
 print("TRAINING MODEL")
 print(f"{'='*60}")
