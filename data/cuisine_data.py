@@ -7,6 +7,7 @@ def get_connection(db_name):
     except Exception as e:
         print(f"Error: {e}")
 
+
 #Creating Table
 def create_cuisine_table(connection):
     query = f'''
@@ -24,6 +25,7 @@ def create_cuisine_table(connection):
     except Exception as e:
         print(f"Error: {e}")
 
+
 #Add row to table
 def insert_cuisine(connection, cuisine, shown, accepted):
     query = '''INSERT INTO cuisine (cuisine, shown, accepted) VALUES (?,?,?)'''
@@ -34,8 +36,9 @@ def insert_cuisine(connection, cuisine, shown, accepted):
     except Exception as e:
         print(f"Error: {e}")
 
+
 #Query through all rows
-def fetch_cuisine(connection):
+def fetch_all_cuisine(connection):
     query = "SELECT * FROM cuisine"
 
     try:
@@ -45,6 +48,19 @@ def fetch_cuisine(connection):
     except Exception as e:
         print(f"Error: {e}")
 
+
+#Query for specific cuisine
+def fetch_cuisine(connection, cuisine):
+    query = "SELECT * FROM cuisine WHERE cuisine = ?"
+
+    try:
+        with connection:
+            return connection.execute(query, (cuisine,)).fetchall()
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+
 #Delete row
 def delete_cuisine(connection):
-    query = ""
+    query = "DELETE FROM cuisine WHERE"
