@@ -57,3 +57,11 @@ def delete_interactions(connection):
     
     except Exception as e:
         print(f"delete_interactions has an error: {e}")
+
+
+#THINGS TO WORK ON
+'''
+1. updating user decision
+2. implement the sql to api
+3. split process of data gathers ----> data refine/traingin
+'''
