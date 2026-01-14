@@ -1,17 +1,10 @@
 import sqlite3
 
-def get_connection(db_name):
-    try:
-        path = "instance/" + db_name
-        return sqlite3.connect(path)
-    except Exception as e:
-        print(f"Error: {e}")
-
 
 #Creating Table
 def create_cuisine_table(connection):
     query = f'''
-        CREATE TABLE IF NOT EXISTS cuisine(
+        CREATE TABLE IF NOT EXISTS cuisines(
             id INTEGER PRIMARY KEY,
             cuisine TEXT,
             shown INTEGER,
@@ -28,7 +21,7 @@ def create_cuisine_table(connection):
 
 #Add row to table
 def insert_cuisine(connection, cuisine, shown, accepted):
-    query = '''INSERT INTO cuisine (cuisine, shown, accepted) VALUES (?,?,?)'''
+    query = '''INSERT INTO cuisines (cuisine, shown, accepted) VALUES (?,?,?)'''
 
     try:
         with connection:
@@ -37,9 +30,20 @@ def insert_cuisine(connection, cuisine, shown, accepted):
         print(f"Error: {e}")
 
 
+def insert_cuisines(connection, cuisine_list):
+    query = "INSERT INTO cuisines (cuisine, shown, accepted) VALUES (?,?,?)"
+
+    try:
+        with connection:
+            connection.executemany(query, cuisine_list)
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+
 #Query through all rows
 def fetch_all_cuisine(connection):
-    query = "SELECT * FROM cuisine"
+    query = "SELECT * FROM cuisines"
 
     try:
         with connection:
@@ -51,7 +55,7 @@ def fetch_all_cuisine(connection):
 
 #Query for specific cuisine
 def fetch_cuisine(connection, cuisine):
-    query = "SELECT * FROM cuisine WHERE cuisine = ?"
+    query = "SELECT * FROM cuisines WHERE cuisine = ?"
 
     try:
         with connection:
@@ -60,13 +64,23 @@ def fetch_cuisine(connection, cuisine):
         print(f"Error: {e}")
 
 
-
 #Delete row
 def delete_cuisine(connection, id):
-    query = "DELETE FROM cuisine WHERE id = ?"
+    query = "DELETE FROM cuisines WHERE id = ?"
 
     try:
         with connection:
-            connection.execute(query, (id))
+            connection.execute(query, (id,))
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+#Upadating information
+def update(connection, cuisine, shown, accept):
+    query = "UPDATE cuisines SET shown = shown + ?, accept = accept + ? WHERE cuisine = ?"
+
+    try:
+        with connection:
+            connection.execute(query, (shown, accept, cuisine))
     except Exception as e:
         print(f"Error: {e}")
