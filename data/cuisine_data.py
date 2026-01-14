@@ -77,6 +77,18 @@ def delete_cuisine(connection, id):
         print(f"delete_cuisine has an error: {e}")
 
 
+def delete_cuisines(connection):
+    query = "DELETE FROM cuisines"
+
+    try:
+        with connection:
+            connection.execute(query)
+            connection.commit()
+
+    except Exception as e:
+        print(f"delete_cuisines has an error: {e}")
+
+
 #Upadating information
 def update_cuisine_stats(connection, cuisine, accepted):
     query = '''
