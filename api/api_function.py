@@ -108,8 +108,10 @@ def extract_api_data(data, cuisine_stats):
             drive_time = value["legs"][0]["duration"]
             drive_time = drive_time[:len(drive_time)-1]
             information[0][index].insert(len(information[0][index])-1,int(drive_time))
+            print(information[0])
 
-    return information      #[[id, rating, num ratings, price level, takeout, dinein, vegan option, open, drive time], [accept/rejection]]
+    #[[ID, Rating, Review Count, Price Level, Takeout, Dinein, Vegan, Open?, Drive, Cuisine], [Accept/Reject]]
+    return information      
 
 
 def remove_id(data):        #Removes resturant ID from feature data to feed to ML

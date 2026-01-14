@@ -17,7 +17,7 @@ cuisine_stats = {}
 locations = [
     (34.0381, -117.8648, "The Village at Walnut"),
     (33.9533, -117.7320, "The Shoppes at Chino Hills"),
-    (33.6846, -117.8265, "Irvine Spectrum Center"),
+    '''(33.6846, -117.8265, "Irvine Spectrum Center"),
     (34.0689, -118.4452, "Century City Westfield"),
     (33.7701, -118.1937, "Long Beach Downtown"),
     (34.1478, -118.1445, "Pasadena Old Town"),
@@ -29,7 +29,7 @@ locations = [
     (33.8303, -118.3416, "Del Amo Fashion Center"),
     (34.1416, -117.9227, "Monrovia Downtown"),
     (33.7175, -117.9542, "The District at Tustin Legacy"),
-    (34.0407, -117.5098, "Victoria Gardens, Rancho Cucamonga")
+    (34.0407, -117.5098, "Victoria Gardens, Rancho Cucamonga")'''
 ]
 
 # Initialize data storage
@@ -45,7 +45,7 @@ for i in range(len(locations)):
     max_distance = 5
     
     print(f"\n{'='*60}")
-    print(f"Loop {i+1}/15: {location_name}")
+    print(f"Loop {i+1}/{len(locations)}5: {location_name}")
     print(f"Coordinates: ({lat}, {lng})")
     print(f"Max Distance: {max_distance} miles")
     print(f"{'='*60}")
