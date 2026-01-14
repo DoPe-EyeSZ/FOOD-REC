@@ -70,6 +70,8 @@ for i in range(3):
     if i < 14:
         time.sleep(1)
 
+
+#=======================================Refine/cleaning data
 print(f"\n{'='*60}")
 print(f"DATA COLLECTION COMPLETE")
 print(f"{'='*60}")
