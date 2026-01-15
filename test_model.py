@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 import os
 from dotenv import load_dotenv
 from api import api_function
-from data import cuisine_data, data_functions
+from data import cuisine_data, data_functions, user_data, restaurant_data, interact_data
 
 load_dotenv()
 cuisine_stats = {}
@@ -84,8 +84,11 @@ print(f"\n{'='*60}")
 print("PROCESSING DATA")
 print(f"{'='*60}")
 
+print(f"INTERACTIONS: {interact_data.fetch_interactions(connection)}")
+print(f"CUISINE: {cuisine_data.fetch_all_cuisine(connection)}")
+print(f"RESTAURANTS: {restaurant_data.fetch_restaurants(connection)}")
 
-frequencies = api_function.find_frequency(connection)
+'''frequencies = api_function.find_frequency(connection)
 print(f"Frequencies: {frequencies}")
 
 update_data = api_function.insert_frequency(all_feature_data, frequencies)
@@ -129,6 +132,6 @@ plt.title('Predictions vs Actual Values')
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.show()
-
+'''
 
 connection.close()

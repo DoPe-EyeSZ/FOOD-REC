@@ -17,7 +17,6 @@ def create_restaurant_table(connection):
     try:
         with connection:
             connection.execute(query)
-            connection.commit()
 
     except Exception as e:
         print(f"create_restaurant_table has an error: {e}")
@@ -28,12 +27,26 @@ def insert_restaurant(connection, place_id, dine, togo, vegan, price, cuisine, n
     query = '''
         INSERT INTO restaurants (place_id, dine_in, take_out, vegan_option, price_level, cuisine, name)
         VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(place_id)
+        DO UPDATE SET
+            dine_in = excluded.dine_in,
+            take_out = excluded.take_out,
+            vegan_option = excluded.vegan_option,
+            price_level = excluded.price_level,
+            cuisine = excluded.cuisine,
+            name = excluded.name
+        WHERE
+            dine_in IS NOT excluded.dine_in
+            OR take_out IS NOT excluded.take_out
+            OR vegan_option IS NOT excluded.vegan_option
+            OR price_level IS NOT excluded.price_level
+            OR cuisine IS NOT excluded.cuisine
+            OR name IS NOT excluded.name;
     '''
 
     try:
         with connection:
             connection.execute(query, (place_id, dine, togo, vegan, price, cuisine, name,))
-            connection.commit()
     
     except Exception as e:
         print(f"insert_restaurant has an error: {e}")
@@ -48,7 +61,6 @@ def delete_restaurant(connection, place_id):
     try:
         with connection:
             connection.execute(query, (place_id,))
-            connection.commit()
 
     except Exception as e:
         print(f"delete_restaurant has an error: {e}")
@@ -62,7 +74,6 @@ def delete_restaurants(connection):
     try:
         with connection:
             connection.execute(query)
-            connection.commit()
 
     except Exception as e:
         print(f"delete_restaurant has an error: {e}")
@@ -71,7 +82,7 @@ def delete_restaurants(connection):
 #Retrieving restaurant
 def fetch_restaurant(connection, place_id):
     query = '''
-        SELECT FROM restaurants WHERE place_id = ?
+        SELECT * FROM restaurants WHERE place_id = ?
     '''
 
     try:

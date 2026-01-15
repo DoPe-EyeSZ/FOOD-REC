@@ -1,6 +1,6 @@
 import os
 import requests
-from data import cuisine_data, data_functions
+from data import cuisine_data, interact_data, restaurant_data
 
 
 price_levels = {
@@ -14,11 +14,15 @@ price_levels = {
 #Extract important data so it can be easily accessable
 def extract_api_data(data, connection):
     if "places" in data:
+
+        #Creating the tables 
         cuisine_data.create_cuisine_table(connection)
+        restaurant_data.create_restaurant_table(connection)
+        interact_data.create_interact_table(connection)
+
         information = [[],[]]
         for place in data["places"]:
 
-            print(place)
             print(f"\n{'='*60}")
             if "generativeSummary" in place:
                 print(f"Summary: {place["generativeSummary"]["overview"]["text"]} \n")
@@ -86,7 +90,15 @@ def extract_api_data(data, connection):
                 print(f"Cuisine: {cuisine}")
                 resturant["cuisine"] = cuisine
                 
-
+            #Add information to restaurnt table
+            restaurant_data.insert_restaurant(connection, 
+                                              resturant["id"], 
+                                              resturant["dineIn"], 
+                                              resturant["takeout"], 
+                                              resturant["vegan"], 
+                                              resturant["price_level"], 
+                                              resturant["cuisine"], 
+                                              resturant["name"])
             
             information[0].append(resturant)
 
@@ -116,6 +128,19 @@ def extract_api_data(data, connection):
             drive_time = drive_time[:len(drive_time)-1]
             information[0][index]["drive_time"] = int(drive_time)
 
+        #Add data to interaction db table
+        features = information[0][0]
+        response = information[1][0]
+        interact_data.insert_interaction(connection,
+                                         features["id"],
+                                         features["rating"],
+                                         features["rating_count"],
+                                         features["open"],
+                                         features["drive_time"],
+                                         response)
+
+
+
     #[[{ID, Name, Rating, Review Count, Price Level, Takeout, Dinein, Vegan, Open?, Drive, Cuisine}], [Accept/Reject]]
     return information      
 
@@ -128,7 +153,7 @@ def find_frequency(connection):       #Find how often user accept/skips food
         c = cuisine[0]
         shown = cuisine[1]
         accepted = cuisine[2]
-        cuisine_dict[c] = float(accepted/shown)
+        cuisine_dict[c] = float(float(accepted)/float(shown))
 
     return cuisine_dict
 
