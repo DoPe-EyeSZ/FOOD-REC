@@ -150,9 +150,9 @@ def find_frequency(connection):       #Find how often user accept/skips food
     cuisine_stats = cuisine_data.fetch_all_cuisine(connection)
 
     for cuisine in cuisine_stats:
-        c = cuisine[0]
-        shown = cuisine[1]
-        accepted = cuisine[2]
+        c = cuisine[1]
+        shown = cuisine[2]
+        accepted = cuisine[3]
         cuisine_dict[c] = float(float(accepted)/float(shown))
 
     return cuisine_dict

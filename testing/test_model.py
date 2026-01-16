@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 import os
 from dotenv import load_dotenv
-from api import api_function
+from ..api import api_function
 from data import cuisine_data, data_functions, user_data, restaurant_data, interact_data
 
 load_dotenv()
@@ -38,7 +38,7 @@ all_feature_data = []
 result = []
 
 # Run 15 API calls
-for i in range(3):
+for i in range(len(locations)):
     location = locations[i]
     lat = location[0]
     lng = location[1]
@@ -88,9 +88,11 @@ print(f"INTERACTIONS: {interact_data.fetch_interactions(connection)}")
 print(f"CUISINE: {cuisine_data.fetch_all_cuisine(connection)}")
 print(f"RESTAURANTS: {restaurant_data.fetch_restaurants(connection)}")
 
-'''frequencies = api_function.find_frequency(connection)
+frequencies = api_function.find_frequency(connection)
 print(f"Frequencies: {frequencies}")
 
+
+'''
 update_data = api_function.insert_frequency(all_feature_data, frequencies)
 print(f"Frequencies inserted. New data length: {len(update_data)}")
 print(f"Sample: {update_data[:3]}")
