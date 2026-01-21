@@ -89,12 +89,13 @@ print(f"\n{'='*60}")
 print("PROCESSING DATA")
 print(f"{'='*60}")
 
-print(f"INTERACTIONS: {interact_data.fetch_interactions(connection)[0]}")
-print(f"CUISINE: {cuisine_data.fetch_all_cuisine(connection)[0]}")
-print(f"RESTAURANTS: {restaurant_data.fetch_restaurants(connection)[0]}")
+print(data_functions.join_interaction_restaurant(connection))
+#print(f"INTERACTIONS: {interact_data.fetch_interactions(connection)[0]}")
+#print(f"CUISINE: {cuisine_data.fetch_all_cuisine(connection)[0]}")
+#print(f"RESTAURANTS: {restaurant_data.fetch_restaurants(connection)[0]}")
 
-frequencies = api_function.find_frequency(connection)
-print(f"Frequencies: {frequencies}")
+#frequencies = api_function.find_frequency(connection)
+#print(f"Frequencies: {frequencies}")
 
 
 '''
