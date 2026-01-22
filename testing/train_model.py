@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
 
 import sys
 from pathlib import Path
@@ -11,41 +11,35 @@ from data import cuisine_data, data_functions, user_data, restaurant_data, inter
 
 connection = data_functions.get_connection("test_data.db")
 
+print(f"{interact_data.fetch_interactions(connection)} \n")
+print(f"{restaurant_data.fetch_restaurants(connection)} \n")
+
+'''#Gathers needed data
 feature_data = data_functions.join_interaction_restaurant(connection)
 frequency = api_function.find_frequency(connection)
 
+#Separates feature data from user response
 features, response = api_function.insert_frequency(feature_data, frequency)
 
-print(f"FEATURE DATA: {features} \n")
-print(f"UPDATED DATA: {response} \n")
-print(f"FREQUENCY DATA: {frequency} \n")
+#Creating test data/ model
+x_train, x_test, y_train, y_test = train_test_split(features, response, test_size=0.2, random_state=42)
+
+model = LogisticRegression()
+
+model.fit(x_train, y_train)
+
+prediction = model.predict(x_test)
+
+score = model.score(x_test, y_test)
+
+print(x_test, y_test)
+print(prediction)
+print(score)'''
 
 
 '''
-update_data = api_function.insert_frequency(all_feature_data, frequencies)
-print(f"Frequencies inserted. New data length: {len(update_data)}")
-print(f"Sample: {update_data[:3]}")
 
-new_data = api_function.remove_nameid(update_data)
-print(new_data)
 
-# ======================================================================Train model
-print(f"\n{'='*60}")
-print("TRAINING MODEL")
-print(f"{'='*60}")
-
-x_train, x_test, y_train, y_test = train_test_split(new_data, result, test_size=0.1, random_state=42)
-
-print(f"Training set: {len(x_train)}")
-print(f"Test set: {len(x_test)}")
-
-clf = LinearRegression()
-clf.fit(x_train, y_train)
-
-predictions = clf.predict(x_test)
-print(f"\nPredictions (first 10): {predictions[:10]}")
-print(f"Actual (first 10): {y_test[:10]}")
-print(f"Accuracy: {clf.score(x_test, y_test)}")
 
 # VISUALIZATION
 print(f"\n{'='*60}")

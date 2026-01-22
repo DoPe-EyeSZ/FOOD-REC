@@ -79,10 +79,4 @@ print(f"{'='*60}")
 print(f"Total restaurants: {len(all_feature_data)}")
 print(f"Total results: {len(result)}")
 
-# Process data
-print(f"\n{'='*60}")
-print("PROCESSING DATA")
-print(f"{'='*60}")
-
-
 connection.close()

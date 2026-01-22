@@ -171,6 +171,7 @@ def insert_frequency(feature_data, freq_dict):       #Insert frequency into clea
 
     return features, user_response
 
+
 def remove_nameid(feature_data):        #Converts all the values of a restaurant to list; remove name/id
     clean_data = []
     for place in feature_data:
