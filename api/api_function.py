@@ -157,12 +157,19 @@ def find_frequency(connection):       #Find how often user accept/skips food
 
     return cuisine_dict
 
-def insert_frequency(feature_data, freq):       #Insert frequency into cleaned data
-    for place_dict in feature_data:
-        cuisine = place_dict["cuisine"]
-        place_dict["cuisine"] = freq[cuisine]
+def insert_frequency(feature_data, freq_dict):       #Insert frequency into cleaned data
+    features = []
+    user_response = []
 
-    return feature_data
+    for place in feature_data:
+        restaurant = list(place)
+
+        #Replaces cuisine w frequency
+        restaurant[4] = freq_dict[restaurant[4]]        
+        features.append(restaurant[:len(restaurant)-1])
+        user_response.append(restaurant[-1])
+
+    return features, user_response
 
 def remove_nameid(feature_data):        #Converts all the values of a restaurant to list; remove name/id
     clean_data = []
