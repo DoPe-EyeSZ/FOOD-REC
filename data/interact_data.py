@@ -37,6 +37,7 @@ def insert_interaction(connection, place_id, rating, rating_count, is_open, driv
     try:
         with connection:
             connection.execute(query, (user_id, place_id, rating, rating_count, is_open, drive_time, accepted))
+            print("INSERTED")
 
     except Exception as e:
         print(f"insert_interaction has an error: {e}")

@@ -11,8 +11,16 @@ from data import cuisine_data, data_functions, user_data, restaurant_data, inter
 
 connection = data_functions.get_connection("test_data.db")
 
-print(f"{interact_data.fetch_interactions(connection)} \n")
-print(f"{restaurant_data.fetch_restaurants(connection)} \n")
+print(f"Cuisine: {cuisine_data.fetch_all_cuisine(connection)}")
+print(f"Total Cuisine: {len(cuisine_data.fetch_all_cuisine(connection))} \n")
+
+
+print(f"Interaction: {interact_data.fetch_interactions(connection)}")
+print(f"Total Interaction: {len(interact_data.fetch_interactions(connection))} \n")
+
+
+print(f"Restaurant: {restaurant_data.fetch_restaurants(connection)}")
+print(f"Total restaurants: {len(restaurant_data.fetch_restaurants(connection))} \n")
 
 '''#Gathers needed data
 feature_data = data_functions.join_interaction_restaurant(connection)

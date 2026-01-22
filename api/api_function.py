@@ -80,7 +80,7 @@ def extract_api_data(data, connection):
                          "takeout":takeout, 
                          "dineIn": dineIn, 
                          "vegan": vegan,
-                          "open": open}
+                         "is_open": open}
             
 
 
@@ -99,7 +99,6 @@ def extract_api_data(data, connection):
                                               resturant["price_level"], 
                                               resturant["cuisine"], 
                                               resturant["name"])
-            
             information[0].append(resturant)
 
             #TEST PURPOSES---------------------
@@ -129,15 +128,20 @@ def extract_api_data(data, connection):
             information[0][index]["drive_time"] = int(drive_time)
 
         #Add data to interaction db table
-        features = information[0][0]
-        response = information[1][0]
-        interact_data.insert_interaction(connection,
-                                         features["id"],
-                                         features["rating"],
-                                         features["rating_count"],
-                                         features["open"],
-                                         features["drive_time"],
-                                         response)
+        features = information[0]
+        responses = information[1]
+
+        for i in range(len(features)):
+            response = responses[i]
+            feature = features[i]
+
+            interact_data.insert_interaction(connection,
+                                                feature["id"],
+                                                feature["rating"],
+                                                feature["rating_count"],
+                                                feature["is_open"],
+                                                feature["drive_time"],
+                                                response)
 
 
 
@@ -221,7 +225,7 @@ def use_api(lat, lng, max_price, max_distance):
     }
 
     params = {
-        "maxResultCount": 1,
+        "maxResultCount": 2,
         "includedPrimaryTypes": ["restaurant"],
         "locationRestriction": {
             "circle": {

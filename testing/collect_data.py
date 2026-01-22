@@ -63,13 +63,9 @@ for i in range(len(locations)):
         all_feature_data.extend(feature_data)       #Populated into a list of dictionaries
         result.extend(results)
         
-        print(f"Retrieved {len(feature_data)} restaurants")
-        print(f"Feature data sample: {feature_data[:2]}")
     else:
         print(f"ERROR {response.status_code}: {response.text}")
     
-    if i < 14:
-        time.sleep(1)
 
 
 #=======================================Refine/cleaning data
@@ -78,5 +74,18 @@ print(f"DATA COLLECTION COMPLETE")
 print(f"{'='*60}")
 print(f"Total restaurants: {len(all_feature_data)}")
 print(f"Total results: {len(result)}")
+
+print(f"Cuisine: {cuisine_data.fetch_all_cuisine(connection)}")
+#print(f"Total Cuisine: {len(cuisine_data.fetch_all_cuisine(connection))} \n")
+
+
+#print(f"Interaction: {interact_data.fetch_interactions(connection)}")
+
+print(f"Total Interaction: {len(interact_data.fetch_interactions(connection))} \n")
+
+
+print(f"Restaurant: {restaurant_data.fetch_restaurants(connection)}")
+print(f"Total restaurants: {len(restaurant_data.fetch_restaurants(connection))} \n")
+
 
 connection.close()

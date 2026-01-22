@@ -47,6 +47,7 @@ def insert_restaurant(connection, place_id, dine, togo, vegan, price, cuisine, n
     try:
         with connection:
             connection.execute(query, (place_id, dine, togo, vegan, price, cuisine, name,))
+            print("RRESTAURANT")
     
     except Exception as e:
         print(f"insert_restaurant has an error: {e}")
