@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 
 import matplotlib.pyplot as plt
@@ -41,7 +42,7 @@ scaler = StandardScaler()
 x_train_scaled = scaler.fit_transform(x_train)
 x_test_scaled = scaler.transform(x_test)
 
-model = LogisticRegression()
+model = RandomForestClassifier(n_estimators= 100, random_state=42)        #LogisticRegression()
 
 model.fit(x_train_scaled, y_train)
 

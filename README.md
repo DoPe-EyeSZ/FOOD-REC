@@ -9,7 +9,27 @@ challenges:
    - i used a linear regression when logistic regression was best
    - data was inconsisent (didnt have a way to store data)
 
-   --> now accuracy is 0.72
+   --> now accuracy is 0.7166666666666667
          - using logistic regression
          - scaled data so drivetime/rating are within reasonable range
          - store data now
+
+current issues (1/23/26)
+* abiguity to data
+   - some restaurants dont have cuisine labels so they are classified as "restaurants"
+
+   SOLUTION: use AI api to auto classify (if finaically feasible)
+
+* lack of feature data
+   - users tend to pick restaurnts based off pictures --> hard encode pictures
+   - only collected 300 data points, the more the better
+   - lowk rushed the decision making process (had to iterate 300 restaurnts so prolly a little tired)
+
+* using logistsc regression
+   - fits use case, but maybe better model like random forrest????
+      - random forrest good for complex relationships with features (rating, rating count, drive time)
+
+
+
+update (1/23/26)
+- random forrest has better accuracy of 0.7666666666666667
