@@ -111,7 +111,6 @@ def extract_api_data(data, connection):
                 accept = True
 
             #-----------------------------
-            print(resturant)
             print(f"\n{'='*60}")
 
             if accept:
@@ -225,7 +224,7 @@ def use_api(lat, lng, max_price, max_distance):
     }
 
     params = {
-        "maxResultCount": 2,
+        "maxResultCount": 20,
         "includedPrimaryTypes": ["restaurant"],
         "locationRestriction": {
             "circle": {

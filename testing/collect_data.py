@@ -17,9 +17,7 @@ connection = data_functions.get_connection("test_data.db")
 
 # SoCal locations with food options (lat, lng, location_name)
 locations = [
-    (34.0381, -117.8648, "The Village at Walnut"),
-    (33.9533, -117.7320, "The Shoppes at Chino Hills"),
-    (33.6846, -117.8265, "Irvine Spectrum Center"),
+    
     (34.0689, -118.4452, "Century City Westfield"),
     (33.7701, -118.1937, "Long Beach Downtown"),
     (34.1478, -118.1445, "Pasadena Old Town"),
