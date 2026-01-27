@@ -23,9 +23,9 @@ def extract_api_data(data, connection):
         information = [[],[]]
         for place in data["places"]:
 
-            print(f"\n{'='*60}")
-            if "generativeSummary" in place:
-                print(f"Summary: {place["generativeSummary"]["overview"]["text"]} \n")
+            #print(f"\n{'='*60}")
+            #if "generativeSummary" in place:
+                #print(f"Summary: {place["generativeSummary"]["overview"]["text"]} \n")
 
             id = place["id"]
             name = place["displayName"]["text"]
@@ -33,42 +33,43 @@ def extract_api_data(data, connection):
             if "rating" in place:
                 rating = place["rating"]
                 rating_count = place["userRatingCount"]
-                print(f"Rating: {rating}")
-                print(f"Rating Count: {rating_count}\n")
+                #print(f"Rating: {rating}")
+                #print(f"Rating Count: {rating_count}\n")
 
             if "priceLevel" in place:
                 price_level = price_levels.get(place["priceLevel"], 0)
             else:
                 price_level = 0
 
-            print(f"Price: {price_level} \n")
+            #print(f"Price: {price_level} \n")
 
             takeout = 0
             if "takeout" in place:
                 if place["takeout"]:
                     takeout = 1
-                    print("Allows Takeout")
+                    #print("Allows Takeout")
 
             dineIn = 0
             if "dineIn" in place:
                 if place["dineIn"]:
                     dineIn = 1
-                    print("Allows Dine in")
+                    #print("Allows Dine in")
 
             vegan = 0
             if "servesVegetarianFood" in place:
                 if place["servesVegetarianFood"]:
                     vegan = 1
-                    print(f"Has Vegitarian Options \n")
+                    #print(f"Has Vegitarian Options \n")
 
             open = 0
             if "currentOpeningHours" in place:
                 if "openNow" in place["currentOpeningHours"]:
                     if place["currentOpeningHours"]["openNow"]:
                         open = 1
-                        print(f"Currently Open \n")
+                        #print(f"Currently Open \n")
                     else:
-                        print(f"Currently CLOSED \n")
+                        None
+                        #print(f"Currently CLOSED \n")
 
             
             
@@ -87,10 +88,10 @@ def extract_api_data(data, connection):
             #Updates cuisine stats (accepted/shown)
             if "primaryType" in place:
                 cuisine = place["primaryType"]
-                print(f"Cuisine: {cuisine}")
+                #print(f"Cuisine: {cuisine}")
                 resturant["cuisine"] = cuisine
                 
-            #Add information to restaurnt table
+            '''#Add information to restaurnt table
             restaurant_data.insert_restaurant(connection, 
                                               resturant["id"], 
                                               resturant["dineIn"], 
@@ -98,11 +99,11 @@ def extract_api_data(data, connection):
                                               resturant["vegan"], 
                                               resturant["price_level"], 
                                               resturant["cuisine"], 
-                                              resturant["name"])
+                                              resturant["name"])'''
             information[0].append(resturant)
 
             #TEST PURPOSES---------------------
-            print(f"Name: {name}")
+            '''print(f"Name: {name}")
             answer = input("y/n?")
 
             accept = False
@@ -118,7 +119,7 @@ def extract_api_data(data, connection):
                 information[1].append(1)
             else:
                 cuisine_data.update_cuisine_stats(connection, cuisine, 0)
-                information[1].append(0)
+                information[1].append(0)'''
         
         #Appends drive time to restaurant info
         for index, value in enumerate(data["routingSummaries"]):
@@ -126,7 +127,7 @@ def extract_api_data(data, connection):
             drive_time = drive_time[:len(drive_time)-1]
             information[0][index]["drive_time"] = int(drive_time)
 
-        #Add data to interaction db table
+        '''#Add data to interaction db table
         features = information[0]
         responses = information[1]
 
@@ -140,7 +141,7 @@ def extract_api_data(data, connection):
                                                 feature["rating_count"],
                                                 feature["is_open"],
                                                 feature["drive_time"],
-                                                response)
+                                                response)'''
 
 
 
@@ -184,7 +185,7 @@ def remove_nameid(feature_data):        #Converts all the values of a restaurant
 
 
 #Calls on API and returns data from fieldmask
-def use_api(lat, lng, max_price, max_distance):
+def use_api(lat, lng, max_distance):
     GOOGLE_API_KEY = os.environ.get("google_api_key")
     url = 'https://places.googleapis.com/v1/places:searchNearby'        #Url for Google Places
 

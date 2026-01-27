@@ -64,7 +64,7 @@ for i in range(len(locations2)):
     print(f"Max Distance: {max_distance} miles")
     print(f"{'='*60}")
     
-    response = api_function.use_api(lat, lng, None, max_distance)
+    response = api_function.use_api(lat, lng, max_distance)
     
     if response.status_code == 200:
         data = response.json()

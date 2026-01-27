@@ -43,6 +43,20 @@ update (1/26/26)
    - model is accurate and consistent for the most part across 5 different test sets
 
 
+update (1/27/26)
+- reverted back to logistic regression bc model did 20% better in training vs testing (overfitting)
+- accuracy is not 76 percent after reverting back to logistic
+- performed feature importance (everything accurate except drive time but i didnt look at drive time)
+   - importance will correct itself
+
+- real world simulation proves to be tough
+- most of function saves data to sql db
+   - but simulation doesn not require that so i had to comment out a lot of stuff
+- data collection phase was tailored for training so i had to provide my response
+   - had to create function that collects feature data without response bc i cannot use join function
+
+
+
 
 skills:
 - cross validation to test model accuracy

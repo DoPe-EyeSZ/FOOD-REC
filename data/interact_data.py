@@ -13,7 +13,7 @@ def create_interact_table(connection):
             rating_count INTEGER,
             is_open INTEGER CHECK (is_open IN (0, 1)),
             drive_time INTEGER,
-            accepted INTEGER DEFAULT 0 CHECK(accepted IN (0, 1)),
+            accepted INTEGER CHECK(accepted IN (0, 1)),
             FOREIGN KEY (place_id) REFERENCES restaurants(place_id)
     
         )
