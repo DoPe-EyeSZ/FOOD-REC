@@ -17,6 +17,7 @@ challenges:
 current issues (1/23/26)
 * abiguity to data
    - some restaurants dont have cuisine labels so they are classified as "restaurants"
+   - chinese restaurts can be seen more so can lead to smaller acceptance ratio than french restaurnt that is seen less often    (chiense 50/55 vs. french 2/2    french>chinese)
 
    SOLUTION: use AI api to auto classify (if finaically feasible)
 

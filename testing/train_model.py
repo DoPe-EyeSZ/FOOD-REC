@@ -55,6 +55,20 @@ print(prediction)
 print(score)
 
 
+#Finding importance of features
+print(f"\n{'='*60}")
+print("FEATURE IMPORTANCE")
+print(f"{'='*60}")
+
+feature_names = ["dine_in", "takeout", "vegan", "price", "cuisine_ratio", "rating", "rating_count", "open", "drive"]
+
+importance = model.feature_importances_
+
+for name, importance in zip(feature_names, importance):
+    bar = '█' * int(importance * 100)
+    print(f"{name:15} {importance:.3f} {bar}")
+
+
 # VISUALIZATION
 print(f"\n{'='*60}")
 print("CREATING VISUALIZATIONS")
