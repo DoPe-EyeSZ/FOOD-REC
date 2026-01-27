@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
@@ -42,7 +42,7 @@ scaler = StandardScaler()
 x_train_scaled = scaler.fit_transform(x_train)
 x_test_scaled = scaler.transform(x_test)
 
-model = RandomForestClassifier(n_estimators= 100, random_state=42)        #LogisticRegression()
+model = LogisticRegression(max_iter=1000, C=1.0)        #LogisticRegression()
 
 model.fit(x_train_scaled, y_train)
 
@@ -54,8 +54,22 @@ score = model.score(x_test_scaled, y_test)
 print(prediction)
 print(score)
 
+# Cross Validation
+scaler2 = StandardScaler()
+all_x_scaled = scaler2.fit_transform(features)
+cv_scores = cross_val_score(model, all_x_scaled, response, cv=5)
+print(cv_scores)
 
-#Finding importance of features
+# Class balance
+print(f"Accepted: {sum(response)/len(response):.1%}")
+
+# Overfitting check
+train_score = model.score(x_train_scaled, y_train)
+test_score = model.score(x_test_scaled, y_test)
+print(f"Train: {train_score:.1%}, Test: {test_score:.1%}, Diff: {abs(train_score-test_score):.1%}")
+
+
+'''#Finding importance of features
 print(f"\n{'='*60}")
 print("FEATURE IMPORTANCE")
 print(f"{'='*60}")
@@ -66,7 +80,7 @@ importance = model.feature_importances_
 
 for name, importance in zip(feature_names, importance):
     bar = '█' * int(importance * 100)
-    print(f"{name:15} {importance:.3f} {bar}")
+    print(f"{name:15} {importance:.3f} {bar}")'''
 
 
 # VISUALIZATION

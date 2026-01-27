@@ -34,3 +34,19 @@ current issues (1/23/26)
 
 update (1/23/26)
 - random forrest has better accuracy of 0.7666666666666667
+
+
+update (1/26/26)
+- accuracy is now 0.79 after adding 200 more data sets
+- gonna use cross validation to test model accuracy so i dont gotta split data manually
+- cross validation results: [0.76 0.8  0.76 0.79 0.84]
+   - model is accurate and consistent for the most part across 5 different test sets
+
+
+
+skills:
+- cross validation to test model accuracy
+- data scaling to allow feature data to be within a reasonable range
+- encoded feature data
+- stored data into a sqlite db for testing
+- trained/test model on 500 data sets
