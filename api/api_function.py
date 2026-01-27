@@ -225,7 +225,7 @@ def use_api(lat, lng, max_price, max_distance):
 
     params = {
         "maxResultCount": 20,
-        "includedPrimaryTypes": ["restaurant"],
+        "includedPrimaryTypes": ["restaurant", "cafe", "bar", "fast_food_restaurant", "coffee_shop"],
         "locationRestriction": {
             "circle": {
             "center": {"latitude": str(lat), "longitude": str(lng)},
