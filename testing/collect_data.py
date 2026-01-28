@@ -48,18 +48,18 @@ locations2 = [
 
 # Initialize data storage
 all_feature_data = []
-result = []
+results = []
 
 # Run 15 API calls
-for i in range(len(locations2)):
-    location = locations2[i]
+for i in range(len(locations1)):
+    location = locations1[i]
     lat = location[0]
     lng = location[1]
     location_name = location[2]
     max_distance = 5
     
     print(f"\n{'='*60}")
-    print(f"Loop {i+1}/{len(locations2)}: {location_name}")
+    print(f"Loop {i+1}/{len(locations1)}: {location_name}")
     print(f"Coordinates: ({lat}, {lng})")
     print(f"Max Distance: {max_distance} miles")
     print(f"{'='*60}")
@@ -67,13 +67,68 @@ for i in range(len(locations2)):
     response = api_function.use_api(lat, lng, max_distance)
     
     if response.status_code == 200:
+        cuisine_data.create_cuisine_table(connection)
+        restaurant_data.create_restaurant_table(connection)
+        interact_data.create_interact_table(connection)
+
         data = response.json()
-        info = api_function.extract_api_data(data, connection)
-        feature_data = info[0]      
-        results = info[1]
+        feature_data = api_function.extract_api_data(data, connection)      #List of dictionaries
+
+        #==================================USER RESPONSE SECTION==================================
+        for restaurant in feature_data:
+            print("\n==============================")
+            print(f"Name: {restaurant['name']}")
+            print(f"Rating: {restaurant['rating']}")
+            print(f"Number of Reviews: {restaurant['rating_count']}")
+            print(f"Price Level (5 == FREE, 1==EXPENSIVE): {restaurant['price_level']}")
+            print(f"Takeout Available: {'Yes' if restaurant['takeout'] else 'No'}")
+            print(f"Dine-In Available: {'Yes' if restaurant['dineIn'] else 'No'}")
+            print(f"Vegan Options: {'Yes' if restaurant['vegan'] else 'No'}")
+            print(f"Currently Open: {'Yes' if restaurant['is_open'] else 'No'}")
+            print(f"Cuisine Type: {restaurant['cuisine']}")
+            print(f"Drive Time: {round(int(restaurant['drive_time'])/60, 2)} minutes")
+            print("==============================")
+
+            user_choice = input("Would you accept this restaurant? (y/n): ").strip().lower()
+
+            if user_choice == "y":
+                response = 1
+                print("Accepted!\n")
+            else:
+                response = 0
+                print("Rejected\n")
+
+            results.append(response)
+
+        #==================================DB STUFF==================================
+           
+        
+        '''    #UPSERTS Restaurant Table
+            restaurant_data.insert_restaurant(connection, 
+                                              restaurant["id"], 
+                                              restaurant["dineIn"], 
+                                              restaurant["takeout"], 
+                                              restaurant["vegan"], 
+                                              restaurant["price_level"], 
+                                              restaurant["cuisine"], 
+                                              restaurant["name"])
+
+            cuisine_data.update_cuisine_stats(connection, restaurant["cuisine"], response)
+
+            interact_data.insert_interaction(connection,
+                                                restaurant["id"],
+                                                restaurant["rating"],
+                                                restaurant["rating_count"],
+                                                restaurant["is_open"],
+                                                restaurant["drive_time"],
+                                                response)'''
+
+                
+
+
         
         all_feature_data.extend(feature_data)       #Populated into a list of dictionaries
-        result.extend(results)
+        print(len(all_feature_data))
         
     else:
         print(f"ERROR {response.status_code}: {response.text}")
@@ -84,20 +139,16 @@ for i in range(len(locations2)):
 print(f"\n{'='*60}")
 print(f"DATA COLLECTION COMPLETE")
 print(f"{'='*60}")
-print(f"Total restaurants: {len(all_feature_data)}")
-print(f"Total results: {len(result)}")
-
-#print(f"Cuisine: {cuisine_data.fetch_all_cuisine(connection)}")
-#print(f"Total Cuisine: {len(cuisine_data.fetch_all_cuisine(connection))} \n")
 
 
-#print(f"Interaction: {interact_data.fetch_interactions(connection)}")
+print(f"Total Restaurants Reviewed: {len(all_feature_data)}")
+print(f"Total Result Recieved: {len(results)}")
 
-print(f"Total Interaction: {len(interact_data.fetch_interactions(connection))} \n")
+
+print(f"Total Interaction Recorded: {len(interact_data.fetch_interactions(connection))} \n")
 
 
-#print(f"Restaurant: {restaurant_data.fetch_restaurants(connection)}")
-print(f"Total restaurants: {len(restaurant_data.fetch_restaurants(connection))} \n")
+print(f"Total Unique Restaurants: {len(restaurant_data.fetch_restaurants(connection))} \n")
 
 
 connection.close()
