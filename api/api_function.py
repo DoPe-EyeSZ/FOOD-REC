@@ -82,6 +82,7 @@ def find_frequency(connection):       #Find how often user accept/skips food
         accepted = cuisine[3]
         cuisine_dict[c] = float(float(accepted)/float(shown))
 
+    print(cuisine_dict)
     return cuisine_dict
 
 def insert_frequency(feature_data, freq_dict):       #Insert frequency into cleaned data

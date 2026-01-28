@@ -68,11 +68,12 @@ update (1/27/26)
 - sort the prediction probablity from highest to lowest
 - select top 5 + random 5 for exploration purposes
 
-* NEXT MOVES:
-   - prompt those restaurnts to users
-   - save user response/ interaction
-   - upload to db
-   - retrain after about 20 iterations?
+
+update (1/28/26)
+- began implementing into flask
+- creating pipeline function
+- save model and scalar to to ML folder through pickle
+   - idrk how to use pickle
 
 
 
