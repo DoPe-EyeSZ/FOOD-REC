@@ -55,6 +55,24 @@ update (1/27/26)
 - data collection phase was tailored for training so i had to provide my response
    - had to create function that collects feature data without response bc i cannot use join function
 
+- had to refactor api function
+   - api data extraction function was made specifically for testing initially so it prompts user for their input
+   - was not beneficial for real world simulation since i did not need to provide input, but just make prediction with
+   raw data
+   - removed all input and database collect to the collect data file so data collection makes sense
+   - now api function data extract function only returns filtered data
+
+- established real world simulation
+   - was 75 percent accurate so fit the model's score
+
+* NEXT MOVES:
+   - sort the prediction probablity from highest to lowest
+   - select top 5 + random 5 for exploration purposes
+   - prompt those restaurnts to users
+   - save user response/ interaction
+   - upload to db
+   - retrain after about 20 iterations?
+
 
 
 
