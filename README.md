@@ -65,9 +65,10 @@ update (1/27/26)
 - established real world simulation
    - was 75 percent accurate so fit the model's score
 
+- sort the prediction probablity from highest to lowest
+- select top 5 + random 5 for exploration purposes
+
 * NEXT MOVES:
-   - sort the prediction probablity from highest to lowest
-   - select top 5 + random 5 for exploration purposes
    - prompt those restaurnts to users
    - save user response/ interaction
    - upload to db

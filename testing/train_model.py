@@ -6,6 +6,7 @@ from sklearn.preprocessing import StandardScaler
 
 import matplotlib.pyplot as plt
 
+import random
 
 import sys
 from pathlib import Path
@@ -113,39 +114,55 @@ response = api_function.use_api(34.027538, -117.836456, 3)        #(1) Grab loca
 
 if response.status_code == 200:        #(2) Check if valid response
         
-        data = response.json()         #(3) Converts to json
+      data = response.json()         #(3) Converts to json
 
-        feature_data = api_function.extract_api_data(data)        #(4) get all feature data
+      feature_data = api_function.extract_api_data(data)        #(4) get all feature data
 
-        clean_feature_data = []        #(5) Clean data to remove name/id form feature data (Join function)
-        for place_dict in feature_data:
-              restaurnt = [place_dict["dineIn"], place_dict["takeout"], place_dict["vegan"], place_dict["price_level"],
-                           place_dict["cuisine"], place_dict["rating"], place_dict["rating_count"], place_dict["is_open"],
-                           place_dict["drive_time"], -1]
-              clean_feature_data.append(restaurnt)
+      clean_feature_data = []        #(5) Clean data to remove name/id form feature data (Join function)
+      for place_dict in feature_data:
+            restaurnt = [place_dict["dineIn"], place_dict["takeout"], place_dict["vegan"], place_dict["price_level"],
+                         place_dict["cuisine"], place_dict["rating"], place_dict["rating_count"], place_dict["is_open"],
+                         place_dict["drive_time"], -1]
+            clean_feature_data.append(restaurnt)
 
-        frequency_dict = api_function.find_frequency(connection)        #(6) Get frequency of cuisine
+      frequency_dict = api_function.find_frequency(connection)        #(6) Get frequency of cuisine
 
-        features, response = api_function.insert_frequency(clean_feature_data, frequency_dict)        #(7) insert frequency into feature data
+      features, response = api_function.insert_frequency(clean_feature_data, frequency_dict)        #(7) insert frequency into feature data
         
-    
-        scaled_features = scaler.transform(features)    #(8) Scale all feature data so no over dominating feature
+      scaled_features = scaler.transform(features)    #(8) Scale all feature data so no over dominating feature
+      
+      pred = model.predict(scaled_features)        #(9) Predict results
 
-        pred = model.predict(scaled_features)        #(9) Predict results
-        prob = model.predict_proba(scaled_features)
+      prob = model.predict_proba(scaled_features)
 
-        print(pred)
-        print(prob)
+      print(pred)
+      print(prob)
 
-        for x in range(len(feature_data)):
+      sorted_restaurant_prob = sorted(zip(feature_data, prob[:, 1]), key=lambda x: x[1], reverse=True)        #(10) sort by highest prob
+
+      top5 = sorted_restaurant_prob[:5]
+      bottom15 = sorted_restaurant_prob[5:len(sorted_restaurant_prob)]
+      random_5_sample = random.sample(bottom15, 5)
+      top10 = top5 + random_5_sample
+      print(top10)
+      random.shuffle(top10)
+      print(top10)
+
+
+
+
+
+      
+
+      '''for x in range(len(feature_data)):
             prediction = pred[x]
             place = feature_data[x]
             if prediction == 1:
-                  print(f"{place["name"]} is predicted to be accepted")
+                  print(f"{place["name"]} is predicted to be accepted \n")
 
             else:
-                  print(f"{place["name"]} is predicted to be rejected")
-
+                  print(f"{place["name"]} is predicted to be rejected \n")
+'''
 
 
 connection.close()

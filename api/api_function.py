@@ -30,7 +30,7 @@ def extract_api_data(data):
 
             rating_count = place.get("userRatingCount", 0)
 
-            price_level = price_levels.get(place.get("priceLevel", 0))
+            price_level = price_levels.get(place.get("priceLevel"), 0)
 
             takeout = 1 if place.get("takeout", False) else 0
 
