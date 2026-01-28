@@ -115,22 +115,18 @@ if response.status_code == 200:        #(2) Check if valid response
         
         data = response.json()         #(3) Converts to json
 
-        info = api_function.extract_api_data(data, connection)        #(4) get all feature data
+        feature_data = api_function.extract_api_data(data)        #(4) get all feature data
 
-        feature_data = info[0]      #all 20 restauant feature data
-
-        results = info[1]       #should be none
-
-        clean_feature_data = []        #(5) Clean data to remove name/id form feature data
-        for place in feature_data:
-              restaurnt = [place["dineIn"], place["takeout"], place["vegan"], place["price_level"],
-                           place["cuisine"], place["rating"], place["rating_count"], place["is_open"],
-                           place["drive_time"], -1]
+        clean_feature_data = []        #(5) Clean data to remove name/id form feature data (Join function)
+        for place_dict in feature_data:
+              restaurnt = [place_dict["dineIn"], place_dict["takeout"], place_dict["vegan"], place_dict["price_level"],
+                           place_dict["cuisine"], place_dict["rating"], place_dict["rating_count"], place_dict["is_open"],
+                           place_dict["drive_time"], -1]
               clean_feature_data.append(restaurnt)
 
-        frequency = api_function.find_frequency(connection)        #(6) Get frequency of cuisine
+        frequency_dict = api_function.find_frequency(connection)        #(6) Get frequency of cuisine
 
-        features, response = api_function.insert_frequency(clean_feature_data, frequency)        #(7) insert frequency into feature data
+        features, response = api_function.insert_frequency(clean_feature_data, frequency_dict)        #(7) insert frequency into feature data
         
     
         scaled_features = scaler.transform(features)    #(8) Scale all feature data so no over dominating feature

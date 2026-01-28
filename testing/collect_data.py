@@ -72,7 +72,7 @@ for i in range(len(locations1)):
         interact_data.create_interact_table(connection)
 
         data = response.json()
-        feature_data = api_function.extract_api_data(data, connection)      #List of dictionaries
+        feature_data = api_function.extract_api_data(data)      #List of dictionaries
 
         #==================================USER RESPONSE SECTION==================================
         for restaurant in feature_data:
@@ -103,7 +103,7 @@ for i in range(len(locations1)):
         #==================================DB STUFF==================================
            
         
-        '''    #UPSERTS Restaurant Table
+            #UPSERTS Restaurant Table
             restaurant_data.insert_restaurant(connection, 
                                               restaurant["id"], 
                                               restaurant["dineIn"], 
@@ -121,7 +121,7 @@ for i in range(len(locations1)):
                                                 restaurant["rating_count"],
                                                 restaurant["is_open"],
                                                 restaurant["drive_time"],
-                                                response)'''
+                                                response)
 
                 
 

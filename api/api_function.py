@@ -12,13 +12,9 @@ price_levels = {
 }
 
 #Extract important data so it can be easily accessable
-def extract_api_data(data, connection):
+def extract_api_data(data):
     if "places" in data:
 
-        #Creating the tables 
-        cuisine_data.create_cuisine_table(connection)
-        restaurant_data.create_restaurant_table(connection)
-        interact_data.create_interact_table(connection)
 
         info = []
         for place in data["places"]:
@@ -28,52 +24,24 @@ def extract_api_data(data, connection):
 
             id = place["id"]
 
-
             name = place["displayName"]["text"]
 
+            rating = place.get("rating", 0)
 
-            if "rating" in place:
-                rating = place["rating"]
-                rating_count = place["userRatingCount"]
+            rating_count = place.get("userRatingCount", 0)
 
+            price_level = price_levels.get(place.get("priceLevel", 0))
 
-            if "priceLevel" in place:
-                price_level = price_levels.get(place["priceLevel"], 0)
-            else:
-                price_level = 0
+            takeout = 1 if place.get("takeout", False) else 0
 
+            dineIn = 1 if place.get("dineIn", False) else 0
 
-            if "takeout" in place:
-                if place["takeout"]:
-                    takeout = 1
-                else:
-                    takeout = 0
+            vegan = 1 if place.get("servesVegetarianFood", False) else 0
 
+            open = 1 if place.get("currentOpeningHours", {}).get("openNow", False) else 0
 
-            if "dineIn" in place:
-                if place["dineIn"]:
-                    dineIn = 1
-            else:
-                dineIn = 0
+            cuisine = place.get("primaryType", "restaurant") 
 
-
-            if "servesVegetarianFood" in place:
-                if place["servesVegetarianFood"]:
-                    vegan = 1
-                else:
-                    vegan = 0
-
-            
-            if "currentOpeningHours" in place:
-                if "openNow" in place["currentOpeningHours"]:
-                    if place["currentOpeningHours"]["openNow"]:
-                        open = 1
-                    else:
-                        open = 0
-            
-
-            if "primaryType" in place:
-                cuisine = place["primaryType"]
 
 
             restaurant = {"id": id, 
