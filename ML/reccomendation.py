@@ -40,7 +40,8 @@ def get_recs(lat, long, distance, model, scaler, connection):
 
                 #Updating Restaurant DB     
                 #restaurant_data.insert_restaurant(connection, place_id, dine_in, takeout, vegan, price_level, cuisine, name)
-                #UPDATE CUISINE TABLE HERE 
+                #UPDATE CUISINE TABLE HERE
+                #cuisine_data.update_cuisine_stats(connection, cuisine, 0) 
                 
 
         #(6) Get frequency dictionary of all cuisines
@@ -55,7 +56,7 @@ def get_recs(lat, long, distance, model, scaler, connection):
         #(9) Predict probability of rejection/acceptance
         prob = model.predict_proba(scaled_features)
 
-        #(10) Pair restaurant with probability; sort from highest to lowest
+        #(10) Pair restaurant with ACCEPTANCE probability; sort from highest to lowest
         sorted_restaurant_prob = sorted(zip(feature_data, prob[:, 1]), key=lambda x: x[1], reverse=True)        
 
         #(11) Extract highest probability restaurant; select 5 random restaurants for exploration

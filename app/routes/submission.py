@@ -30,6 +30,7 @@ def user_submission():
         max_distance = request.form.get("max_distance")
 
         top10 = reccomendation.get_recs(lat, lng, max_distance, model, scaler, connection)
+
         if top10 is None:
             connection.close()
             return "Error"
@@ -37,7 +38,7 @@ def user_submission():
         print(top10)
             
         connection.close()    
-        return render_template("output.html")
+        return render_template("output.html", top10 = top10)
         
         
         
