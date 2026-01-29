@@ -75,6 +75,11 @@ update (1/28/26)
 - save model and scalar to to ML folder through pickle
    - idrk how to use pickle
 
+update (1/29/26)
+- more implementation to flask
+- adding reponse handling
+- error arised from passing dictionary to url which caused crashing
+- established basic data transfer across routes
 
 
 
