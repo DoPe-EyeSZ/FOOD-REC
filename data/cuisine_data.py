@@ -104,3 +104,17 @@ def update_cuisine_stats(connection, cuisine, accepted, user_id = 'test_user'):
             connection.execute(query, (user_id, cuisine, accepted, accepted))
     except Exception as e:
         print(f"update_cuisine_stats has an error: {e}")
+
+
+def increment_acceptance(connection, cuisine, user_id = 'test_user'):
+    query = '''
+        UPDATE cuisines
+        SET accepted = accepted + 1
+        WHERE user_id = ? AND cuisine = ?
+    '''
+
+    try:
+        with connection:
+            connection.execute(query, (user_id, cuisine))
+    except Exception as e:
+        print(f"update_cuisine_stats has an error: {e}")
