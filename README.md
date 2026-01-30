@@ -85,6 +85,10 @@ update (1/30/26)
 - simplify training file
    - added training function
 
+NEXT STEPS:
+- work on retraining data after submission
+- deployment!!!!
+
 
 
 skills:
