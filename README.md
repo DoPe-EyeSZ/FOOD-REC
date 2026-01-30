@@ -81,6 +81,10 @@ update (1/29/26)
 - error arised from passing dictionary to url which caused crashing
 - established basic data transfer across routes
 
+update (1/30/26)
+- simplify training file
+   - added training function
+
 
 
 skills:

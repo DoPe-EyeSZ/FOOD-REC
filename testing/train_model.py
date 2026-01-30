@@ -1,19 +1,11 @@
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import StandardScaler
-
-import matplotlib.pyplot as plt
-
-import pickle
 
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from api import api_function
-from data import cuisine_data, data_functions, user_data, restaurant_data, interact_data
-from ML import reccomendation, ml_model
+from data import data_functions
+from ML import ml_model
 
 from dotenv import load_dotenv
 load_dotenv()
