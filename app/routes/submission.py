@@ -1,9 +1,8 @@
 from flask import Blueprint, redirect, url_for, render_template, request, session, flash, jsonify
-from data import data_functions
+from data import data_functions, interact_data, cuisine_data
 from ML import reccomendation
 import pickle
 
-from data import interact_data, cuisine_data
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -72,26 +71,23 @@ def process_response():
     drive_time = request.form.get("drive_time")
 
     #Saving interaction
-    interact_data.insert_interaction(connection, place_id, rating, rating_count, opening, drive_time, user_id="test_user")
+    #interact_data.insert_interaction(connection, place_id, rating, rating_count, opening, drive_time, response, user_id="test_user")
 
-    #Updating cuisine
-    cuisine_data.increment_acceptance(connection, cuisine, user_id="test_user")
-
-    print(response)
-    print(place_id)
-    print(cuisine)
-    print(rating)
-    print(rating_count)
-    print(opening)
-    print(drive_time)
+    #Increment acceptance
+    if response == 1:
+        print("accepted")
+        #cuisine_data.increment_acceptance(connection, cuisine, user_id="test_user")
 
 
-    
-    connection.close()
     if session["index"] < len(session["suggestions"]):
+        connection.close()
         return redirect(url_for("submission.show_restaurant"))
+    
     else:
-        return "summary"
+        reccent_10 = data_functions.join_10_restaurant(connection, user_id="test_user")
+        connection.close()
+        print(reccent_10)
+        return render_template("summary.html")
 
         
         
