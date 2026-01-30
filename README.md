@@ -93,3 +93,10 @@ skills:
 - encoded feature data
 - stored data into a sqlite db for testing
 - trained/test model on 500 data sets
+
+
+
+v2 ideas:
+- show image of restaurant
+- show description of restaurant
+- show predicted probability

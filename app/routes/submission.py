@@ -37,9 +37,8 @@ def user_submission():
             return "Error"
         
         session["suggestions"] = top10
-        print(len(session["suggestions"]))
+        print(session["suggestions"])
         session["index"] = 0
-        print(session["index"])
             
         connection.close()    
         return redirect(url_for("submission.show_restaurant"))
@@ -50,7 +49,6 @@ def show_restaurant():
     suggestions = session["suggestions"]
     index = session["index"]
 
-    print(f"{index+1} restaurant")
     restaurant_to_display = suggestions[index]
     
 
@@ -75,7 +73,6 @@ def process_response():
 
     #Increment acceptance
     if response == "1":
-        print("accepted")
         cuisine_data.increment_acceptance(connection, cuisine, user_id="test_user")
 
 
@@ -87,7 +84,7 @@ def process_response():
         reccent_10 = data_functions.join_10_restaurant(connection, user_id="test_user")
         connection.close()
         print(reccent_10)
-        return render_template("summary.html")
+        return render_template("summary.html", displayed_restaurants = reccent_10)
 
         
         

@@ -7,7 +7,17 @@
 <body>
     <h1>output section</h1>
 
-    <p>{{displayed_restaurant}}</p>
+    <p>Name: {{displayed_restaurant[0]["name"]}}</p>
+    <p>cuisine: {{displayed_restaurant[0]["cuisine"]}}</p>
+    <p>dine in: {{displayed_restaurant[0]["dineIn"]}}</p>
+    <p>drive time: {{displayed_restaurant[0]["drive_time"]}}</p>
+    <p>opening: {{displayed_restaurant[0]["is_open"]}}</p>
+    <p>price: {{displayed_restaurant[0]["price_level"]}}</p>
+    <p>rating_count: {{displayed_restaurant[0]["rating_count"]}}</p>
+    <p>takeout: {{displayed_restaurant[0]["takeout"]}}</p>
+    <p>vegan option: {{displayed_restaurant[0]["vegan"]}}</p>
+    <p>rating: {{displayed_restaurant[0]["rating"]}}</p>
+
     <form action="{{ url_for('submission.process_response') }}" method="POST" style="display:inline;">
         <input type="hidden" name="response" value="1">
         <input type="hidden" name="place_id" value="{{ displayed_restaurant[0]['id'] }}">

@@ -7,5 +7,20 @@
 <body>
     <h1>summary section</h1>
 
+    {% for restaurant in displayed_restaurants %}
+        <p>name: {{restaurant[0]}}</p>
+        <p>dine in option: {{restaurant[1]}}</p>
+        <p>takeout: {{restaurant[2]}}</p>
+        <p>vegan: {{restaurant[3]}}</p>
+        <p>price: {{restaurant[4]}}</p>
+        <p>cuisine: {{restaurant[5]}}</p>
+        <p>rating: {{restaurant[6]}}</p>
+        <p>rating count: {{restaurant[7]}}</p>
+        <p>open: {{restaurant[8]}}</p>
+        <p>drive: {{restaurant[9]}}</p>
+        <p>ur decision: {{restaurant[10]}}</p>
+
+    {% endfor %}
+
     <a href="{{ url_for('submission.user_submission') }}">Go back</a>
 </html>
