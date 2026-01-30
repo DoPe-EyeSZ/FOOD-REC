@@ -1,5 +1,5 @@
 from flask import Blueprint, redirect, url_for, render_template, request, session, flash, jsonify
-from data import data_functions, interact_data, cuisine_data
+from data import data_functions, interact_data, cuisine_data, user_data
 from ML import reccomendation
 import pickle
 
@@ -14,8 +14,14 @@ model = pickle.load(open('ml/models/model.pkl', 'rb'))
 scaler = pickle.load(open('ml/models/scaler.pkl', 'rb'))
 
 
-
 @submission.route("/", methods = ["POST", "GET"])
+def login():
+    if request.method == "POST":
+        return redirect(url_for("submission.user_submission"))
+    return render_template("login.html")
+
+
+@submission.route("/user_submission", methods = ["POST", "GET"])
 def user_submission():
     if request.method == "GET":     #For after user logs in
         return render_template("submission.html")
