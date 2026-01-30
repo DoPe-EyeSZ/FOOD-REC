@@ -41,7 +41,7 @@ def get_recs(lat, long, distance, model, scaler, connection):
                 #Updating Restaurant DB     
                 #restaurant_data.insert_restaurant(connection, place_id, dine_in, takeout, vegan, price_level, cuisine, name)
                 #UPDATE CUISINE TABLE HERE
-                #cuisine_data.update_cuisine_stats(connection, cuisine, 0) 
+                #cuisine_data.update_cuisine_stats(connection, cuisine, 0, user_id="test_user") 
                 
 
         #(6) Get frequency dictionary of all cuisines
@@ -66,7 +66,7 @@ def get_recs(lat, long, distance, model, scaler, connection):
         top10 = top5 + random_5_sample
         random.shuffle(top10)
 
-        #[({feature data}, probability)]
+        #[({feature data}, acceptance probability)]
         return top10
     
     else:

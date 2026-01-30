@@ -3,6 +3,8 @@ from data import data_functions
 from ML import reccomendation
 import pickle
 
+from data import interact_data, cuisine_data
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -68,6 +70,12 @@ def process_response():
     rating_count = request.form.get("rating_count")
     opening = request.form.get("is_open")
     drive_time = request.form.get("drive_time")
+
+    #Saving interaction
+    interact_data.insert_interaction(connection, place_id, rating, rating_count, opening, drive_time, user_id="test_user")
+
+    #Updating cuisine
+    cuisine_data.increment_acceptance(connection, cuisine, user_id="test_user")
 
     print(response)
     print(place_id)

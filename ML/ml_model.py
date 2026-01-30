@@ -28,14 +28,12 @@ def train_save_model(connection):
     x_train_scaled = logistic_scaler.fit_transform(x_train)
     x_test_scaled = logistic_scaler.transform(x_test)
 
-    logistic_model = LogisticRegression(max_iter=1000, C=1.0)        #LogisticRegression()
-
+    #LogisticRegression training
+    logistic_model = LogisticRegression(max_iter=1000, C=1.0)        
     logistic_model.fit(x_train_scaled, y_train)
 
 
-
     #Saving model and scaler to ML file
-
     models_dir = Path(__file__).parent.parent / 'ml' / 'models'
     models_dir.mkdir(parents=True, exist_ok=True)
 
