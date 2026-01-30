@@ -35,13 +35,13 @@ def get_recs(lat, long, distance, model, scaler, connection):
                 open = place_dict["is_open"]
                 drive = place_dict["drive_time"]
 
-                restaurnt = [dine_in, takeout, vegan, price_level, cuisine, rating, rating_count, open, drive, -1]
+                restaurnt = [dine_in, takeout, vegan, price_level, cuisine, rating, rating_count, open, drive, "response_placeholder"]
                 clean_feature_data.append(restaurnt)
 
                 #Updating Restaurant DB     
-                #restaurant_data.insert_restaurant(connection, place_id, dine_in, takeout, vegan, price_level, cuisine, name)
+                restaurant_data.insert_restaurant(connection, place_id, dine_in, takeout, vegan, price_level, cuisine, name)
                 #UPDATE CUISINE TABLE HERE
-                #cuisine_data.update_cuisine_stats(connection, cuisine, 0, user_id="test_user") 
+                cuisine_data.update_cuisine_stats(connection, cuisine, 0, user_id="test_user") 
                 
 
         #(6) Get frequency dictionary of all cuisines
