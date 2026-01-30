@@ -3,12 +3,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
 from api import api_function
-from data import cuisine_data, data_functions, user_data, restaurant_data, interact_data
+from data import data_functions
 
 import pickle
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 
 def train_save_model(connection):
 
