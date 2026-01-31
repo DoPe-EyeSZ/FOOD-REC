@@ -104,3 +104,4 @@ v2 ideas:
 - show image of restaurant
 - show description of restaurant
 - show predicted probability
+- auto retrain
