@@ -84,10 +84,14 @@ update (1/29/26)
 update (1/30/26)
 - simplify training file
    - added training function
+- install postgresql db
+   - conneciton established
+   - must learn syntax
+   - find best approach to handle testing/prod at same time
 
 NEXT STEPS:
-- work on retraining data after submission
-- deployment!!!!
+- figure out hwo to approach using sqlite and psotgresql (both or just one)
+- convert all to postgresql
 
 
 
