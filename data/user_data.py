@@ -4,16 +4,20 @@ import sqlite3
 def create_user_table(connection):
     query = '''
         CREATE TABLE IF NOT EXISTS users(
-            user_id INTEGER PRIMARY KEY,
+            user_id SERIAL PRIMARY KEY,
             name TEXT,
             email TEXT,
-            PASSWORD TEXT
+            password TEXT
         )
     '''
 
     try:
         with connection:
-            connection.execute(query)
+            cursor = connection.cursor()
+            cursor.execute(query)
+            connection.commit()
+            cursor.close()
+            print("user")
 
     except Exception as e:
         print(f"create_user_table has an error: {e}")

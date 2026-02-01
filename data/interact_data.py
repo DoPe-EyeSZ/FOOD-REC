@@ -23,6 +23,7 @@ def create_interact_table(connection):
             cursor.execute(query)
             connection.commit()
             cursor.close()
+            print("interact")
 
     except Exception as e:
         print(f"create_user_interact_table has an error: {e}")

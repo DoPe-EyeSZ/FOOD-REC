@@ -18,6 +18,7 @@ def create_cuisine_table(connection):
             cursor.execute(query)
             connection.commit()
             cursor.close()
+            print("cuisine")
 
     except Exception as e:
         print(f"create_cuisine_table has an error: {e}")
