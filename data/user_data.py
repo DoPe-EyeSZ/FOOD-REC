@@ -1,4 +1,3 @@
-import sqlite3
 
 #Creating table
 def create_user_table(connection):
