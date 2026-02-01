@@ -89,20 +89,40 @@ update (1/30/26)
    - must learn syntax
    - find best approach to handle testing/prod at same time
 
-update (1/31/26)
+```markdown
+update (2/1/26)
 - converted sqlite syntax to postgresql
    - pain in the ass
-   - idk if it works
+   - placeholders: ? → %s
+   - auto-increment: AUTOINCREMENT → SERIAL
+   - connection.execute() → cursor.execute()
+   - added .fetchone() and .fetchall() for SELECT queries
 - added two db, one for testing, other for prod
-- try creating table
-   - table not creating for some reason
+   - restaurant_ml (test) and restaurant_ml_prod (prod)
+   - dual database strategy for safe development
+- tried creating tables
+   - issue: with connection: causing double-commit problems
+   - fixed: removed with connection: and connection.commit() from create functions
+   - commit once in test_postgres.py after all tables created
+- db queries work successfully ✅
+   - tables exist in database (verified with Python queries)
+   - tables do not show in pgadmin though (GUI bug, not actual issue)
+   - workaround: use pgAdmin Query Tool instead of tree view
 
-- db queries work successfully
-   - tables do not show in pgadmin though
+
 
 NEXT STEPS:
-- figure out hwo to approach using sqlite and psotgresql (both or just one)
-- convert all to postgresql
+- write migration script (copy SQLite data → PostgreSQL test db)
+- update remaining files:
+  - data_functions.py (JOIN queries)
+  - api/api_function.py (database calls)
+  - ml/recommendations.py (get_recs function)
+  - testing/train_model.py (connection calls)
+  - app/routes/submission.py (change to db_type="prod")
+- test full Flask app with PostgreSQL
+- retrain ML model with PostgreSQL data
+- verify 500+ interactions migrated correctly
+```
 
 
 

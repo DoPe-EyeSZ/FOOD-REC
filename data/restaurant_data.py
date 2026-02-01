@@ -46,11 +46,10 @@ def insert_restaurant(connection, place_id, dine, togo, vegan, price, cuisine, n
     '''
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query, (place_id, dine, togo, vegan, price, cuisine, name,))
-            connection.commit()
-            cursor.close()
+        cursor = connection.cursor()
+        cursor.execute(query, (place_id, dine, togo, vegan, price, cuisine, name,))
+        connection.commit()
+        cursor.close()
     
     except Exception as e:
         print(f"insert_restaurant has an error: {e}")
@@ -63,11 +62,10 @@ def delete_restaurant(connection, place_id):
     '''
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query, (place_id,))
-            connection.commit()
-            cursor.close()
+        cursor = connection.cursor()
+        cursor.execute(query, (place_id,))
+        connection.commit()
+        cursor.close()
 
     except Exception as e:
         print(f"delete_restaurant has an error: {e}")
@@ -79,11 +77,10 @@ def delete_restaurants(connection):
     '''
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query)
-            connection.commit()
-            cursor.close()
+        cursor = connection.cursor()
+        cursor.execute(query)
+        connection.commit()
+        cursor.close()
 
     except Exception as e:
         print(f"delete_restaurant has an error: {e}")
@@ -96,12 +93,11 @@ def fetch_restaurant(connection, place_id):
     '''
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query, (place_id,))
-            data = cursor.fetchone()
-            cursor.close()
-            return data
+        cursor = connection.cursor()
+        cursor.execute(query, (place_id,))
+        data = cursor.fetchone()
+        cursor.close()
+        return data
         
     except Exception as e:
         print(f"fetch_restaurant has an error: {e}")
@@ -113,12 +109,11 @@ def fetch_restaurants(connection):
     '''
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query)
-            data = cursor.fetchall()
-            cursor.close()
-            return data
+        cursor = connection.cursor()
+        cursor.execute(query)
+        data = cursor.fetchall()
+        cursor.close()
+        return data
         
     except Exception as e:
         print(f"fetch_restaurants has an error: {e}")

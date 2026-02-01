@@ -27,13 +27,11 @@ def fetch_all_cuisine(connection, user_id = 'test_user'):
     query = "SELECT * FROM cuisine_stats WHERE user_id = %s"
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query, (user_id,))
-            rows = cursor.fetchall()
-            cursor.close()
-
-            return rows
+        cursor = connection.cursor()
+        cursor.execute(query, (user_id,))
+        rows = cursor.fetchall()
+        cursor.close()
+        return rows
         
     except Exception as e:
         print(f"fetch_all_cuisine has an error: {e}")
@@ -44,15 +42,14 @@ def fetch_cuisine(connection, cuisine, user_id = "test_user"):
     query = "SELECT * FROM cuisine_stats WHERE user_id = %s AND cuisine = %s"
 
     try:
-        with connection:
             
-            cursor = connection.cursor()
-            cursor.execute(query, (user_id, cuisine,))
-            row = cursor.fetchone()
-            cursor.close()
+        cursor = connection.cursor()
+        cursor.execute(query, (user_id, cuisine,))
+        row = cursor.fetchone()
+        cursor.close()
 
-
-            return row
+        return row
+    
     except Exception as e:
         print(f"fetch_cuisine has an error: {e}")
 
@@ -62,11 +59,10 @@ def delete_cuisine(connection, cuisine, user_id = 'test_user'):
     query = "DELETE FROM cuisine_stats WHERE user_id = %s AND cuisine = %s"
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query, (user_id, cuisine,))
-            connection.commit()
-            cursor.close()
+        cursor = connection.cursor()
+        cursor.execute(query, (user_id, cuisine,))
+        connection.commit()
+        cursor.close()
             
     except Exception as e:
         print(f"delete_cuisine has an error: {e}")
@@ -85,11 +81,10 @@ def upsert_cuisine_stats(connection, cuisine, accepted, user_id = 'test_user'):
     '''
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query, (user_id, cuisine, accepted, accepted))
-            connection.commit()
-            cursor.close()
+        cursor = connection.cursor()
+        cursor.execute(query, (user_id, cuisine, accepted, accepted))
+        connection.commit()
+        cursor.close()
 
     except Exception as e:
         print(f"upsert_cuisine_stats has an error: {e}")
@@ -103,11 +98,10 @@ def increment_acceptance(connection, cuisine, user_id = 'test_user'):
     '''
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query, (user_id, cuisine))
-            connection.commit()
-            cursor.close()
+        cursor = connection.cursor()
+        cursor.execute(query, (user_id, cuisine))
+        connection.commit()
+        cursor.close()
             
     except Exception as e:
         print(f"increment_acceptance has an error: {e}")

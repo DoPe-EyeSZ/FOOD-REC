@@ -35,11 +35,10 @@ def insert_user_interaction(connection, place_id, rating, rating_count, is_open,
     '''
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query, (user_id, place_id, rating, rating_count, is_open, drive_time, accepted))
-            connection.commit()
-            cursor.close()
+        cursor = connection.cursor()
+        cursor.execute(query, (user_id, place_id, rating, rating_count, is_open, drive_time, accepted))
+        connection.commit()
+        cursor.close()
 
     except Exception as e:
         print(f"insert_interaction has an error: {e}")
@@ -50,11 +49,10 @@ def delete_user_interaction(connection, id):
     query = "DELETE FROM user_interactions WHERE id = %s"
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query, (id,))
-            connection.commit()
-            cursor.close()
+        cursor = connection.cursor()
+        cursor.execute(query, (id,))
+        connection.commit()
+        cursor.close()
 
     except Exception as e:
         print(f"delete_user_interaction has an error: {e}")
@@ -64,11 +62,10 @@ def delete_user_interactions(connection, user_id = 'test_user'):
     query = "DELETE FROM user_interactions WHERE user_id = %s"
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query, (user_id,))
-            connection.commit()
-            cursor.close()
+        cursor = connection.cursor()
+        cursor.execute(query, (user_id,))
+        connection.commit()
+        cursor.close()
     
     except Exception as e:
         print(f"delete_user_interactions has an error: {e}")
@@ -79,12 +76,11 @@ def fetch_user_interaction(connection, id, user_id = "test_user"):
     query = "SELECT * FROM user_interactions WHERE id = %s AND user_id = %s"
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query, (id, user_id))
-            data = cursor.fetchone()
-            cursor.close()
-            return data
+        cursor = connection.cursor()
+        cursor.execute(query, (id, user_id))
+        data = cursor.fetchone()
+        cursor.close()
+        return data
         
     except Exception as e:
         print(f"fetch_user_interaction has an error: {e}")
@@ -94,12 +90,12 @@ def fetch_user_interactions(connection, user_id = "test_user"):
     query = "SELECT * FROM user_interactions WHERE user_id = %s"
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query, (user_id,))
-            data = cursor.fetchall()
-            cursor.close()
-            return data
+            
+        cursor = connection.cursor()
+        cursor.execute(query, (user_id,))
+        data = cursor.fetchall()
+        cursor.close()
+        return data
             
     
     except Exception as e:

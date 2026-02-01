@@ -3,14 +3,13 @@
 def create_user_table(connection):
     query = '''
         CREATE TABLE IF NOT EXISTS users(
-            user_id SERIAL PRIMARY KEY,
+            user_id TEXT PRIMARY KEY,
             name TEXT,
             password TEXT
         )
     '''
 
     try:
-
         cursor = connection.cursor()
         cursor.execute(query)
         cursor.close()
