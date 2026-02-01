@@ -97,6 +97,9 @@ update (1/31/26)
 - try creating table
    - table not creating for some reason
 
+- db queries work successfully
+   - tables do not show in pgadmin though
+
 NEXT STEPS:
 - figure out hwo to approach using sqlite and psotgresql (both or just one)
 - convert all to postgresql
