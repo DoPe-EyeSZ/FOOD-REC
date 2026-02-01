@@ -112,16 +112,17 @@ update (2/1/26)
 
 
 NEXT STEPS:
+- test individual functions
 - write migration script (copy SQLite data → PostgreSQL test db)
+- verify 500+ interactions migrated correctly
 - update remaining files:
-  - data_functions.py (JOIN queries)
   - api/api_function.py (database calls)
   - ml/recommendations.py (get_recs function)
   - testing/train_model.py (connection calls)
   - app/routes/submission.py (change to db_type="prod")
 - test full Flask app with PostgreSQL
 - retrain ML model with PostgreSQL data
-- verify 500+ interactions migrated correctly
+
 ```
 
 
