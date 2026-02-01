@@ -1,10 +1,8 @@
-import sqlite3
 
-#FOREIGN KEY (user_id) REFERENCES users(user_id),
 #Creating Table
 def create_cuisine_table(connection):
     query = f'''
-        CREATE TABLE IF NOT EXISTS cuisines(
+        CREATE TABLE IF NOT EXISTS cuisine_stats(
             user_id TEXT DEFAULT 'test_user',
             cuisine TEXT,
             shown INTEGER DEFAULT 0,
@@ -16,105 +14,101 @@ def create_cuisine_table(connection):
     '''
     try:
         with connection:
-            connection.execute(query)
-    except Exception as e:
-        print(f"create_table has an error: {e}")
-
-
-#Add row to table
-def insert_cuisine(connection, cuisine, shown, accepted, user_id = 'test_user'):
-    query = '''INSERT INTO cuisines (user_id, cuisine, shown, accepted) VALUES (?,?,?,?)'''
-
-    try:
-        with connection:
-            connection.execute(query, (user_id, cuisine, shown, accepted))
-    except Exception as e:
-        print(f"insert_cuisine has an error: {e}")
-
-
-def insert_cuisines(connection, cuisine_list, user_id = 'test_user'):
-    query = "INSERT INTO cuisines (user_id, cuisine, shown, accepted) VALUES (?,?,?,?)"
-
-    try:
-        with connection:
-            connection.executemany(query, cuisine_list, user_id)
+            cursor = connection.cursor()
+            cursor.execute(query)
+            connection.commit()
+            cursor.close()
 
     except Exception as e:
-        print(f"insert_cuisines has an error: {e}")
+        print(f"create_cuisine_table has an error: {e}")
 
 
 #Query through all rows
 def fetch_all_cuisine(connection, user_id = 'test_user'):
-    query = "SELECT * FROM cuisines WHERE user_id = ?"
+    query = "SELECT * FROM cuisine_stats WHERE user_id = %s"
 
     try:
         with connection:
-            rows = connection.execute(query, (user_id,)).fetchall()
+            cursor = connection.cursor()
+            cursor.execute(query, (user_id,))
+            rows = cursor.fetchall()
+            cursor.close()
+
             return rows
+        
     except Exception as e:
         print(f"fetch_all_cuisine has an error: {e}")
 
 
 #Query for specific cuisine
 def fetch_cuisine(connection, cuisine, user_id = "test_user"):
-    query = "SELECT * FROM cuisines WHERE user_id = ? AND cuisine = ?"
+    query = "SELECT * FROM cuisine_stats WHERE user_id = %s AND cuisine = %s"
 
     try:
         with connection:
-            return connection.execute(query, (user_id, cuisine,)).fetchall()
+            
+            cursor = connection.cursor()
+            cursor.execute(query, (user_id, cuisine,))
+            row = cursor.fetchone()
+            cursor.close()
+
+
+            return row
     except Exception as e:
         print(f"fetch_cuisine has an error: {e}")
 
 
 #Delete row
 def delete_cuisine(connection, cuisine, user_id = 'test_user'):
-    query = "DELETE FROM cuisines WHERE user_id = ? AND cuisine = ?"
+    query = "DELETE FROM cuisine_stats WHERE user_id = %s AND cuisine = %s"
 
     try:
         with connection:
-            connection.execute(query, (user_id, cuisine))
+            cursor = connection.cursor()
+            cursor.execute(query, (user_id, cuisine,))
+            connection.commit()
+            cursor.close()
+            
     except Exception as e:
         print(f"delete_cuisine has an error: {e}")
 
 
-def delete_cuisines(connection, user_id = 'test_user'):
-    query = "DELETE FROM cuisines WHERE user_id = ?"
 
-    try:
-        with connection:
-            connection.execute(query, (user_id,))
-
-    except Exception as e:
-        print(f"delete_cuisines has an error: {e}")
-
-
-#Upadating information
-def update_cuisine_stats(connection, cuisine, accepted, user_id = 'test_user'):
+#Upsert cuisine information
+def upsert_cuisine_stats(connection, cuisine, accepted, user_id = 'test_user'):
     query = '''
-        INSERT INTO cuisines (user_id, cuisine, shown, accepted)
-        VALUES (?, ?, 1, ?)
+        INSERT INTO cuisine_stats (user_id, cuisine, shown, accepted)
+        VALUES (%s, %s, 1, %s)
         ON CONFLICT(user_id, cuisine)
         DO UPDATE SET
             shown = shown + 1,
-            accepted = accepted + ?
+            accepted = accepted + %s
     '''
 
     try:
         with connection:
-            connection.execute(query, (user_id, cuisine, accepted, accepted))
+            cursor = connection.cursor()
+            cursor.execute(query, (user_id, cuisine, accepted, accepted))
+            connection.commit()
+            cursor.close()
+
     except Exception as e:
-        print(f"update_cuisine_stats has an error: {e}")
+        print(f"upsert_cuisine_stats has an error: {e}")
 
 
 def increment_acceptance(connection, cuisine, user_id = 'test_user'):
     query = '''
-        UPDATE cuisines
+        UPDATE cuisine_stats
         SET accepted = accepted + 1
-        WHERE user_id = ? AND cuisine = ?
+        WHERE user_id = %s AND cuisine = %s
     '''
 
     try:
         with connection:
-            connection.execute(query, (user_id, cuisine))
+            cursor = connection.cursor()
+            cursor.execute(query, (user_id, cuisine))
+            connection.commit()
+            cursor.close()
+            
     except Exception as e:
         print(f"increment_acceptance has an error: {e}")

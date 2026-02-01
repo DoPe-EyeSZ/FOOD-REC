@@ -23,7 +23,7 @@ def join_interaction_restaurant(connection, user_id = "test_user"):
         FROM restaurants r
         JOIN interactions i
         ON r.place_id = i.place_id
-        WHERE i.user_id = ?
+        WHERE i.user_id = %s
     '''
 
     try:
@@ -41,7 +41,7 @@ def join_10_restaurant(connection, user_id = "test_user"):
         FROM restaurants r
         JOIN interactions i
         ON r.place_id = i.place_id
-        WHERE i.user_id = ?
+        WHERE i.user_id = %s
         ORDER BY i.id DESC 
         LIMIT 10
     '''
