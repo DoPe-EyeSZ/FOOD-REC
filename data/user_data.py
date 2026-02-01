@@ -10,12 +10,11 @@ def create_user_table(connection):
     '''
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query)
-            connection.commit()
-            cursor.close()
-            print("user")
+
+        cursor = connection.cursor()
+        cursor.execute(query)
+        cursor.close()
+        print("user")
 
     except Exception as e:
         print(f"create_user_table has an error: {e}")

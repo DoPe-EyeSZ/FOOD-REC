@@ -18,12 +18,10 @@ def create_interact_table(connection):
     '''
 
     try:
-        with connection:
-            cursor = connection.cursor()
-            cursor.execute(query)
-            connection.commit()
-            cursor.close()
-            print("interact")
+        cursor = connection.cursor()
+        cursor.execute(query)
+        cursor.close()
+        print("interact")
 
     except Exception as e:
         print(f"create_user_interact_table has an error: {e}")
