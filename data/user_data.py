@@ -5,7 +5,6 @@ def create_user_table(connection):
         CREATE TABLE IF NOT EXISTS users(
             user_id SERIAL PRIMARY KEY,
             name TEXT,
-            email TEXT,
             password TEXT
         )
     '''
