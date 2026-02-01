@@ -1,4 +1,3 @@
-import sqlite3
 import psycopg2
 from config import POSTGRES_HOST, POSTGRES_DB_TEST, POSTGRES_DB_PROD, POSTGRES_USER, POSTGRES_PASSWORD
 

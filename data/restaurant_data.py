@@ -39,12 +39,12 @@ def insert_restaurant(connection, place_id, dine, togo, vegan, price, cuisine, n
             cuisine = excluded.cuisine,
             name = excluded.name
         WHERE
-            dine_in <> excluded.dine_in
-            OR take_out <> excluded.take_out
-            OR vegan_option <> excluded.vegan_option
-            OR price_level <> excluded.price_level
-            OR cuisine <> excluded.cuisine
-            OR name <> excluded.name;
+            restaurants.dine_in <> excluded.dine_in
+            OR restaurants.take_out <> excluded.take_out
+            OR restaurants.vegan_option <> excluded.vegan_option
+            OR restaurants.price_level <> excluded.price_level
+            OR restaurants.cuisine <> excluded.cuisine
+            OR restaurants.name <> excluded.name;
     '''
 
     try:

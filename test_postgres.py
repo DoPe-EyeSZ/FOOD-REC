@@ -6,9 +6,8 @@ try:
     
     
     user_data.create_user_table(connection)
+    restaurant_data.create_restaurant_table(connection)
 
-
-    #restaurant_data.create_restaurant_table(connection)
     #cuisine_data.create_cuisine_table(connection)
     #interact_data.create_interact_table(connection)
     
