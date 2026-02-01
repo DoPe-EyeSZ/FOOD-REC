@@ -1,22 +1,19 @@
 import sqlite3
 import psycopg2
-from config import POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
+from config import POSTGRES_HOST, POSTGRES_DB_TEST, POSTGRES_DB_PROD, POSTGRES_USER, POSTGRES_PASSWORD
 
-def get_connection(db_name = None, db_type = "dev"):
+def get_connection(db_type = "test"):
 
-    if db_type == "dev":
-        try:
-            path = "instance/" + db_name
-            return sqlite3.connect(path)
-        except Exception as e:
-            print(f"Error: {e}")
-
+    if db_type == "test":
+        database = POSTGRES_DB_TEST
     else:
-        connection = psycopg2.connect(host = POSTGRES_HOST, 
-                                      database = POSTGRES_DB, 
-                                      user = POSTGRES_USER, 
-                                      password = POSTGRES_PASSWORD)
-        return connection
+        database = POSTGRES_DB_PROD
+        
+    connection = psycopg2.connect(host = POSTGRES_HOST, 
+                                  database = database, 
+                                  user = POSTGRES_USER, 
+                                  password = POSTGRES_PASSWORD)
+    return connection
 
 
 def join_interaction_restaurant(connection, user_id = "test_user"):
