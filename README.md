@@ -89,6 +89,12 @@ update (1/30/26)
    - must learn syntax
    - find best approach to handle testing/prod at same time
 
+update (1/31/26)
+- converted sqlite syntax to postgresql
+   - pain in the ass
+   - idk if it works
+- added two db, one for testing, other for prod
+
 NEXT STEPS:
 - figure out hwo to approach using sqlite and psotgresql (both or just one)
 - convert all to postgresql

@@ -1,5 +1,3 @@
-import sqlite3
-
 
 #Creating Table
 def create_restaurant_table(connection):
@@ -11,12 +9,16 @@ def create_restaurant_table(connection):
             vegan_option INTEGER CHECK (vegan_option IN (0, 1)),
             price_level INTEGER CHECK (price_level >=0 AND price_level<=5),
             cuisine TEXT, 
-            name TEXT
+            name TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     '''
     try:
         with connection:
-            connection.execute(query)
+            cursor = connection.cursor()
+            cursor.execute(query)
+            connection.commit()
+            cursor.close()
 
     except Exception as e:
         print(f"create_restaurant_table has an error: {e}")
@@ -26,7 +28,7 @@ def create_restaurant_table(connection):
 def insert_restaurant(connection, place_id, dine, togo, vegan, price, cuisine, name):
     query = '''
         INSERT INTO restaurants (place_id, dine_in, take_out, vegan_option, price_level, cuisine, name)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT(place_id)
         DO UPDATE SET
             dine_in = excluded.dine_in,
@@ -36,17 +38,20 @@ def insert_restaurant(connection, place_id, dine, togo, vegan, price, cuisine, n
             cuisine = excluded.cuisine,
             name = excluded.name
         WHERE
-            dine_in IS NOT excluded.dine_in
-            OR take_out IS NOT excluded.take_out
-            OR vegan_option IS NOT excluded.vegan_option
-            OR price_level IS NOT excluded.price_level
-            OR cuisine IS NOT excluded.cuisine
-            OR name IS NOT excluded.name;
+            dine_in <> excluded.dine_in
+            OR take_out <> excluded.take_out
+            OR vegan_option <> excluded.vegan_option
+            OR price_level <> excluded.price_level
+            OR cuisine <> excluded.cuisine
+            OR name <> excluded.name;
     '''
 
     try:
         with connection:
-            connection.execute(query, (place_id, dine, togo, vegan, price, cuisine, name,))
+            cursor = connection.cursor()
+            cursor.execute(query, (place_id, dine, togo, vegan, price, cuisine, name,))
+            connection.commit()
+            cursor.close()
     
     except Exception as e:
         print(f"insert_restaurant has an error: {e}")
@@ -55,12 +60,15 @@ def insert_restaurant(connection, place_id, dine, togo, vegan, price, cuisine, n
 #Delete a restaurant
 def delete_restaurant(connection, place_id):
     query = '''
-        DELETE FROM restaurants WHERE place_id = ?
+        DELETE FROM restaurants WHERE place_id = %s
     '''
 
     try:
         with connection:
-            connection.execute(query, (place_id,))
+            cursor = connection.cursor()
+            cursor.execute(query, (place_id,))
+            connection.commit()
+            cursor.close()
 
     except Exception as e:
         print(f"delete_restaurant has an error: {e}")
@@ -73,7 +81,10 @@ def delete_restaurants(connection):
 
     try:
         with connection:
-            connection.execute(query)
+            cursor = connection.cursor()
+            cursor.execute(query)
+            connection.commit()
+            cursor.close()
 
     except Exception as e:
         print(f"delete_restaurant has an error: {e}")
@@ -82,12 +93,16 @@ def delete_restaurants(connection):
 #Retrieving restaurant
 def fetch_restaurant(connection, place_id):
     query = '''
-        SELECT * FROM restaurants WHERE place_id = ?
+        SELECT * FROM restaurants WHERE place_id = %s
     '''
 
     try:
         with connection:
-            return connection.execute(query, (place_id))
+            cursor = connection.cursor()
+            cursor.execute(query, (place_id,))
+            data = cursor.fetchone()
+            cursor.close()
+            return data
         
     except Exception as e:
         print(f"fetch_restaurant has an error: {e}")
@@ -100,7 +115,11 @@ def fetch_restaurants(connection):
 
     try:
         with connection:
-            return connection.execute(query).fetchall()
+            cursor = connection.cursor()
+            cursor.execute(query)
+            data = cursor.fetchall()
+            cursor.close()
+            return data
         
     except Exception as e:
         print(f"fetch_restaurants has an error: {e}")
