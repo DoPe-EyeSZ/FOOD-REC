@@ -21,7 +21,7 @@ def join_interaction_restaurant(connection, user_id = "test_user"):
         SELECT r.dine_in, r.take_out, r.vegan_option, r.price_level, r.cuisine,
         i.rating, i.rating_count, i.is_open, i.drive_time, i.accepted
         FROM restaurants r
-        JOIN interactions i
+        JOIN user_interactions i
         ON r.place_id = i.place_id
         WHERE i.user_id = %s
     '''
@@ -36,10 +36,10 @@ def join_interaction_restaurant(connection, user_id = "test_user"):
 
 def join_10_restaurant(connection, user_id = "test_user"):
     query = '''
-        SELECT r. name, r.dine_in, r.take_out, r.vegan_option, r.price_level, r.cuisine,
+        SELECT r.name, r.dine_in, r.take_out, r.vegan_option, r.price_level, r.cuisine,
         i.rating, i.rating_count, i.is_open, i.drive_time, i.accepted
         FROM restaurants r
-        JOIN interactions i
+        JOIN user_interactions i
         ON r.place_id = i.place_id
         WHERE i.user_id = %s
         ORDER BY i.id DESC 
@@ -51,4 +51,4 @@ def join_10_restaurant(connection, user_id = "test_user"):
             return connection.execute(query, (user_id,)).fetchall()
 
     except Exception as e:
-        print(f"join_interaction_restaurant has an error: {e}")
+        print(f"join_10_restaurant has an error: {e}")
