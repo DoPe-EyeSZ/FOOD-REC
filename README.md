@@ -94,6 +94,8 @@ update (1/31/26)
    - pain in the ass
    - idk if it works
 - added two db, one for testing, other for prod
+- try creating table
+   - table not creating for some reason
 
 NEXT STEPS:
 - figure out hwo to approach using sqlite and psotgresql (both or just one)
