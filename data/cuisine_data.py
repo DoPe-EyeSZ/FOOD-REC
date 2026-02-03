@@ -63,6 +63,7 @@ def delete_cuisine(connection, cuisine, user_id = 'test_user'):
         cursor.execute(query, (user_id, cuisine,))
         connection.commit()
         cursor.close()
+        print('success')
             
     except Exception as e:
         print(f"delete_cuisine has an error: {e}")
@@ -76,8 +77,8 @@ def upsert_cuisine_stats(connection, cuisine, accepted, user_id = 'test_user'):
         VALUES (%s, %s, 1, %s)
         ON CONFLICT(user_id, cuisine)
         DO UPDATE SET
-            shown = shown + 1,
-            accepted = accepted + %s
+            shown = cuisine_stats.shown + 1,
+            accepted = cuisine_stats.accepted + %s
     '''
 
     try:

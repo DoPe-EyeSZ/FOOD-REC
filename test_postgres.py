@@ -7,13 +7,14 @@ try:
     restaurant_data.create_restaurant_table(connection)
     cuisine_data.create_cuisine_table(connection)
     interact_data.create_interact_table(connection)
-    
-    
-    print("table")
     connection.commit()
-    print("commit works")
+    
+
+    cuisine_data.delete_cuisine(connection, "chinese", user_id="test_user")
+    print(cuisine_data.fetch_all_cuisine(connection, user_id="test_user"))
+    
+    
     connection.close()
-    print("close works")
 
 except Exception as e:
     print(f"error: {e}")
