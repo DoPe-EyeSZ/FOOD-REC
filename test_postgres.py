@@ -10,16 +10,19 @@ try:
     connection.commit()
     
 
-    restaurant_data.insert_restaurant(connection, "place_id1", 1, 1, 1, 3, "chinese", "test1")
-    restaurant_data.insert_restaurant(connection, "place_id2", 1, 1, 1, 3, "chinese", "test1")
+    restaurant_data.insert_restaurant(connection, "place_id1", 0, 0, 0, 0, "chinese", "test1")
+    restaurant_data.insert_restaurant(connection, "place_id2", 1, 1, 1, 1, "chinese", "test1")
+    restaurant_data.insert_restaurant(connection, "place_id3", 1, 0, 1, 0, "chinese", "test1")
 
-    '''interact_data.insert_user_interaction(connection, "place_id1", 5, 55, 1, 60, 0, "test_user")
-    interact_data.insert_user_interaction(connection, "place_id1", 6, 85, 0, 465, 1, "test_user")
-    interact_data.insert_user_interaction(connection, "place_id2", 3.3, 55, 1, 60, 0, "test_user")'''
-    print(len(interact_data.fetch_user_interactions(connection, user_id="test_user")))
-    interact_data.delete_user_interactions(connection, user_id="test_user")
-    print(len(interact_data.fetch_user_interactions(connection, user_id="test_user")))
-    
+
+    print(len(restaurant_data.fetch_restaurants(connection,)))
+    restaurant_data.delete_restaurant(connection, "place_id2")
+    print(len(restaurant_data.fetch_restaurants(connection,)))
+    restaurant_data.delete_restaurants(connection)
+    print(len(restaurant_data.fetch_restaurants(connection,)))
+
+
+
 
     
     
