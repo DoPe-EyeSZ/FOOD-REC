@@ -13,10 +13,10 @@ from data import cuisine_data, data_functions, user_data, restaurant_data, inter
 
 load_dotenv()
 
-connection = data_functions.get_connection("test_data.db")
+connection = data_functions.get_connection("test")
 
 # SoCal locations with food options (lat, lng, location_name)
-locations1 = [
+location1 = [
     
     (34.0689, -118.4452, "Century City Westfield"),
     (33.7701, -118.1937, "Long Beach Downtown"),
@@ -32,7 +32,7 @@ locations1 = [
     (34.0407, -117.5098, "Victoria Gardens, Rancho Cucamonga")
 ]
 
-locations2 = [
+location2 = [
     (34.07362, -118.40035, "Beverly Hills Restaurants Area"),            
     (34.04473, -118.24928, "Downtown Los Angeles Food District"),        
     (34.07816, -118.26056, "Echo Park (LA) Food Scene"),                  
@@ -45,21 +45,25 @@ locations2 = [
     (34.14778, -118.14452, "Pasadena Old Town"),                       
 ]
 
+location3 = [
+    (34.0635, -118.3580, "The Grove, Los Angeles")
+]
+
 
 # Initialize data storage
 all_feature_data = []
 results = []
 
 # Run 15 API calls
-for i in range(len(locations1)):
-    location = locations1[i]
+for i in range(len(location3)):
+    location = location3[i]
     lat = location[0]
     lng = location[1]
     location_name = location[2]
     max_distance = 5
     
     print(f"\n{'='*60}")
-    print(f"Loop {i+1}/{len(locations1)}: {location_name}")
+    print(f"Loop {i+1}/{len(location3)}: {location_name}")
     print(f"Coordinates: ({lat}, {lng})")
     print(f"Max Distance: {max_distance} miles")
     print(f"{'='*60}")
@@ -113,9 +117,9 @@ for i in range(len(locations1)):
                                               restaurant["cuisine"], 
                                               restaurant["name"])
 
-            cuisine_data.update_cuisine_stats(connection, restaurant["cuisine"], response)
+            cuisine_data.upsert_cuisine_stats(connection, restaurant["cuisine"], response)
 
-            interact_data.insert_interaction(connection,
+            interact_data.insert_user_interaction(connection,
                                                 restaurant["id"],
                                                 restaurant["rating"],
                                                 restaurant["rating_count"],
@@ -141,11 +145,11 @@ print(f"DATA COLLECTION COMPLETE")
 print(f"{'='*60}")
 
 
-print(f"Total Restaurants Reviewed: {len(all_feature_data)}")
-print(f"Total Result Recieved: {len(results)}")
+print(f"Total Restaurants Retrieved: {len(all_feature_data)}")
+print(f"Total Result Reviewed: {len(results)}")
 
 
-print(f"Total Interaction Recorded: {len(interact_data.fetch_interactions(connection))} \n")
+print(f"Total Interaction Recorded: {len(interact_data.fetch_user_interactions(connection))} \n")
 
 
 print(f"Total Unique Restaurants: {len(restaurant_data.fetch_restaurants(connection))} \n")

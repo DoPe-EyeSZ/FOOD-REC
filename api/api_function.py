@@ -2,6 +2,8 @@ import os
 import requests
 from data import cuisine_data, interact_data, restaurant_data
 
+from dotenv import load_dotenv
+load_dotenv()
 
 price_levels = {
     "PRICE_LEVEL_FREE": 5,
