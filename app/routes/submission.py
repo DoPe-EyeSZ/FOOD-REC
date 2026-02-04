@@ -30,7 +30,7 @@ def user_submission():
     else:
 
         #Creating connection
-        connection = data_functions.get_connection("test_data_backup.db")
+        connection = data_functions.get_connection("prod")
         
         #User's Input
         lat = request.form.get('lat')
@@ -64,7 +64,7 @@ def show_restaurant():
 
 @submission.route("/process_response", methods = ["POST"])
 def process_response():
-    connection = data_functions.get_connection("test_data_backup.db")
+    connection = data_functions.get_connection("prod")
     session["index"] += 1
     
     response = request.form.get("response")
@@ -76,7 +76,7 @@ def process_response():
     drive_time = request.form.get("drive_time")
 
     #Saving interaction
-    interact_data.insert_interaction(connection, place_id, rating, rating_count, opening, drive_time, response, user_id="test_user")
+    interact_data.insert_user_interaction(connection, place_id, rating, rating_count, opening, drive_time, response, user_id="test_user")
 
     #Increment acceptance
     if response == "1":
