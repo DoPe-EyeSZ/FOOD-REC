@@ -4,6 +4,14 @@ from api import api_function
 
 try:
     pg_connection = data_functions.get_connection("test")
+    restaurant_data.create_restaurant_table(pg_connection)
+    user_data.create_user_table(pg_connection)
+    cuisine_data.create_cuisine_table(pg_connection)
+    interact_data.create_interact_table(pg_connection)
+
+    pg_connection.commit()
+
+
     lite_connection = sqlite3.connect("instance/test_data.db")
 
     query1 = '''
@@ -23,14 +31,12 @@ try:
     '''
     lite_cuisines = lite_connection.execute(query3).fetchall()
 
-
-        
-        
+    
 
 
     print(f"{'='*30} SQLITE {'='*30} ")
     print(len(lite_cuisines))
-    print(len(lite_restaurants))
+    print(lite_restaurants)
     print(len(lite_interaction))
 
     
@@ -41,10 +47,12 @@ try:
     interact = interact_data.fetch_user_interactions(pg_connection)
 
     
-    print(cuisine)
-    print(api_function.find_frequency(pg_connection))
-    print(len(restaurant))
+    print(len(cuisine))
+    print(restaurant)
     print(len(interact))
+
+
+
 
 
 
