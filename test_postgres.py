@@ -6,7 +6,7 @@ try:
     pg_connection = data_functions.get_connection("test")
     pg_connection2 = data_functions.get_connection("prod")
 
-    restaurant_data.create_restaurant_table(pg_connection)
+    '''restaurant_data.create_restaurant_table(pg_connection)
     user_data.create_user_table(pg_connection)
     cuisine_data.create_cuisine_table(pg_connection)
     interact_data.create_interact_table(pg_connection)
@@ -16,21 +16,15 @@ try:
 
     lite_connection = sqlite3.connect("instance/test_data.db")
 
-    query1 = '''
-        SELECT * FROM interactions
-    '''
+    query1 = "SELECT * FROM interactions"
     lite_interaction = lite_connection.execute(query1).fetchall()
 
 
-    query2 = '''
-        SELECT * from restaurants
-    '''
+    query2 = "SELECT * from restaurants"
     lite_restaurants = lite_connection.execute(query2).fetchall()
 
 
-    query3 = '''
-        SELECT * FROM cuisines
-    '''
+    query3 = "SELECT * FROM cuisines"
     lite_cuisines = lite_connection.execute(query3).fetchall()
 
     
@@ -63,13 +57,17 @@ try:
     print(len(restaurant2))
     print(len(interact2))
 
-    query4 = '''
-        ALTER TABLE users RENAME COLUMN password TO password_hash
     '''
+    query4 = '''
+        ALTER TABLE cuisine_stats 
+        ADD CONSTRAINT cuisine_stats_fkey
+        FOREIGN KEY (username) REFERENCES users(username)
+    '''
+
 
     cur = pg_connection2.cursor()
 
-    cur.execute(query4)
+    cur.execute(query4, )
     pg_connection2.commit()
     cur.close()
 

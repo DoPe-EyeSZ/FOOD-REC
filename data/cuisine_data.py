@@ -3,12 +3,12 @@
 def create_cuisine_table(connection):
     query = f'''
         CREATE TABLE IF NOT EXISTS cuisine_stats(
-            user_id TEXT DEFAULT 'test_user',
+            username TEXT DEFAULT 'test_user',
             cuisine TEXT,
             shown INTEGER DEFAULT 0,
             accepted INTEGER DEFAULT 0,
-            
-            PRIMARY KEY (user_id, cuisine)
+            PRIMARY KEY (username, cuisine),
+            FOREIGN KEY (username) REFERENCES users(username)
 
         )
     '''
@@ -22,12 +22,12 @@ def create_cuisine_table(connection):
 
 
 #Query through all rows
-def fetch_all_cuisine(connection, user_id = 'test_user'):
-    query = "SELECT * FROM cuisine_stats WHERE user_id = %s"
+def fetch_all_cuisine(connection, username = 'test_user'):
+    query = "SELECT * FROM cuisine_stats WHERE username = %s"
 
     try:
         cursor = connection.cursor()
-        cursor.execute(query, (user_id,))
+        cursor.execute(query, (username,))
         rows = cursor.fetchall()
         cursor.close()
         return rows
@@ -37,13 +37,13 @@ def fetch_all_cuisine(connection, user_id = 'test_user'):
 
 
 #Query for specific cuisine
-def fetch_cuisine(connection, cuisine, user_id = "test_user"):
-    query = "SELECT * FROM cuisine_stats WHERE user_id = %s AND cuisine = %s"
+def fetch_cuisine(connection, cuisine, username = "test_user"):
+    query = "SELECT * FROM cuisine_stats WHERE username = %s AND cuisine = %s"
 
     try:
             
         cursor = connection.cursor()
-        cursor.execute(query, (user_id, cuisine,))
+        cursor.execute(query, (username, cuisine,))
         row = cursor.fetchone()
         cursor.close()
 
@@ -54,12 +54,12 @@ def fetch_cuisine(connection, cuisine, user_id = "test_user"):
 
 
 #Delete row
-def delete_cuisine(connection, cuisine, user_id = 'test_user'):
-    query = "DELETE FROM cuisine_stats WHERE user_id = %s AND cuisine = %s"
+def delete_cuisine(connection, cuisine, username = 'test_user'):
+    query = "DELETE FROM cuisine_stats WHERE username = %s AND cuisine = %s"
 
     try:
         cursor = connection.cursor()
-        cursor.execute(query, (user_id, cuisine,))
+        cursor.execute(query, (username, cuisine,))
         connection.commit()
         cursor.close()
         print('success')
@@ -70,11 +70,11 @@ def delete_cuisine(connection, cuisine, user_id = 'test_user'):
 
 
 #Upsert cuisine information
-def upsert_cuisine_stats(connection, cuisine, accepted, user_id = 'test_user'):
+def upsert_cuisine_stats(connection, cuisine, accepted, username = 'test_user'):
     query = '''
-        INSERT INTO cuisine_stats (user_id, cuisine, shown, accepted)
+        INSERT INTO cuisine_stats (username, cuisine, shown, accepted)
         VALUES (%s, %s, 1, %s)
-        ON CONFLICT(user_id, cuisine)
+        ON CONFLICT(username, cuisine)
         DO UPDATE SET
             shown = cuisine_stats.shown + 1,
             accepted = cuisine_stats.accepted + %s
@@ -82,7 +82,7 @@ def upsert_cuisine_stats(connection, cuisine, accepted, user_id = 'test_user'):
 
     try:
         cursor = connection.cursor()
-        cursor.execute(query, (user_id, cuisine, accepted, accepted))
+        cursor.execute(query, (username, cuisine, accepted, accepted))
         connection.commit()
         cursor.close()
 
@@ -90,16 +90,16 @@ def upsert_cuisine_stats(connection, cuisine, accepted, user_id = 'test_user'):
         print(f"upsert_cuisine_stats has an error: {e}")
 
 
-def increment_acceptance(connection, cuisine, user_id = 'test_user'):
+def increment_acceptance(connection, cuisine, username = 'test_user'):
     query = '''
         UPDATE cuisine_stats
         SET accepted = accepted + 1
-        WHERE user_id = %s AND cuisine = %s
+        WHERE username = %s AND cuisine = %s
     '''
 
     try:
         cursor = connection.cursor()
-        cursor.execute(query, (user_id, cuisine))
+        cursor.execute(query, (username, cuisine))
         connection.commit()
         cursor.close()
             
