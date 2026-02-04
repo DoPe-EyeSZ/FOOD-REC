@@ -63,6 +63,15 @@ try:
     print(len(restaurant2))
     print(len(interact2))
 
+    query4 = '''
+        ALTER TABLE users RENAME COLUMN password TO password_hash
+    '''
+
+    cur = pg_connection2.cursor()
+
+    cur.execute(query4)
+    pg_connection2.commit()
+    cur.close()
 
 
 
