@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-connection = data_functions.get_connection("test")
+connection = data_functions.get_connection("prod")
 
 logistic_model, logistic_scaler, score = ml_model.train_save_model(connection)
 
