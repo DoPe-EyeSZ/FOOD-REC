@@ -53,6 +53,7 @@ def delete_user_interaction(connection, id):
         cursor.execute(query, (id,))
         connection.commit()
         cursor.close()
+        
 
     except Exception as e:
         print(f"delete_user_interaction has an error: {e}")
@@ -66,6 +67,7 @@ def delete_user_interactions(connection, user_id = 'test_user'):
         cursor.execute(query, (user_id,))
         connection.commit()
         cursor.close()
+        print('success')
     
     except Exception as e:
         print(f"delete_user_interactions has an error: {e}")

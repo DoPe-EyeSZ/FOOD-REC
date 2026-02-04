@@ -10,8 +10,17 @@ try:
     connection.commit()
     
 
-    cuisine_data.delete_cuisine(connection, "chinese", user_id="test_user")
-    print(cuisine_data.fetch_all_cuisine(connection, user_id="test_user"))
+    restaurant_data.insert_restaurant(connection, "place_id1", 1, 1, 1, 3, "chinese", "test1")
+    restaurant_data.insert_restaurant(connection, "place_id2", 1, 1, 1, 3, "chinese", "test1")
+
+    '''interact_data.insert_user_interaction(connection, "place_id1", 5, 55, 1, 60, 0, "test_user")
+    interact_data.insert_user_interaction(connection, "place_id1", 6, 85, 0, 465, 1, "test_user")
+    interact_data.insert_user_interaction(connection, "place_id2", 3.3, 55, 1, 60, 0, "test_user")'''
+    print(len(interact_data.fetch_user_interactions(connection, user_id="test_user")))
+    interact_data.delete_user_interactions(connection, user_id="test_user")
+    print(len(interact_data.fetch_user_interactions(connection, user_id="test_user")))
+    
+
     
     
     connection.close()
