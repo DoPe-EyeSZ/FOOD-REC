@@ -59,8 +59,8 @@ try:
 
     '''
     query4 = '''
-        ALTER TABLE cuisine_stats 
-        ADD CONSTRAINT cuisine_stats_fkey
+        ALTER TABLE user_interactions
+        ADD CONSTRAINT user_interactions_fkey
         FOREIGN KEY (username) REFERENCES users(username)
     '''
 

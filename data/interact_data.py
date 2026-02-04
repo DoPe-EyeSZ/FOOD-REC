@@ -1,10 +1,9 @@
 #Creating table
-# USEthisLATERUSEthisLATERUSEthisLATERUSEthisLATERUSEthisLATER FOREIGN KEY (user_id) REFERENCES users(user_id)
 def create_interact_table(connection):
     query = '''
         CREATE TABLE IF NOT EXISTS user_interactions(
             id SERIAL PRIMARY KEY,
-            user_id TEXT DEFAULT 'test_user',
+            username TEXT DEFAULT 'test_user',
             place_id TEXT,
             rating REAL,
             rating_count INTEGER,
@@ -12,7 +11,8 @@ def create_interact_table(connection):
             drive_time INTEGER,
             accepted INTEGER CHECK(accepted IN (0, 1)),
             timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (place_id) REFERENCES restaurants(place_id)
+            FOREIGN KEY (place_id) REFERENCES restaurants(place_id),
+            FOREIGN KEY (username) REFERENCES users(username)
     
         )
     '''
@@ -27,15 +27,15 @@ def create_interact_table(connection):
 
 
 #Inserting interaction
-def insert_user_interaction(connection, place_id, rating, rating_count, is_open, drive_time, accepted, user_id = 'test_user'):
+def insert_user_interaction(connection, place_id, rating, rating_count, is_open, drive_time, accepted, username = 'test_user'):
     query = '''
-    INSERT INTO user_interactions (user_id, place_id, rating, rating_count, is_open, drive_time, accepted) 
+    INSERT INTO user_interactions (username, place_id, rating, rating_count, is_open, drive_time, accepted) 
     VALUES (%s, %s, %s, %s, %s, %s, %s)
     '''
 
     try:
         cursor = connection.cursor()
-        cursor.execute(query, (user_id, place_id, rating, rating_count, is_open, drive_time, accepted))
+        cursor.execute(query, (username, place_id, rating, rating_count, is_open, drive_time, accepted))
         connection.commit()
         cursor.close()
 
@@ -58,12 +58,12 @@ def delete_user_interaction(connection, id):
         print(f"delete_user_interaction has an error: {e}")
 
 
-def delete_user_interactions(connection, user_id = 'test_user'):
-    query = "DELETE FROM user_interactions WHERE user_id = %s"
+def delete_user_interactions(connection, username = 'test_user'):
+    query = "DELETE FROM user_interactions WHERE username = %s"
 
     try:
         cursor = connection.cursor()
-        cursor.execute(query, (user_id,))
+        cursor.execute(query, (username,))
         connection.commit()
         cursor.close()
         print('success')
@@ -73,12 +73,12 @@ def delete_user_interactions(connection, user_id = 'test_user'):
 
 
 #Fetching data
-def fetch_user_interaction(connection, id, user_id = "test_user"):
-    query = "SELECT * FROM user_interactions WHERE id = %s AND user_id = %s"
+def fetch_user_interaction(connection, id, username = "test_user"):
+    query = "SELECT * FROM user_interactions WHERE id = %s AND username = %s"
 
     try:
         cursor = connection.cursor()
-        cursor.execute(query, (id, user_id))
+        cursor.execute(query, (id, username))
         data = cursor.fetchone()
         cursor.close()
         return data
@@ -87,13 +87,13 @@ def fetch_user_interaction(connection, id, user_id = "test_user"):
         print(f"fetch_user_interaction has an error: {e}")
 
 
-def fetch_user_interactions(connection, user_id = "test_user"):
-    query = "SELECT * FROM user_interactions WHERE user_id = %s"
+def fetch_user_interactions(connection, username = "test_user"):
+    query = "SELECT * FROM user_interactions WHERE username = %s"
 
     try:
             
         cursor = connection.cursor()
-        cursor.execute(query, (user_id,))
+        cursor.execute(query, (username,))
         data = cursor.fetchall()
         cursor.close()
         return data

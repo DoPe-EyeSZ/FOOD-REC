@@ -15,19 +15,19 @@ def get_connection(db_type = "test"):
     return connection
 
 
-def join_interaction_restaurant(connection, user_id = "test_user"):
+def join_interaction_restaurant(connection, username = "test_user"):
     query = '''
         SELECT r.dine_in, r.take_out, r.vegan_option, r.price_level, r.cuisine,
         i.rating, i.rating_count, i.is_open, i.drive_time, i.accepted
         FROM restaurants r
         JOIN user_interactions i
         ON r.place_id = i.place_id
-        WHERE i.user_id = %s
+        WHERE i.username = %s
     '''
 
     try:
         cursor = connection.cursor()
-        cursor.execute(query, (user_id,))
+        cursor.execute(query, (username,))
         data = cursor.fetchall()
         cursor.close()
         return data
@@ -36,21 +36,21 @@ def join_interaction_restaurant(connection, user_id = "test_user"):
         print(f"join_interaction_restaurant has an error: {e}")
 
 
-def join_10_restaurant(connection, user_id = "test_user"):
+def join_10_restaurant(connection, username = "test_user"):
     query = '''
         SELECT r.name, r.dine_in, r.take_out, r.vegan_option, r.price_level, r.cuisine,
         i.rating, i.rating_count, i.is_open, i.drive_time, i.accepted
         FROM restaurants r
         JOIN user_interactions i
         ON r.place_id = i.place_id
-        WHERE i.user_id = %s
+        WHERE i.username = %s
         ORDER BY i.id DESC 
         LIMIT 10
     '''
 
     try:
         cursor = connection.cursor()
-        cursor.execute(query, (user_id,))
+        cursor.execute(query, (username,))
         data = cursor.fetchall()
         cursor.close()
         return data
