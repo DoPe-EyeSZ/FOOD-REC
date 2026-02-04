@@ -48,7 +48,7 @@ try:
 
     
     print(len(cuisine))
-    print(restaurant)
+    print(len(restaurant))
     print(len(interact))
 
 
