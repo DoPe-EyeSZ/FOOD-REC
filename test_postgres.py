@@ -4,6 +4,8 @@ from api import api_function
 
 try:
     pg_connection = data_functions.get_connection("test")
+    pg_connection2 = data_functions.get_connection("prod")
+
     restaurant_data.create_restaurant_table(pg_connection)
     user_data.create_user_table(pg_connection)
     cuisine_data.create_cuisine_table(pg_connection)
@@ -36,7 +38,7 @@ try:
 
     print(f"{'='*30} SQLITE {'='*30} ")
     print(len(lite_cuisines))
-    print(lite_restaurants)
+    print(len(lite_restaurants))
     print(len(lite_interaction))
 
     
@@ -46,10 +48,21 @@ try:
     cuisine = cuisine_data.fetch_all_cuisine(pg_connection)
     interact = interact_data.fetch_user_interactions(pg_connection)
 
+    restaurant2 = restaurant_data.fetch_restaurants(pg_connection2)
+    cuisine2 = cuisine_data.fetch_all_cuisine(pg_connection2)
+    interact2 = interact_data.fetch_user_interactions(pg_connection2)
+
     
     print(len(cuisine))
     print(len(restaurant))
     print(len(interact))
+
+    print(f"{'='*30} POSTGRES PROD {'='*30} ")
+
+    print(len(cuisine2))
+    print(len(restaurant2))
+    print(len(interact2))
+
 
 
 
@@ -60,6 +73,7 @@ try:
     
     
     pg_connection.close()
+    pg_connection2.close()
 
 except Exception as e:
     print(f"error: {e}")
