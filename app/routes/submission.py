@@ -20,6 +20,7 @@ def login():
         return redirect(url_for("submission.user_submission"))
     return render_template("login.html")'''
 
+
 @submission.route("/", methods = ["POST", "GET"])
 @submission.route("/user_submission", methods = ["POST", "GET"])
 def user_submission():
