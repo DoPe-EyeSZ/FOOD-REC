@@ -175,6 +175,13 @@ TECHNICAL STATS:
 - ML accuracy maintained: 76%
 - Zero data loss during migration
 
+
+update 2/4/26
+- updated api function file
+- updated rec function
+- tested "test/train model" and works fine
+- implementing user login/signup
+
 NEXT STEPS:
 - update remaining files:
   - api/api_function.py (database calls)

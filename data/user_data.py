@@ -3,8 +3,8 @@
 def create_user_table(connection):
     query = '''
         CREATE TABLE IF NOT EXISTS users(
-            username TEXT PRIMARY KEY,
-            name TEXT,
+            user_id SERIAL PRIMARY KEY,
+            username TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL
         )
     '''

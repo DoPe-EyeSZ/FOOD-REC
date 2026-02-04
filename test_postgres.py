@@ -59,9 +59,9 @@ try:
 
     '''
     query4 = '''
-        ALTER TABLE user_interactions
-        ADD CONSTRAINT user_interactions_fkey
-        FOREIGN KEY (username) REFERENCES users(username)
+        SELECT constraint_name, constraint_type
+        FROM information_schema.table_constraints 
+        WHERE table_name = 'users'
     '''
 
 
