@@ -14,14 +14,20 @@ model = pickle.load(open('ml/models/model.pkl', 'rb'))
 scaler = pickle.load(open('ml/models/scaler.pkl', 'rb'))
 
 
-'''@submission.route("/", methods = ["POST", "GET"])
+@submission.route("/", methods = ["POST", "GET"])
 def login():
     if request.method == "POST":
+        user_name = request.form.get("username")
+        password = request.form.get("password")
+
+        print(user_name)
+        print(password)
+
         return redirect(url_for("submission.user_submission"))
-    return render_template("login.html")'''
+    return render_template("login.html")
 
 
-@submission.route("/", methods = ["POST", "GET"])
+#@submission.route("/", methods = ["POST", "GET"])
 @submission.route("/user_submission", methods = ["POST", "GET"])
 def user_submission():
     if request.method == "GET":     #For after user logs in
