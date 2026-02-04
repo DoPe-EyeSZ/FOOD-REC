@@ -111,10 +111,18 @@ update (2/1/26)
 
 
 
+update (2/3/26)
+- fully migrated all sqlite data to pg db
+  - migrated to wrong db at first so it explains why i was having issues view tables
+  - eventually fixed it
+
+- testing all functions with pg syntax
+- tested test_train_split function (works)
+- tested data collecting (works)
+- tested training file (works)
+- created back up of restaurant_ml_test to use for prod testing
+
 NEXT STEPS:
-- test individual functions
-- write migration script (copy SQLite data → PostgreSQL test db)
-- verify 500+ interactions migrated correctly
 - update remaining files:
   - api/api_function.py (database calls)
   - ml/recommendations.py (get_recs function)
