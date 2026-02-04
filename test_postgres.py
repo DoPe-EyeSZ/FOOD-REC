@@ -23,27 +23,45 @@ try:
     lite_cuisines = lite_connection.execute(query3).fetchall()
 
 
+    query4 = '''
+        SELECT * FROM interactions
+    '''
+
+    for place in lite_interaction:
+        userid = place[1]
+        placeid = place[2]
+        rating = place[3]
+        rating_count = place[4]
+        open = place[5]
+        drive = place[6]
+        accept = place[7]
+
+        interact_data.insert_user_interaction(pg_connection, placeid, rating, rating_count, open, drive, accept, "test_user")
+
+
+    cursor = pg_connection.cursor()
+    pg_connection.commit()
+    cursor.close()
+
+        
+        
+
+
+    print(f"{'='*30} SQLITE {'='*30} ")
     print(len(lite_cuisines))
     print(len(lite_restaurants))
-    print(lite_interaction)
-
-
-    user_data.create_user_table(pg_connection)
-    restaurant_data.create_restaurant_table(pg_connection)
-    cuisine_data.create_cuisine_table(pg_connection)
-    interact_data.create_interact_table(pg_connection)
-    pg_connection.commit()
-    
+    print(len(lite_interaction))
 
     
-
+    print(f"{'='*30} POSTGRES {'='*30} ")
     user_count = None
     restaurant_count = restaurant_data.fetch_restaurants(pg_connection)
     cuisine_count = cuisine_data.fetch_all_cuisine(pg_connection)
     interact_count = interact_data.fetch_user_interactions(pg_connection)
 
-    print(len(restaurant_count))
+    
     print(len(cuisine_count))
+    print(len(restaurant_count))
     print(len(interact_count))
 
 
