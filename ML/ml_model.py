@@ -38,20 +38,20 @@ def train_save_model(connection):
     
     #Get Accuracy Score
     score = logistic_model.score(x_test_scaled, y_test)
-    print(f"Model is {round(score * 100, 2)}% accurate")
+    print(f"Model is {round(score * 100, 2)}% accurate \n")
 
 
     #Cross validation on new model
     scaler2 = StandardScaler()
     all_x_scaled = scaler2.fit_transform(features)
     cv_scores = cross_val_score(LogisticRegression(max_iter=1000, C=1.0), all_x_scaled, response, cv=5)
-    print(f"Accuracy scores of other tests: {cv_scores}")
+    print(f"Accuracy scores of other tests: {cv_scores} \n")
 
 
     #Check for overfitting
     train_score = logistic_model.score(x_train_scaled, y_train)
     test_score = logistic_model.score(x_test_scaled, y_test)
-    print(f"Train: {train_score:.1%}, Test: {test_score:.1%}, Diff: {abs(train_score-test_score):.1%}")
+    print(f"Train: {train_score:.1%}, Test: {test_score:.1%}, Diff: {abs(train_score-test_score):.1%} \n")
 
     answer = input("Do you want to save model? (yes/no): ").lower()
 

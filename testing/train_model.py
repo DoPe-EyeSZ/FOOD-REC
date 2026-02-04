@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-connection = data_functions.get_connection("test_data.db")
+connection = data_functions.get_connection("test")
 
 logistic_model, logistic_scaler, score = ml_model.train_save_model(connection)
 
@@ -51,36 +51,6 @@ plt.grid(True, alpha=0.3)
 plt.show()'''
 
 
-
-#Real world simulation now      (USE AS PIPELINE REFERENCE LATER ON)
-
-
-'''top10 = reccomendation.get_recs(34.027538, -117.836456, 3, "test_data.db")
-      
-for restaurant in top10:            #(11) show user restaurant
-
-      attributes = restaurant[0]
-      prob_accept = restaurant[1]
-      print()
-      drive_time_minutes = round(attributes["drive_time"] / 60, 1)
-
-      print(f"Name: {attributes['name']}")
-      print(f"Rating: {attributes['rating']}")
-      print(f"Rating count: {attributes['rating_count']}")
-      print(f"Price level: {attributes['price_level']}")
-      print(f"Takeout: {attributes['takeout']}")
-      print(f"Dine in: {attributes['dineIn']}")
-      print(f"Vegan options: {attributes['vegan']}")
-      print(f"Open now: {attributes['is_open']}")
-      print(f"Cuisine: {attributes['cuisine']}")
-      print(f"Drive time: {drive_time_minutes} minutes")
-
-      response = input("Do you like this restaurant? (y/n)")            #(12) save interaction to db
-
-      if response == "y":
-            print("save accept")          #Use userid in session & attributes["place_id"] to find cuisine and update acceptance
-      else:
-            print("save rejection")'''
 
 
 connection.close()

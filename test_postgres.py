@@ -1,5 +1,6 @@
 from data import data_functions, cuisine_data, interact_data, restaurant_data, user_data
 import sqlite3
+from api import api_function
 
 try:
     pg_connection = data_functions.get_connection("test")
@@ -23,26 +24,6 @@ try:
     lite_cuisines = lite_connection.execute(query3).fetchall()
 
 
-    query4 = '''
-        SELECT * FROM interactions
-    '''
-
-    for place in lite_interaction:
-        userid = place[1]
-        placeid = place[2]
-        rating = place[3]
-        rating_count = place[4]
-        open = place[5]
-        drive = place[6]
-        accept = place[7]
-
-        interact_data.insert_user_interaction(pg_connection, placeid, rating, rating_count, open, drive, accept, "test_user")
-
-
-    cursor = pg_connection.cursor()
-    pg_connection.commit()
-    cursor.close()
-
         
         
 
@@ -55,14 +36,15 @@ try:
     
     print(f"{'='*30} POSTGRES {'='*30} ")
     user_count = None
-    restaurant_count = restaurant_data.fetch_restaurants(pg_connection)
-    cuisine_count = cuisine_data.fetch_all_cuisine(pg_connection)
-    interact_count = interact_data.fetch_user_interactions(pg_connection)
+    restaurant = restaurant_data.fetch_restaurants(pg_connection)
+    cuisine = cuisine_data.fetch_all_cuisine(pg_connection)
+    interact = interact_data.fetch_user_interactions(pg_connection)
 
     
-    print(len(cuisine_count))
-    print(len(restaurant_count))
-    print(len(interact_count))
+    print(cuisine)
+    print(api_function.find_frequency(pg_connection))
+    print(len(restaurant))
+    print(len(interact))
 
 
 
