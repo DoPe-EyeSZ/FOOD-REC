@@ -21,7 +21,6 @@ def create_interact_table(connection):
         cursor = connection.cursor()
         cursor.execute(query)
         cursor.close()
-        print("interact")
 
     except Exception as e:
         print(f"create_user_interact_table has an error: {e}")

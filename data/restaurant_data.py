@@ -17,7 +17,6 @@ def create_restaurant_table(connection):
         cursor = connection.cursor()
         cursor.execute(query)
         cursor.close()
-        print("restaurant")
 
     except Exception as e:
         print(f"create_restaurant_table has an error: {e}")

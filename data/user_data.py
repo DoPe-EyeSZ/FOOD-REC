@@ -13,7 +13,6 @@ def create_user_table(connection):
         cursor = connection.cursor()
         cursor.execute(query)
         cursor.close()
-        print("user")
 
     except Exception as e:
         print(f"create_user_table has an error: {e}")
