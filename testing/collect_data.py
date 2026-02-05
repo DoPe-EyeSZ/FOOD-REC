@@ -13,7 +13,7 @@ from data import cuisine_data, data_functions, user_data, restaurant_data, inter
 
 load_dotenv()
 
-connection = data_functions.get_connection("test")
+connection = data_functions.get_connection("prod")
 
 # SoCal locations with food options (lat, lng, location_name)
 location1 = [
@@ -49,21 +49,25 @@ location3 = [
     (34.0635, -118.3580, "The Grove, Los Angeles")
 ]
 
+location4 = [
+    (34.1016, -118.3387, "Hollywood & Highland")
+]
+
 
 # Initialize data storage
 all_feature_data = []
 results = []
 
 # Run 15 API calls
-for i in range(len(location3)):
-    location = location3[i]
+for i in range(len(location4)):
+    location = location4[i]
     lat = location[0]
     lng = location[1]
     location_name = location[2]
     max_distance = 5
     
     print(f"\n{'='*60}")
-    print(f"Loop {i+1}/{len(location3)}: {location_name}")
+    print(f"Loop {i+1}/{len(location4)}: {location_name}")
     print(f"Coordinates: ({lat}, {lng})")
     print(f"Max Distance: {max_distance} miles")
     print(f"{'='*60}")
@@ -117,7 +121,7 @@ for i in range(len(location3)):
                                               restaurant["cuisine"], 
                                               restaurant["name"])
 
-            cuisine_data.upsert_cuisine_stats(connection, restaurant["cuisine"], response)
+            cuisine_data.upsert_cuisine_stats(connection, restaurant["cuisine"], response, user_id = 1)
 
             interact_data.insert_user_interaction(connection,
                                                 restaurant["id"],
@@ -125,7 +129,8 @@ for i in range(len(location3)):
                                                 restaurant["rating_count"],
                                                 restaurant["is_open"],
                                                 restaurant["drive_time"],
-                                                response)
+                                                response,
+                                                user_id= 1)
 
                 
 
@@ -149,7 +154,7 @@ print(f"Total Restaurants Retrieved: {len(all_feature_data)}")
 print(f"Total Result Reviewed: {len(results)}")
 
 
-print(f"Total Interaction Recorded: {len(interact_data.fetch_user_interactions(connection))} \n")
+print(f"Total Interaction Recorded: {len(interact_data.fetch_user_interactions(connection, user_id=1))} \n")
 
 
 print(f"Total Unique Restaurants: {len(restaurant_data.fetch_restaurants(connection))} \n")

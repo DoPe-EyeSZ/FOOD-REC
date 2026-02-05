@@ -36,12 +36,12 @@ try:
     print(f"{'='*30} POSTGRES TEST {'='*30} ")
     user_count = None
     restaurant = restaurant_data.fetch_restaurants(pg_connection)
-    cuisine = cuisine_data.fetch_all_cuisine(pg_connection)
-    interact = interact_data.fetch_user_interactions(pg_connection)
+    cuisine = cuisine_data.fetch_all_cuisine(pg_connection, user_id=1)
+    interact = interact_data.fetch_user_interactions(pg_connection, user_id= 1)
 
     restaurant2 = restaurant_data.fetch_restaurants(pg_connection2)
-    cuisine2 = cuisine_data.fetch_all_cuisine(pg_connection2)
-    interact2 = interact_data.fetch_user_interactions(pg_connection2)
+    cuisine2 = cuisine_data.fetch_all_cuisine(pg_connection2, user_id=1)
+    interact2 = interact_data.fetch_user_interactions(pg_connection2, user_id= 1)
 
     
     print(len(cuisine))

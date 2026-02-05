@@ -22,7 +22,7 @@ def create_cuisine_table(connection):
 
 
 #Query through all rows
-def fetch_all_cuisine(connection, user_id = 1):
+def fetch_all_cuisine(connection, user_id):
     query = "SELECT * FROM cuisine_stats WHERE user_id = %s"
 
     try:
@@ -37,7 +37,7 @@ def fetch_all_cuisine(connection, user_id = 1):
 
 
 #Query for specific cuisine
-def fetch_cuisine(connection, cuisine, user_id = 1):
+def fetch_cuisine(connection, cuisine, user_id):
     query = "SELECT * FROM cuisine_stats WHERE user_id = %s AND cuisine = %s"
 
     try:
@@ -54,7 +54,7 @@ def fetch_cuisine(connection, cuisine, user_id = 1):
 
 
 #Delete row
-def delete_cuisine(connection, cuisine, user_id = 1):
+def delete_cuisine(connection, cuisine, user_id):
     query = "DELETE FROM cuisine_stats WHERE user_id = %s AND cuisine = %s"
 
     try:
@@ -70,7 +70,7 @@ def delete_cuisine(connection, cuisine, user_id = 1):
 
 
 #Upsert cuisine information
-def upsert_cuisine_stats(connection, cuisine, accepted, user_id = 1):
+def upsert_cuisine_stats(connection, cuisine, accepted, user_id):
     query = '''
         INSERT INTO cuisine_stats (user_id, cuisine, shown, accepted)
         VALUES (%s, %s, 1, %s)
@@ -90,7 +90,7 @@ def upsert_cuisine_stats(connection, cuisine, accepted, user_id = 1):
         print(f"upsert_cuisine_stats has an error: {e}")
 
 
-def increment_acceptance(connection, cuisine, user_id = 1):
+def increment_acceptance(connection, cuisine, user_id):
     query = '''
         UPDATE cuisine_stats
         SET accepted = accepted + 1
