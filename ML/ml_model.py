@@ -9,12 +9,12 @@ import pickle
 from pathlib import Path
 
 
-def train_save_model(connection):
+def train_save_model(connection, user_id):
 
 
     #Gathers all feature data
-    feature_data = data_functions.join_interaction_restaurant(connection)
-    frequency = api_function.find_frequency(connection)
+    feature_data = data_functions.join_interaction_restaurant(connection, user_id)
+    frequency = api_function.find_frequency(connection, user_id)
 
 
     #Separates feature data from user response

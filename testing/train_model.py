@@ -11,9 +11,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-connection = data_functions.get_connection("prod")
+connection = data_functions.get_connection("test")
 
-logistic_model, logistic_scaler, score = ml_model.train_save_model(connection)
+logistic_model, logistic_scaler, score = ml_model.train_save_model(connection, user_id=1)
 
 
 #LOGISTIC REGRESSION FEATURE IMPORTANCE

@@ -74,14 +74,15 @@ def extract_api_data(data):
     return info      
 
 
-def find_frequency(connection):       #Find how often user accept/skips food
+def find_frequency(connection, user_id):       #Find how often user accept/skips food
     cuisine_dict = {}
-    cuisine_stats = cuisine_data.fetch_all_cuisine(connection)
+    cuisine_stats = cuisine_data.fetch_all_cuisine(connection, user_id)
+    print(cuisine_stats)
 
     for cuisine in cuisine_stats:
-        c = cuisine[1]
-        shown = cuisine[2]
-        accepted = cuisine[3]
+        c = cuisine[0]
+        shown = cuisine[1]
+        accepted = cuisine[2]
         cuisine_dict[c] = float(float(accepted)/float(shown))
 
     return cuisine_dict
