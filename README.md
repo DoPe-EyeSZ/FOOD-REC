@@ -184,7 +184,7 @@ update 2/4/26
 - added user id
 
 NEXT STEPS:
-- add user id to test db
+- add user id and features to test db
 - add user login/signup
 - update remaining files:
   - api/api_function.py (database calls)
