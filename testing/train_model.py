@@ -16,21 +16,6 @@ connection = data_functions.get_connection("test")
 logistic_model, logistic_scaler, score = ml_model.train_save_model(connection, user_id=1)
 
 
-#LOGISTIC REGRESSION FEATURE IMPORTANCE
-print(f"\n{'='*60}")
-print("FEATURE IMPORTANCE")
-print(f"{'='*60}")
-
-feature_names = ["dine_in", "takeout", "vegan", "price", "cuisine_ratio", "rating", "rating_count", "open", "drive"]
-
-coef = logistic_model.coef_[0]
-importance = abs(coef)
-
-sorted_pairs = sorted(zip(feature_names, importance), key=lambda x: x[1], reverse=True)
-
-for name, imp in sorted_pairs:
-    bar = '█' * int(imp * 100)
-    print(f"{name:15} {imp:.3f} {bar} \n")
 
 
 # VISUALIZATION

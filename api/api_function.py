@@ -80,9 +80,9 @@ def find_frequency(connection, user_id):       #Find how often user accept/skips
     print(cuisine_stats)
 
     for cuisine in cuisine_stats:
-        c = cuisine[0]
-        shown = cuisine[1]
-        accepted = cuisine[2]
+        c = cuisine[1]
+        shown = cuisine[2]
+        accepted = cuisine[3]
         cuisine_dict[c] = float(float(accepted)/float(shown))
 
     return cuisine_dict
