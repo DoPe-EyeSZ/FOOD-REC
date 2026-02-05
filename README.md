@@ -181,8 +181,11 @@ update 2/4/26
 - updated rec function
 - tested "test/train model" and works fine
 - implementing user login/signup
+- added user id
 
 NEXT STEPS:
+- add user id to test db
+- add user login/signup
 - update remaining files:
   - api/api_function.py (database calls)
   - ml/recommendations.py (get_recs function)
