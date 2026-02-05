@@ -6,7 +6,7 @@ try:
     pg_connection = data_functions.get_connection("test")
     pg_connection2 = data_functions.get_connection("prod")
 
-    '''restaurant_data.create_restaurant_table(pg_connection)
+    restaurant_data.create_restaurant_table(pg_connection)
     user_data.create_user_table(pg_connection)
     cuisine_data.create_cuisine_table(pg_connection)
     interact_data.create_interact_table(pg_connection)
@@ -36,20 +36,20 @@ try:
     print(len(lite_interaction))
 
     
-    print(f"{'='*30} POSTGRES {'='*30} ")
+    '''print(f"{'='*30} POSTGRES {'='*30} ")
     user_count = None
     restaurant = restaurant_data.fetch_restaurants(pg_connection)
     cuisine = cuisine_data.fetch_all_cuisine(pg_connection)
-    interact = interact_data.fetch_user_interactions(pg_connection)
+    interact = interact_data.fetch_user_interactions(pg_connection)'''
 
     restaurant2 = restaurant_data.fetch_restaurants(pg_connection2)
     cuisine2 = cuisine_data.fetch_all_cuisine(pg_connection2)
     interact2 = interact_data.fetch_user_interactions(pg_connection2)
 
     
-    print(len(cuisine))
+    '''print(len(cuisine))
     print(len(restaurant))
-    print(len(interact))
+    print(len(interact))'''
 
     print(f"{'='*30} POSTGRES PROD {'='*30} ")
 
@@ -57,19 +57,7 @@ try:
     print(len(restaurant2))
     print(len(interact2))
 
-    '''
-    query4 = '''
-        SELECT constraint_name, constraint_type
-        FROM information_schema.table_constraints 
-        WHERE table_name = 'users'
-    '''
 
-
-    cur = pg_connection2.cursor()
-
-    cur.execute(query4, )
-    pg_connection2.commit()
-    cur.close()
 
 
 

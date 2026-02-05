@@ -3,7 +3,7 @@
 def create_cuisine_table(connection):
     query = f'''
         CREATE TABLE IF NOT EXISTS cuisine_stats(
-            user_id TEXT DEFAULT 'test_user',
+            user_id INTEGER DEFAULT 'test_user',
             cuisine TEXT,
             shown INTEGER DEFAULT 0,
             accepted INTEGER DEFAULT 0,
@@ -22,12 +22,12 @@ def create_cuisine_table(connection):
 
 
 #Query through all rows
-def fetch_all_cuisine(connection, user_id = 'test_user'):
+def fetch_all_cuisine(connection, user_id = "1"):
     query = "SELECT * FROM cuisine_stats WHERE user_id = %s"
 
     try:
         cursor = connection.cursor()
-        cursor.execute(query, (user_id,))
+        cursor.execute(query, (int(user_id),))
         rows = cursor.fetchall()
         cursor.close()
         return rows
@@ -37,7 +37,7 @@ def fetch_all_cuisine(connection, user_id = 'test_user'):
 
 
 #Query for specific cuisine
-def fetch_cuisine(connection, cuisine, user_id = "test_user"):
+def fetch_cuisine(connection, cuisine, user_id = 1):
     query = "SELECT * FROM cuisine_stats WHERE user_id = %s AND cuisine = %s"
 
     try:
@@ -54,7 +54,7 @@ def fetch_cuisine(connection, cuisine, user_id = "test_user"):
 
 
 #Delete row
-def delete_cuisine(connection, cuisine, user_id = 'test_user'):
+def delete_cuisine(connection, cuisine, user_id = 1):
     query = "DELETE FROM cuisine_stats WHERE user_id = %s AND cuisine = %s"
 
     try:
@@ -70,7 +70,7 @@ def delete_cuisine(connection, cuisine, user_id = 'test_user'):
 
 
 #Upsert cuisine information
-def upsert_cuisine_stats(connection, cuisine, accepted, user_id = 'test_user'):
+def upsert_cuisine_stats(connection, cuisine, accepted, user_id = 1):
     query = '''
         INSERT INTO cuisine_stats (user_id, cuisine, shown, accepted)
         VALUES (%s, %s, 1, %s)
@@ -90,7 +90,7 @@ def upsert_cuisine_stats(connection, cuisine, accepted, user_id = 'test_user'):
         print(f"upsert_cuisine_stats has an error: {e}")
 
 
-def increment_acceptance(connection, cuisine, user_id = 'test_user'):
+def increment_acceptance(connection, cuisine, user_id = 1):
     query = '''
         UPDATE cuisine_stats
         SET accepted = accepted + 1

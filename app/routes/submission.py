@@ -82,11 +82,11 @@ def process_response():
     drive_time = request.form.get("drive_time")
 
     #Saving interaction
-    interact_data.insert_user_interaction(connection, place_id, rating, rating_count, opening, drive_time, response, user_id="test_user")
+    interact_data.insert_user_interaction(connection, place_id, rating, rating_count, opening, drive_time, response, user_id=1)
 
     #Increment acceptance
     if response == "1":
-        cuisine_data.increment_acceptance(connection, cuisine, user_id="test_user")
+        cuisine_data.increment_acceptance(connection, cuisine, user_id=1)
 
 
     if session["index"] < len(session["suggestions"]):
@@ -94,7 +94,7 @@ def process_response():
         return redirect(url_for("submission.show_restaurant"))
     
     else:
-        reccent_10 = data_functions.join_10_restaurant(connection, user_id="test_user")
+        reccent_10 = data_functions.join_10_restaurant(connection, user_id=1)
         connection.close()
         print(reccent_10)
         return render_template("summary.html", displayed_restaurants = reccent_10)

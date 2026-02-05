@@ -27,7 +27,7 @@ def create_interact_table(connection):
 
 
 #Inserting interaction
-def insert_user_interaction(connection, place_id, rating, rating_count, is_open, drive_time, accepted, user_id = 'test_user'):
+def insert_user_interaction(connection, place_id, rating, rating_count, is_open, drive_time, accepted, user_id = 1):
     query = '''
     INSERT INTO user_interactions (user_id, place_id, rating, rating_count, is_open, drive_time, accepted) 
     VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -58,7 +58,7 @@ def delete_user_interaction(connection, id):
         print(f"delete_user_interaction has an error: {e}")
 
 
-def delete_user_interactions(connection, user_id = 'test_user'):
+def delete_user_interactions(connection, user_id = 1):
     query = "DELETE FROM user_interactions WHERE user_id = %s"
 
     try:
@@ -73,7 +73,7 @@ def delete_user_interactions(connection, user_id = 'test_user'):
 
 
 #Fetching data
-def fetch_user_interaction(connection, id, user_id = "test_user"):
+def fetch_user_interaction(connection, id, user_id = 1):
     query = "SELECT * FROM user_interactions WHERE id = %s AND user_id = %s"
 
     try:
@@ -87,7 +87,7 @@ def fetch_user_interaction(connection, id, user_id = "test_user"):
         print(f"fetch_user_interaction has an error: {e}")
 
 
-def fetch_user_interactions(connection, user_id = "test_user"):
+def fetch_user_interactions(connection, user_id = 1):
     query = "SELECT * FROM user_interactions WHERE user_id = %s"
 
     try:

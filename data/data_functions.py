@@ -15,7 +15,7 @@ def get_connection(db_type = "test"):
     return connection
 
 
-def join_interaction_restaurant(connection, user_id = "test_user"):
+def join_interaction_restaurant(connection, user_id = 1):
     query = '''
         SELECT r.dine_in, r.take_out, r.vegan_option, r.price_level, r.cuisine,
         i.rating, i.rating_count, i.is_open, i.drive_time, i.accepted
@@ -36,7 +36,7 @@ def join_interaction_restaurant(connection, user_id = "test_user"):
         print(f"join_interaction_restaurant has an error: {e}")
 
 
-def join_10_restaurant(connection, user_id = "test_user"):
+def join_10_restaurant(connection, user_id = 1):
     query = '''
         SELECT r.name, r.dine_in, r.take_out, r.vegan_option, r.price_level, r.cuisine,
         i.rating, i.rating_count, i.is_open, i.drive_time, i.accepted
