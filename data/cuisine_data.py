@@ -22,12 +22,12 @@ def create_cuisine_table(connection):
 
 
 #Query through all rows
-def fetch_all_cuisine(connection, user_id = "1"):
+def fetch_all_cuisine(connection, user_id = 1):
     query = "SELECT * FROM cuisine_stats WHERE user_id = %s"
 
     try:
         cursor = connection.cursor()
-        cursor.execute(query, (int(user_id),))
+        cursor.execute(query, (user_id),)
         rows = cursor.fetchall()
         cursor.close()
         return rows
