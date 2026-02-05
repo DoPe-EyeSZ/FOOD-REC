@@ -27,7 +27,7 @@ def fetch_all_cuisine(connection, user_id = 1):
 
     try:
         cursor = connection.cursor()
-        cursor.execute(query, (user_id),)
+        cursor.execute(query, (user_id,))
         rows = cursor.fetchall()
         cursor.close()
         return rows

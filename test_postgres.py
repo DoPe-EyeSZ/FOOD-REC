@@ -42,9 +42,10 @@ try:
     cuisine = cuisine_data.fetch_all_cuisine(pg_connection)
     interact = interact_data.fetch_user_interactions(pg_connection)'''
 
-    restaurant2 = restaurant_data.fetch_restaurants(pg_connection2)
-    cuisine2 = cuisine_data.fetch_all_cuisine(pg_connection2)
-    interact2 = interact_data.fetch_user_interactions(pg_connection2)
+    #restaurant2 = restaurant_data.fetch_restaurants(pg_connection2)
+    #cuisine2 = cuisine_data.increment_acceptance(pg_connection2, "chinese_restaurant", 1)
+    cuisine3 = cuisine_data.fetch_cuisine(pg_connection2, "chinese_restaurant", 1)
+    #interact2 = interact_data.fetch_user_interactions(pg_connection2)
 
     
     '''print(len(cuisine))
@@ -53,9 +54,9 @@ try:
 
     print(f"{'='*30} POSTGRES PROD {'='*30} ")
 
-    print(len(cuisine2))
-    print(len(restaurant2))
-    print(len(interact2))
+    print(cuisine3)
+    #print(len(restaurant2))
+    #print(len(interact2))
 
 
 
