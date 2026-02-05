@@ -6,15 +6,22 @@ try:
     pg_connection = data_functions.get_connection("test")
     pg_connection2 = data_functions.get_connection("prod")
 
-    restaurant_data.create_restaurant_table(pg_connection)
     user_data.create_user_table(pg_connection)
-    cuisine_data.create_cuisine_table(pg_connection)
-    interact_data.create_interact_table(pg_connection)
-
     pg_connection.commit()
 
 
-    lite_connection = sqlite3.connect("instance/test_data.db")
+
+    query = '''
+        DELETE FROM users WHERE user_id = %s
+    '''
+    
+
+    cur = pg_connection.cursor()
+    cur.execute(query, (2,))
+    pg_connection.commit()
+    cur.close()
+
+    '''lite_connection = sqlite3.connect("instance/test_data.db")
 
     query1 = "SELECT * FROM interactions"
     lite_interaction = lite_connection.execute(query1).fetchall()
@@ -36,27 +43,30 @@ try:
     print(len(lite_interaction))
 
     
-    '''print(f"{'='*30} POSTGRES {'='*30} ")
+    print(f"{'='*30} POSTGRES TEST {'='*30} ")
     user_count = None
     restaurant = restaurant_data.fetch_restaurants(pg_connection)
     cuisine = cuisine_data.fetch_all_cuisine(pg_connection)
-    interact = interact_data.fetch_user_interactions(pg_connection)'''
+    interact = interact_data.fetch_user_interactions(pg_connection)
 
-    #restaurant2 = restaurant_data.fetch_restaurants(pg_connection2)
-    #cuisine2 = cuisine_data.increment_acceptance(pg_connection2, "chinese_restaurant", 1)
-    cuisine3 = cuisine_data.fetch_cuisine(pg_connection2, "chinese_restaurant", 1)
-    #interact2 = interact_data.fetch_user_interactions(pg_connection2)
+    restaurant2 = restaurant_data.fetch_restaurants(pg_connection2)
+    cuisine2 = cuisine_data.fetch_all_cuisine(pg_connection2)
+    interact2 = interact_data.fetch_user_interactions(pg_connection2)
 
     
-    '''print(len(cuisine))
+    print(len(cuisine))
     print(len(restaurant))
-    print(len(interact))'''
+    print(len(interact))
 
     print(f"{'='*30} POSTGRES PROD {'='*30} ")
 
-    print(cuisine3)
-    #print(len(restaurant2))
-    #print(len(interact2))
+    print(len(cuisine2))
+    print(len(restaurant2))
+    print(len(interact2))
+
+    data = data_functions.join_10_restaurant(pg_connection2, user_id=1)
+
+    print(len(data))'''
 
 
 
