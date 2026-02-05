@@ -184,10 +184,11 @@ update 2/4/26
 - added user id
 
 update 2/5/26
-- added user_id to test db 
+- added user_id to test db
+- removed all default user id values
 
 NEXT STEPS:
-- make sure test db functions work as well
+- test ml recs, ml_model
 - add user login/signup
 - update remaining files:
   - api/api_function.py (database calls)
