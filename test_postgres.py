@@ -11,17 +11,7 @@ try:
 
 
 
-    query = '''
-        DELETE FROM users WHERE user_id = %s
-    '''
-    
-
-    cur = pg_connection.cursor()
-    cur.execute(query, (2,))
-    pg_connection.commit()
-    cur.close()
-
-    '''lite_connection = sqlite3.connect("instance/test_data.db")
+    lite_connection = sqlite3.connect("instance/test_data.db")
 
     query1 = "SELECT * FROM interactions"
     lite_interaction = lite_connection.execute(query1).fetchall()
@@ -66,7 +56,7 @@ try:
 
     data = data_functions.join_10_restaurant(pg_connection2, user_id=1)
 
-    print(len(data))'''
+    print(len(data))
 
 
 
