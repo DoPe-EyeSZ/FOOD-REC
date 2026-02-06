@@ -187,16 +187,30 @@ update 2/5/26
 - added user_id to test db
 - removed all default user id values
 
-NEXT STEPS:
-- test ml recs, ml_model
-- add user login/signup
-- update remaining files:
-  - api/api_function.py (database calls)
-  - ml/recommendations.py (get_recs function)
-  - testing/train_model.py (connection calls)
-  - app/routes/submission.py (change to db_type="prod")
-- test full Flask app with PostgreSQL
-- retrain ML model with PostgreSQL data
+update 2/6/26
+- added secure password hasing with werkzeug.security
+  - genreate pw has for signup
+  - check hash for login
+- Created authentication flow
+  - Login route: validates credentials, creates session
+  - Protected routes: check for `user_id` in session
+  - Logout route: clears session
+- Built database helper functions
+  - `fetch_user_credentials()`: retrieves user_id and password_hash
+  - `create_user()`: inserts new user with hashed password
+  - `update_username()`: changes username
+  - `change_pw()`: updates password hash
+- Updated login route with user feedback
+  - Error messages for wrong username/password
+  - Redirect to user dashboard on success
+
+### Next Steps
+- Fix plaintext password in test database (hash it)
+- Test multi-user functionality
+- Add signup route
+- Implement `login_required` decorator for protected routes
+- Move to Docker containerization
+- Deploy to AWS
 
 ```
 

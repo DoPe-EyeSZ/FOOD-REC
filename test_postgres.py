@@ -1,13 +1,14 @@
 from data import data_functions, cuisine_data, interact_data, restaurant_data, user_data
 import sqlite3
 from api import api_function
+from werkzeug.security import generate_password_hash, check_password_hash
 
 try:
-    pg_connection = data_functions.get_connection("test")
-    pg_connection2 = data_functions.get_connection("prod")
+    test_connection = data_functions.get_connection("test")
+    prod_connection = data_functions.get_connection("prod")
 
-    user_data.create_user_table(pg_connection)
-    pg_connection.commit()
+    user_data.create_user_table(test_connection)
+    test_connection.commit()
 
 
 
@@ -35,13 +36,13 @@ try:
     
     print(f"{'='*30} POSTGRES TEST {'='*30} ")
     user_count = None
-    restaurant = restaurant_data.fetch_restaurants(pg_connection)
-    cuisine = cuisine_data.fetch_all_cuisine(pg_connection, user_id=1)
-    interact = interact_data.fetch_user_interactions(pg_connection, user_id= 1)
+    restaurant = restaurant_data.fetch_restaurants(test_connection)
+    cuisine = cuisine_data.fetch_all_cuisine(test_connection, user_id=1)
+    interact = interact_data.fetch_user_interactions(test_connection, user_id= 1)
 
-    restaurant2 = restaurant_data.fetch_restaurants(pg_connection2)
-    cuisine2 = cuisine_data.fetch_all_cuisine(pg_connection2, user_id=1)
-    interact2 = interact_data.fetch_user_interactions(pg_connection2, user_id= 1)
+    restaurant2 = restaurant_data.fetch_restaurants(prod_connection)
+    cuisine2 = cuisine_data.fetch_all_cuisine(prod_connection, user_id=1)
+    interact2 = interact_data.fetch_user_interactions(prod_connection, user_id= 1)
 
     
     print(len(cuisine))
@@ -54,9 +55,16 @@ try:
     print(len(restaurant2))
     print(len(interact2))
 
-    data = data_functions.join_10_restaurant(pg_connection2, user_id=1)
+    pw = "test_pw_hash"
 
-    print(len(data))
+    pw_hash = generate_password_hash(pw)
+
+    user_data.change_pw(test_connection, pw_hash, 1)
+    user_data.change_pw(prod_connection, pw_hash, 1)
+    pw = user_data.fetch_user_credentials(prod_connection, "test_user")
+
+    print(check_password_hash(pw[1], "test_pw_hash")
+)
 
 
 
@@ -68,8 +76,8 @@ try:
 
     
     
-    pg_connection.close()
-    pg_connection2.close()
+    test_connection.close()
+    prod_connection.close()
 
 except Exception as e:
     print(f"error: {e}")

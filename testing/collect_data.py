@@ -13,7 +13,7 @@ from data import cuisine_data, data_functions, user_data, restaurant_data, inter
 
 load_dotenv()
 
-connection = data_functions.get_connection("prod")
+connection = data_functions.get_connection("test")
 
 # SoCal locations with food options (lat, lng, location_name)
 location1 = [
@@ -29,10 +29,7 @@ location1 = [
     (33.8303, -118.3416, "Del Amo Fashion Center"),
     (34.1416, -117.9227, "Monrovia Downtown"),
     (33.7175, -117.9542, "The District at Tustin Legacy"),
-    (34.0407, -117.5098, "Victoria Gardens, Rancho Cucamonga")
-]
-
-location2 = [
+    (34.0407, -117.5098, "Victoria Gardens, Rancho Cucamonga"),
     (34.07362, -118.40035, "Beverly Hills Restaurants Area"),            
     (34.04473, -118.24928, "Downtown Los Angeles Food District"),        
     (34.07816, -118.26056, "Echo Park (LA) Food Scene"),                  
@@ -43,14 +40,13 @@ location2 = [
     (32.73415, -117.14449, "Hillcrest, San Diego"),          
     (33.98900, -117.37305, "Fullerton Downtown Food Area"),   
     (34.14778, -118.14452, "Pasadena Old Town"),                       
+    (34.0635, -118.3580, "The Grove, Los Angeles"),
+    (34.1016, -118.3387, "Hollywood & Highland"),
 ]
 
-location3 = [
-    (34.0635, -118.3580, "The Grove, Los Angeles")
-]
-
-location4 = [
-    (34.1016, -118.3387, "Hollywood & Highland")
+location2 = [
+    (37.7749, -122.4194, "San Francisco Union Square"),
+    (38.5816, -121.4944, "Sacramento Downtown Commons"),
 ]
 
 
@@ -59,15 +55,15 @@ all_feature_data = []
 results = []
 
 # Run 15 API calls
-for i in range(len(location4)):
-    location = location4[i]
+for i in range(len(location2)):
+    location = location2[i]
     lat = location[0]
     lng = location[1]
     location_name = location[2]
     max_distance = 5
     
     print(f"\n{'='*60}")
-    print(f"Loop {i+1}/{len(location4)}: {location_name}")
+    print(f"Loop {i+1}/{len(location2)}: {location_name}")
     print(f"Coordinates: ({lat}, {lng})")
     print(f"Max Distance: {max_distance} miles")
     print(f"{'='*60}")
