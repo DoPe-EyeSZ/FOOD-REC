@@ -204,10 +204,16 @@ update 2/6/26
   - Error messages for wrong username/password
   - Redirect to user dashboard on success
 
+- added user authentication
+  - used werkzeung or wtv
+- added login feature
+- added signup feature
+- added nav bar feature
+
 ### Next Steps
-- Fix plaintext password in test database (hash it)
 - Test multi-user functionality
-- Add signup route
+- fix nav bar
+  - add links to nav bar
 - Implement `login_required` decorator for protected routes
 - Move to Docker containerization
 - Deploy to AWS
