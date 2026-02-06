@@ -1,46 +1,40 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Places Near You</title>
-</head>
-<body>
-    <h1>Put your parameters</h1>
+{% extends "logged_in_base.html" %}
 
-    <div id="locationPrompt">
-        <p>This app needs your location to find places near you.</p>
-        <button onclick="getLocation()">Allow Location</button>
-    </div>
+{% block title %} Places Near You {% endblock %}
 
-    <form action="{{url_for('submission.user_submission')}}" method="POST" id="locationForm" style="display: none;">
-        <input type="hidden" name="lat" id="lat">
-        <input type="hidden" name="lng" id="lng">
-        <input type="number" name="max_distance" placeholder="Enter Max Distance" max="30" required>
-        <button type="submit">Submit</button>
-    </form>
+{% block content %}
+<h1>Put your parameters</h1>
 
-    <script>
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        document.getElementById('lat').value = position.coords.latitude;
-                        document.getElementById('lng').value = position.coords.longitude;
-                        
-                        // Hide prompt, show form
-                        document.getElementById('locationPrompt').style.display = 'none';
-                        document.getElementById('locationForm').style.display = 'block';
-                        
-                        console.log('Location set:', position.coords.latitude, position.coords.longitude);
-                    },
-                    (error) => {
-                        alert("Location access denied. Please enable location to use this app.");
-                    }
-                );
-            } else {
-                alert("Geolocation not supported by your browser");
+<div id="locationPrompt">
+    <p>This app needs your location to find places near you.</p>
+    <button onclick="getLocation()">Allow Location</button>
+</div>
+
+<form action="{{ url_for('submission.user_submission') }}" method="POST" id="locationForm" style="display: none;">
+    <input type="hidden" name="lat" id="lat">
+    <input type="hidden" name="lng" id="lng">
+    <input type="number" name="max_distance" placeholder="Enter Max Distance" max="30" required>
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                document.getElementById('lat').value = position.coords.latitude;
+                document.getElementById('lng').value = position.coords.longitude;
+
+                document.getElementById('locationPrompt').style.display = 'none';
+                document.getElementById('locationForm').style.display = 'block';
+            },
+            () => {
+                alert("Location access denied. Please enable location to use this app.");
             }
-        }
-    </script>
-</body>
-</html>
+        );
+    } else {
+        alert("Geolocation not supported by your browser");
+    }
+}
+</script>
+{% endblock %}

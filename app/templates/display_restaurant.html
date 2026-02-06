@@ -1,43 +1,40 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Output</title>
-</head>
-<body>
-    <h1>output section</h1>
+{% extends "logged_in_base.html" %}
 
-    <p>Name: {{displayed_restaurant[0]["name"]}}</p>
-    <p>cuisine: {{displayed_restaurant[0]["cuisine"]}}</p>
-    <p>dine in: {{displayed_restaurant[0]["dineIn"]}}</p>
-    <p>drive time: {{displayed_restaurant[0]["drive_time"]}}</p>
-    <p>opening: {{displayed_restaurant[0]["is_open"]}}</p>
-    <p>price: {{displayed_restaurant[0]["price_level"]}}</p>
-    <p>rating_count: {{displayed_restaurant[0]["rating_count"]}}</p>
-    <p>takeout: {{displayed_restaurant[0]["takeout"]}}</p>
-    <p>vegan option: {{displayed_restaurant[0]["vegan"]}}</p>
-    <p>rating: {{displayed_restaurant[0]["rating"]}}</p>
+{% block title %}Restaurant Display{% endblock %}
 
-    <form action="{{ url_for('submission.process_response') }}" method="POST" style="display:inline;">
-        <input type="hidden" name="response" value="1">
-        <input type="hidden" name="place_id" value="{{ displayed_restaurant[0]['id'] }}">
-        <input type="hidden" name="cuisine" value="{{ displayed_restaurant[0]['cuisine'] }}">
-        <input type="hidden" name="rating" value="{{ displayed_restaurant[0]['rating'] }}">
-        <input type="hidden" name="rating_count" value="{{ displayed_restaurant[0]['rating_count'] }}">
-        <input type="hidden" name="is_open" value="{{ displayed_restaurant[0]['is_open'] }}">
-        <input type="hidden" name="drive_time" value="{{ displayed_restaurant[0]['drive_time'] }}">
-        <button type="submit">Accept </button>
-    </form>
+{% block content %}
+<h2>Output Section</h2>
 
-    <!-- Reject Form -->
-    <form action="{{ url_for('submission.process_response') }}" method="POST" style="display:inline;">
-        <input type="hidden" name="response" value="0">
-        <input type="hidden" name="place_id" value="{{ displayed_restaurant[0]['id'] }}">
-        <input type="hidden" name="cuisine" value="{{ displayed_restaurant[0]['cuisine'] }}">
-        <input type="hidden" name="rating" value="{{ displayed_restaurant[0]['rating'] }}">
-        <input type="hidden" name="rating_count" value="{{ displayed_restaurant[0]['rating_count'] }}">
-        <input type="hidden" name="is_open" value="{{ displayed_restaurant[0]['is_open'] }}">
-        <input type="hidden" name="drive_time" value="{{ displayed_restaurant[0]['drive_time'] }}">
-        <button type="submit">Reject </button>
-    </form>
-</html>
+<p>Name: {{ displayed_restaurant[0]["name"] }}</p>
+<p>Cuisine: {{ displayed_restaurant[0]["cuisine"] }}</p>
+<p>Dine in: {{ displayed_restaurant[0]["dineIn"] }}</p>
+<p>Drive time: {{ displayed_restaurant[0]["drive_time"] }}</p>
+<p>Opening: {{ displayed_restaurant[0]["is_open"] }}</p>
+<p>Price: {{ displayed_restaurant[0]["price_level"] }}</p>
+<p>Rating count: {{ displayed_restaurant[0]["rating_count"] }}</p>
+<p>Takeout: {{ displayed_restaurant[0]["takeout"] }}</p>
+<p>Vegan option: {{ displayed_restaurant[0]["vegan"] }}</p>
+<p>Rating: {{ displayed_restaurant[0]["rating"] }}</p>
+
+<form action="{{ url_for('submission.process_response') }}" method="POST" style="display:inline;">
+    <input type="hidden" name="response" value="1">
+    <input type="hidden" name="place_id" value="{{ displayed_restaurant[0]['id'] }}">
+    <input type="hidden" name="cuisine" value="{{ displayed_restaurant[0]['cuisine'] }}">
+    <input type="hidden" name="rating" value="{{ displayed_restaurant[0]['rating'] }}">
+    <input type="hidden" name="rating_count" value="{{ displayed_restaurant[0]['rating_count'] }}">
+    <input type="hidden" name="is_open" value="{{ displayed_restaurant[0]['is_open'] }}">
+    <input type="hidden" name="drive_time" value="{{ displayed_restaurant[0]['drive_time'] }}">
+    <button type="submit">Accept</button>
+</form>
+
+<form action="{{ url_for('submission.process_response') }}" method="POST" style="display:inline;">
+    <input type="hidden" name="response" value="0">
+    <input type="hidden" name="place_id" value="{{ displayed_restaurant[0]['id'] }}">
+    <input type="hidden" name="cuisine" value="{{ displayed_restaurant[0]['cuisine'] }}">
+    <input type="hidden" name="rating" value="{{ displayed_restaurant[0]['rating'] }}">
+    <input type="hidden" name="rating_count" value="{{ displayed_restaurant[0]['rating_count'] }}">
+    <input type="hidden" name="is_open" value="{{ displayed_restaurant[0]['is_open'] }}">
+    <input type="hidden" name="drive_time" value="{{ displayed_restaurant[0]['drive_time'] }}">
+    <button type="submit">Reject</button>
+</form>
+{% endblock %}

@@ -5,7 +5,7 @@ import random
 from dotenv import load_dotenv
 load_dotenv()
 
-def get_recs(lat, long, distance, model, scaler, connection):
+def get_recs(lat, long, distance, model, scaler, connection, user_id):
 
     #(1) Grab location/distance from user
     response = api_function.use_api(lat, long, distance)        
@@ -41,7 +41,7 @@ def get_recs(lat, long, distance, model, scaler, connection):
                 #Updating Restaurant DB     
                 restaurant_data.insert_restaurant(connection, place_id, dine_in, takeout, vegan, price_level, cuisine, name)
                 #UPDATE CUISINE TABLE HERE
-                cuisine_data.upsert_cuisine_stats(connection, cuisine, 0, user_id="test_user") 
+                cuisine_data.upsert_cuisine_stats(connection, cuisine, 0, user_id) 
                 
 
         #(6) Get frequency dictionary of all cuisine_stats

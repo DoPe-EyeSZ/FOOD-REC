@@ -1,19 +1,18 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>signup</title>
-</head>
-<body>
-    <h1>signup section</h1>
+{% extends "logged_out_base.html" %}
 
-    <form action="#" method="POST">
-        <p>username</p>
-        <input type="text" name="username">
+{% block title %}
+Signup
+{% endblock %}
 
-        <p>password</p>
-        <input type="text" name="password">
-        <button type="submit">login</button>
+{% block content %}
+<h1>Sign Up Section</h1>
 
-    </form>
-</html>
+<form action="#" method="POST">
+    <p>Username</p>
+    <input type="text" name="username">
+
+    <p>Password</p>
+    <input type="password" name="password">
+    <button type="submit">Signup</button>
+</form>
+{% endblock %}
