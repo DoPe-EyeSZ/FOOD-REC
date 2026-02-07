@@ -187,28 +187,111 @@ update 2/5/26
 - added user_id to test db
 - removed all default user id values
 
-update 2/6/26
-- added secure password hasing with werkzeug.security
-  - genreate pw has for signup
-  - check hash for login
-- Created authentication flow
-  - Login route: validates credentials, creates session
-  - Protected routes: check for `user_id` in session
-  - Logout route: clears session
-- Built database helper functions
-  - `fetch_user_credentials()`: retrieves user_id and password_hash
-  - `create_user()`: inserts new user with hashed password
-  - `update_username()`: changes username
-  - `change_pw()`: updates password hash
-- Updated login route with user feedback
-  - Error messages for wrong username/password
-  - Redirect to user dashboard on success
+Update 2/6/26 - Authentication & Rate Limiting Implementation
 
-- added user authentication
-  - used werkzeung or wtv
-- added login feature
-- added signup feature
-- added nav bar feature
+Authentication & Security
+- Implemented secure password hashing with werkzeug.security
+  - generate_password_hash() for user signup
+  - check_password_hash() for login verification
+  - Never store plaintext passwords in database
+- Created complete authentication flow
+  - Login route: validates credentials, creates Flask session
+  - Signup route: creates new users with hashed passwords
+  - Logout route: clears user session
+  - Protected routes: verify user_id exists in session before access
+- Built Flask session management
+  - Store user_id in server-side session
+  - Session persists across requests
+  - Configured app.secret_key for session encryption
+
+Database Operations
+- Refactored database schema for security
+  - Changed primary key from username to user_id (SERIAL)
+  - Added password_hash column for secure password storage
+  - Set username as UNIQUE constraint
+  - Updated foreign key references across all tables
+- Created database helper functions
+  - fetch_user_credentials(username): retrieves user_id and password_hash
+  - create_user(username, password_hash): inserts new user
+  - update_username(new_username, user_id): changes username
+  - change_pw(new_pw_hash, user_id): updates password hash
+- Followed SQL best practices
+  - Parameterized queries to prevent SQL injection
+  - Proper error handling with try/except
+  - Connection management with cursor.close()
+
+User Experience & Error Handling
+- Implemented user feedback system
+  - Error messages for invalid username
+  - Error messages for incorrect password
+  - Success messages with flash()
+  - Form data persistence on validation errors
+- Applied redirect vs render patterns
+  - Redirect after successful POST (prevents duplicate submissions)
+  - Render template for form validation errors
+  - Redirect for authentication state changes
+  - POST-Redirect-GET pattern for form submissions
+
+Rate Limiting Architecture
+- Researched rate limiting strategies
+  - Compared Redis, PostgreSQL, in-memory, and session-based approaches
+  - Evaluated trade-offs: persistence, scalability, bypass prevention
+  - Industry standard patterns (multi-layer, cost-based, tiered limits)
+- Designed rate limiting solution
+  - PostgreSQL-based implementation (no additional services required)
+  - User-based and IP-based tracking
+  - Automatic window expiration
+  - Proper HTTP 429 status codes with retry-after headers
+- Learned about storage considerations
+  - Server-side vs client-side storage
+  - Data persistence across restarts
+  - Bypass prevention techniques
+
+Web Development Concepts
+- HTTP status codes
+  - 200 (success), 401 (unauthorized), 429 (rate limit), 500 (server error)
+- RESTful routing patterns
+  - GET for displaying forms
+  - POST for form submissions
+  - Proper HTTP method usage
+- Browser behavior
+  - How redirects work
+  - Form resubmission on refresh
+  - Session cookies vs localStorage
+- Deployment considerations
+  - Development vs production configurations
+  - Environment-based settings
+  - Service dependencies (Redis, PostgreSQL)
+
+Python Skills
+- Decorators and higher-order functions
+  - @wraps for preserving function metadata
+  - Custom decorator patterns for route protection
+  - Function factories (decorators with parameters)
+- Error handling patterns
+  - Try/except blocks for database operations
+  - Return values for success/failure signaling
+  - Graceful degradation
+- Type safety and validation
+  - Input validation before database operations
+  - Checking for None values
+  - Explicit return statements
+
+Security Best Practices
+- Password security
+  - Salted hashing (random salt per password)
+  - Using cryptographically secure hash functions
+  - Never comparing hashes with == (timing attacks)
+- Authentication patterns
+  - Session-based authentication
+  - Server-side session storage
+  - Protecting sensitive routes
+- Attack prevention
+  - SQL injection prevention (parameterized queries)
+  - Brute force mitigation (rate limiting)
+  - CSRF consideration (POST for state changes)
+
+
 
 ### Next Steps
 - Test multi-user functionality

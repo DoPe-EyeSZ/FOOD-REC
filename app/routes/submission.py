@@ -177,7 +177,14 @@ def statistics():
     if "user_id" in session:
         connection = data_functions.get_connection("prod")
 
-        all_cuisines = cuisine_data.fetch_all_cuisine(connection, session["user_id"])
+        '''
+        show num of cuisines seen
+        show num of food places interacted with
+        show num of restaurants seen
+        show top 10 cuisines that appeared the most
+        show what cuisnes we think they like the most
+        show what we think they care about the most for restaurant
+        '''
         
         return render_template("stats.html")
 

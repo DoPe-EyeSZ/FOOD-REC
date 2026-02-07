@@ -56,31 +56,34 @@ try:
     print(len(interact2))
 
     pw = "test_pw_hash"
+    all_cuisines = cuisine_data.fetch_all_cuisine(prod_connection, 1)
+    all_interactions = interact_data.fetch_user_interactions(prod_connection, 1)
+
+    highest_appearance = []
+    highest_acceptance = []
+
+    for info in all_cuisines:
+        cuisine = info[1]
+        appear = info[2]
+        accept = info[3]
+        
+        if appear > 3:
+            highest_acceptance.append([cuisine, round(accept/appear, 2)])
+        highest_appearance.append(list(info[1:]))
+
+    highest_appearance.sort(key = lambda c: c[1], reverse=True)
+    highest_acceptance.sort(key = lambda c:c[1], reverse=True)
+
+    print(highest_appearance[:10])       #Cuisine user seen the most
+    print(highest_acceptance[:10])       #Cuisine program thinks user like the most
+    print(len(all_cuisines))        #Number of cuisines users have seen
+    print(len(all_interactions))        #Number of restaurants interacted with
 
 
 
+    
 
-    information1 = cuisine_data.fetch_all_cuisine(prod_connection, 1)
-    information2 = interact_data.fetch_user_interactions(prod_connection, 1)
-    print(len(information2))
 
-    new = []
-    for info in information1:
-        new.append(list(info[1:]))
-
-    highest_appearance = sorted(new, key=lambda n: n[1], reverse=True )
-    print(highest_appearance )
-    print()
-
-    new2 = []
-
-    for info in information1:
-        acceptance = info[3]/info[2]
-        new2.append([info[1], round(acceptance, 2)])
-
-    highest_acceptance = sorted(new2, reverse=True, key=lambda n: n[1])
-
-    print(highest_acceptance)
 
 
 
