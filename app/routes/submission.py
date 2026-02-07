@@ -78,7 +78,6 @@ def signup():
         return redirect(url_for("submission.signup"))
 
 
-#@submission.route("/", methods = ["POST", "GET"])
 @submission.route("/user_submission", methods = ["POST", "GET"])
 def user_submission():
     print(session)
