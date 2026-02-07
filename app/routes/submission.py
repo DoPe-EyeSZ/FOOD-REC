@@ -162,6 +162,7 @@ def process_response():
         
         else:
             reccent_10 = data_functions.join_10_restaurant(connection, user_id = session["user_id"])
+            print(reccent_10)
             connection.close()
             return render_template("summary.html", displayed_restaurants = reccent_10)
         

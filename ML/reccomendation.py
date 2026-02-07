@@ -45,7 +45,7 @@ def get_recs(lat, long, distance, model, scaler, connection, user_id):
                 
 
         #(6) Get frequency dictionary of all cuisine_stats
-        frequency_dict = api_function.find_frequency(connection)        
+        frequency_dict = api_function.find_frequency(connection, user_id)        
 
         #(7) insert frequency into feature data
         features, unused = api_function.insert_frequency(clean_feature_data, frequency_dict) 

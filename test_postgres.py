@@ -57,18 +57,17 @@ try:
 
     pw = "test_pw_hash"
 
-    pw_hash = generate_password_hash(pw)
-
-    user_data.change_pw(test_connection, pw_hash, 1)
-    user_data.change_pw(prod_connection, pw_hash, 1)
-    pw = user_data.fetch_user_credentials(prod_connection, "test_user")
-
-    print(check_password_hash(pw[1], "test_pw_hash")
-)
 
 
 
+    query4 = '''
+        DELETE FROM users WHERE user_id = %s
+    '''
 
+    cur = prod_connection.cursor()
+    cur.execute(query4, (3,))
+    prod_connection.commit()
+    cur.close()
 
 
 
