@@ -34,10 +34,12 @@ def login():
             
         else:
             flash("Wrong username or password", "warning")
-            return render_template("login.html")
+            return redirect(url_for("submission.login"))
+            
 
+    else:
 
-    return render_template("login.html")
+        return render_template("login.html")
 
 
 @submission.route("/logout", methods = ["GET"])
@@ -49,7 +51,7 @@ def logout():
     else:
         flash("You're not logged in", "warning")
 
-    return render_template("login.html")
+    return redirect(url_for("submission.login"))
 
 
 
@@ -70,17 +72,17 @@ def signup():
 
         else:
             flash("Username already exists", "warning")
-            return render_template("signup.html")
+            return redirect(url_for("submission.signup"))
 
     else:
-        return render_template("signup.html")
+        return redirect(url_for("submission.signup"))
 
 
 #@submission.route("/", methods = ["POST", "GET"])
 @submission.route("/user_submission", methods = ["POST", "GET"])
 def user_submission():
     print(session)
-    if session["user_id"]:
+    if "user_id" in session:
         if request.method == "GET":     #For after user logs in
             return render_template("submission.html")
 
@@ -108,12 +110,12 @@ def user_submission():
             return redirect(url_for("submission.show_restaurant"))
     
     else:
-        render_template("login.html")
+        return redirect(url_for("submission.login"))
     
 
 @submission.route("/show_restaurant")
 def show_restaurant():
-    if session["user_id"]:
+    if "user_id" in session:
         suggestions = session["suggestions"]
         index = session["index"]
 
@@ -122,12 +124,12 @@ def show_restaurant():
         return render_template("display_restaurant.html", displayed_restaurant = restaurant_to_display)
     
     else:
-        render_template("login.html")
+        return redirect(url_for("submission.login"))
 
 
 @submission.route("/process_response", methods = ["POST"])
 def process_response():
-    if session["user_id"]:
+    if "user_id" in session:
         connection = data_functions.get_connection("prod")
         session["index"] += 1
         
@@ -167,9 +169,20 @@ def process_response():
             return render_template("summary.html", displayed_restaurants = reccent_10)
         
     else:
-        render_template("login.html")
+        return redirect(url_for("submission.login"))
 
+
+@submission.route("/statistics", methods = ["GET"])
+def statistics():
+    if "user_id" in session:
+        connection = data_functions.get_connection("prod")
+
+        all_cuisines = cuisine_data.fetch_all_cuisine(connection, session["user_id"])
         
+        return render_template("stats.html")
+
+    else:
+        return redirect(url_for("submission.login"))
         
         
         
