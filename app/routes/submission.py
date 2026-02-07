@@ -176,17 +176,40 @@ def process_response():
 def statistics():
     if "user_id" in session:
         connection = data_functions.get_connection("prod")
+        frontend_data = {}
+
+        all_cuisines = cuisine_data.fetch_all_cuisine(connection, session["user_id"])
+        all_interactions = interact_data.fetch_user_interactions(connection, session["user_id"])
+
+        highest_appearance = []
+        highest_acceptance = []
+
+        for info in all_cuisines:
+            cuisine = info[1].replace("_", " ").title()
+            appear = info[2]
+            accept = info[3]
+
+            ratio = round((accept/appear)*100, 2)            
+            if appear > 3 and ratio > 50:
+                highest_acceptance.append([cuisine, ratio])
+            highest_appearance.append([cuisine, appear])
+
+        highest_appearance.sort(key = lambda c: c[1], reverse=True)
+        highest_acceptance.sort(key = lambda c:c[1], reverse=True)
+
+        frontend_data["highest_appearance"] = highest_appearance[:10]       #Cuisine user seen the most
+        frontend_data["highest_acceptance"] = highest_acceptance[:10]       #Cuisine user likes the most (with ratio)
+        frontend_data["all_cuisine_len"] = len(all_cuisines)        #Number of cuisines users have seen
+        frontend_data["all_interaction_len"] = len(all_interactions)        #Number of restaurants interacted with
+
+        
 
         '''
-        show num of cuisines seen
-        show num of food places interacted with
-        show num of restaurants seen
-        show top 10 cuisines that appeared the most
-        show what cuisnes we think they like the most
+        Cuisine not specified for cusind named "restuarnt"
         show what we think they care about the most for restaurant
         '''
         
-        return render_template("stats.html")
+        return render_template("stats.html", frontend_data = frontend_data)
 
     else:
         return redirect(url_for("submission.login"))

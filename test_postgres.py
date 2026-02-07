@@ -63,13 +63,13 @@ try:
     highest_acceptance = []
 
     for info in all_cuisines:
-        cuisine = info[1]
+        cuisine = info[1].replace("_", " ").title()
         appear = info[2]
         accept = info[3]
         
         if appear > 3:
             highest_acceptance.append([cuisine, round(accept/appear, 2)])
-        highest_appearance.append(list(info[1:]))
+        highest_appearance.append([cuisine, appear])
 
     highest_appearance.sort(key = lambda c: c[1], reverse=True)
     highest_acceptance.sort(key = lambda c:c[1], reverse=True)

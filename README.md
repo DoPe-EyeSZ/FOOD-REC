@@ -294,10 +294,7 @@ Security Best Practices
 
 
 ### Next Steps
-- Test multi-user functionality
-- fix nav bar
-  - add links to nav bar
-- Implement `login_required` decorator for protected routes
+- add rate limit
 - Move to Docker containerization
 - Deploy to AWS
 
