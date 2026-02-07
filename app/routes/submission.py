@@ -33,10 +33,24 @@ def login():
             return redirect(url_for("submission.user_submission"))
             
         else:
-            return render_template("login.html", error= "Wrong password or username")
+            flash("Wrong username or password", "warning")
+            return render_template("login.html")
 
 
     return render_template("login.html")
+
+
+@submission.route("/logout", methods = ["GET"])
+def logout():
+    if "user_id" in session:
+        session.clear()
+        flash("Successfully logged out!", "success")
+    
+    else:
+        flash("You're not logged in", "warning")
+
+    return render_template("login.html")
+
 
 
 @submission.route("/signup", methods = ["POST", "GET"])
@@ -55,7 +69,8 @@ def signup():
             return redirect(url_for("submission.user_submission"))
 
         else:
-            return render_template("signup.html", error = "username exists")
+            flash("Username already exists", "warning")
+            return render_template("signup.html")
 
     else:
         return render_template("signup.html")
