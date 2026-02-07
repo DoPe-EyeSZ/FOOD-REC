@@ -12,6 +12,7 @@
     <nav>
         <a href="{{url_for('submission.logout')}}">Logout</a>
         <a href="{{url_for('submission.statistics')}}">Statistics</a>
+        <a href="{{url_for('submission.user_submission')}}">Fetch Suggestions</a>
     </nav>
 
     {% with messages = get_flashed_messages() %}
