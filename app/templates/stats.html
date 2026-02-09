@@ -9,7 +9,7 @@ Your Stats
 
 <h2>Most Appearances</h2>
 {% for restaurant in frontend_data["highest_appearance"] %}
-    {% if restaurant[0] == "restaurant" %}
+    {% if restaurant[0] == "Restaurant" %}
         <p>Unspecified Restaurants have appeared {{restaurant[1]}}</p>
     
     {% else %}
@@ -21,7 +21,7 @@ Your Stats
 
 <h2>We Believe You Like:</h2>
 {% for restaurant in frontend_data["highest_acceptance"] %}
-    {% if restaurant[0] == "restaurant" %}
+    {% if restaurant[0] == "Restaurant" %}
         <p>Unspecified Restaurants because you accepted it {{restaurant[1]}}% of the time</p>
     
     {% else %}

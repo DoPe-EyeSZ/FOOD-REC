@@ -57,25 +57,31 @@ def logout():
 
 @submission.route("/signup", methods = ["POST", "GET"])
 def signup():
-    if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-        connection = data_functions.get_connection("prod")
 
-        if not user_data.fetch_user_credentials(connection, username):
-            pw_hash = generate_password_hash(password)
-            user_data.create_user(connection, username, pw_hash)
-            user_id = user_data.fetch_user_credentials(connection, username)[0]
-            session["user_id"] = user_id
-            flash("user created")
-            return redirect(url_for("submission.user_submission"))
-
-        else:
-            flash("Username already exists", "warning")
-            return redirect(url_for("submission.signup"))
+    if "user_id" in session:
+        flash("ur already logged in")
+        return redirect(url_for("submission.signup"))
 
     else:
-        return redirect(url_for("submission.signup"))
+        #After user submits signup form
+        if request.method == "POST":
+            username = request.form.get("username")
+            password = request.form.get("password")
+            connection = data_functions.get_connection("prod")
+
+            #Create new account if user does not exist
+            if not user_data.fetch_user_credentials(connection, username):
+                pw_hash = generate_password_hash(password)
+                user_data.create_user(connection, username, pw_hash)
+                user_id = user_data.fetch_user_credentials(connection, username)[0]
+                session["user_id"] = user_id
+                flash("user created")
+                return redirect(url_for("submission.user_submission"))
+
+            else:
+                flash("Username already exists", "warning")
+
+        return render_template("signup.html")
 
 
 @submission.route("/user_submission", methods = ["POST", "GET"])
@@ -163,7 +169,11 @@ def process_response():
         
         else:
             reccent_10 = data_functions.join_10_restaurant(connection, user_id = session["user_id"])
-            print(reccent_10)
+            suggestions = session["suggestions"]
+            for x in range(10):
+                print(reccent_10[x])
+                print(suggestions[x])
+                print()
             connection.close()
             return render_template("summary.html", displayed_restaurants = reccent_10)
         
