@@ -291,7 +291,19 @@ Security Best Practices
   - Brute force mitigation (rate limiting)
   - CSRF consideration (POST for state changes)
 
+update 2/9/26
+- improved data pipeline for summary section so easier to pull data
+- tested cv/model accuracy after 5 more iterations (100 new data sets)
+  - accuracy jumped to 85 percent in testing vs training with 75 percent
+  - implies that testing set got lucky
 
+  
+Restaurant Recommendation ML System (for resume)
+- Trained Logistic Regression model on 642 user interactions across 34 cuisine types
+- Achieved 75% prediction accuracy (5-fold cross-validation)
+- Implemented features: rating, price, distance, cuisine preference, dietary options
+- Model predicts user restaurant preferences with 50% improvement over random baseline
+- Deployed with Flask + PostgreSQL, serving personalized recommendations
 
 ### Next Steps
 - add rate limit
@@ -318,6 +330,7 @@ v2 ideas:
    - allow user to train data
 - auto retrain
 - allow user to pick places instead of using current location
+- have users select 20-30 restaurants to train model
 
 
 

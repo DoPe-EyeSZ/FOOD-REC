@@ -86,7 +86,6 @@ def signup():
 
 @submission.route("/user_submission", methods = ["POST", "GET"])
 def user_submission():
-    print(session)
     if "user_id" in session:
         if request.method == "GET":     #For after user logs in
             return render_template("submission.html")
@@ -108,7 +107,6 @@ def user_submission():
                 return "Error"
             
             session["suggestions"] = top10
-            print(session["suggestions"])
             session["index"] = 0
                 
             connection.close()    
@@ -158,24 +156,49 @@ def process_response():
 
         #Increment acceptance
         if response == "1":
-            cuisine_data.increment_acceptance(connection, 
-                                              cuisine, 
-                                              user_id = session["user_id"])
+            cuisine_data.increment_acceptance(connection, cuisine, user_id = session["user_id"])
 
-
+        #Continue to show suggested restaurants
         if session["index"] < len(session["suggestions"]):
             connection.close()
             return redirect(url_for("submission.show_restaurant"))
         
+        #All restaurants has been shown
         else:
-            reccent_10 = data_functions.join_10_restaurant(connection, user_id = session["user_id"])
+            #ORDER: name, dinein, takeout, vegan, price, cuisine, rating, rating count, opening, drive, acceptance
+            reccent_10_tuple = data_functions.join_10_restaurant(connection, user_id = session["user_id"])[::-1]
             suggestions = session["suggestions"]
+
+            #Stores all data for front end
+            full_summary = []
+
+            
+            
+            price_map = {
+                    5: "$",
+                    4: "$$", 
+                    3: "$$$",
+                    2: "$$$$",
+                    1: "$$$$$"
+                }
+            
+            #Combines important feature data with acceptance probability
             for x in range(10):
-                print(reccent_10[x])
-                print(suggestions[x])
-                print()
+                restaurant = list(reccent_10_tuple[x])
+                probability = suggestions[x][1]*100
+                restaurant.append(round(probability, 2))
+                restaurant[4] = price_map.get(restaurant[4], "N/A")
+                full_summary.append(restaurant)
+                
+            keys = ["name", "dine_in", "take_out", "vegan", "price", "cuisine", 
+                "rating", "rating_count", "open", "drive", "accept", "accept_prob"]
+
+            #Convert to dictionary
+            suggested_restaurant = [dict(zip(keys, place)) for place in full_summary]
+                
+
             connection.close()
-            return render_template("summary.html", displayed_restaurants = reccent_10)
+            return render_template("summary.html", displayed_restaurants = suggested_restaurant)
         
     else:
         return redirect(url_for("submission.login"))

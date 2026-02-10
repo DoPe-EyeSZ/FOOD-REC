@@ -5,20 +5,28 @@ Summary
 {% endblock %}
 
 {% block content %}
-<h1>Summary Section</h1>
+<h1>Decision Summary</h1>
 
 {% for restaurant in displayed_restaurants %}
-    <p>Name: {{ restaurant[0] }}</p>
-    <p>Dine in option: {{ restaurant[1] }}</p>
-    <p>Takeout: {{ restaurant[2] }}</p>
-    <p>Vegan: {{ restaurant[3] }}</p>
-    <p>Price: {{ restaurant[4] }}</p>
-    <p>Cuisine: {{ restaurant[5] }}</p>
-    <p>Rating: {{ restaurant[6] }}</p>
-    <p>Rating count: {{ restaurant[7] }}</p>
-    <p>Open: {{ restaurant[8] }}</p>
-    <p>Drive: {{ restaurant[9] }}</p>
-    <p>Your decision: {{ restaurant[10] }}</p>
+    <h2>{{ restaurant["name"] }}</h2>
+    
+    <p><strong>Cuisine:</strong> {{ restaurant["cuisine"].title() }}</p>
+    <p><strong>Rating:</strong> {{ restaurant["rating"] }} stars ({{ restaurant["rating_count"] }} reviews)</p>
+    <p><strong>Price Level:</strong> {{restaurant["price"] }}</p>
+    <p><strong>Drive Time:</strong> {{ (restaurant["drive"] / 60) | round(1) }} minutes</p>
+    
+    <p><strong>Available Options:</strong></p>
+    <ul>
+        {% if restaurant["dine_in"] == 1 %}<li>Offers dine-in</li>{% endif %}
+        {% if restaurant["take_out"] == 1 %}<li>Offers takeout</li>{% endif %}
+        {% if restaurant["vegan"] == 1 %}<li>Vegan options available</li>{% endif %}
+    </ul>
+    
+    <p><strong>Status:</strong> {% if restaurant["open"] == 1 %}Currently open{% else %}Currently closed{% endif %}</p>
+    
+    <p><strong>Your Decision:</strong> {% if restaurant["accept"] == 1 %}Accepted{% else %}Rejected{% endif %}</p>
+    <p>You had a {{ restaurant["accept_prob"] }}% chance of accepting this restaurant</p>
+    
     <hr>
 {% endfor %}
 
