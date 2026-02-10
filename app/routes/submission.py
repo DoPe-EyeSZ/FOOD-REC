@@ -1,22 +1,33 @@
+#Flask tools
 from flask import Blueprint, redirect, url_for, render_template, request, session, flash, jsonify
+
+#Security
 from werkzeug.security import generate_password_hash, check_password_hash
+
+#Data functions
 from data import data_functions, interact_data, cuisine_data, user_data
+
+#ML functions
 from ML import reccomendation
 import pickle
 
+from app import limiter
 
+#Loading api keys
 from dotenv import load_dotenv
 load_dotenv()
 
 
-
 submission = Blueprint("submission", __name__, template_folder="templates")
+
+#Updated model/scaler
 model = pickle.load(open('ml/models/model.pkl', 'rb'))
 scaler = pickle.load(open('ml/models/scaler.pkl', 'rb'))
 
 
 @submission.route("/", methods = ["POST", "GET"])
 @submission.route("/login", methods = ["POST", "GET"])
+@limiter.limit("3 per hour")
 def login():
     if request.method == "POST":
         connection = data_functions.get_connection("prod")
@@ -85,6 +96,7 @@ def signup():
 
 
 @submission.route("/user_submission", methods = ["POST", "GET"])
+@limiter.limit("10 per hour")
 def user_submission():
     if "user_id" in session:
         if request.method == "GET":     #For after user logs in
