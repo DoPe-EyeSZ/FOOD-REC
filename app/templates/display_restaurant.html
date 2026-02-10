@@ -3,18 +3,21 @@
 {% block title %}Restaurant Display{% endblock %}
 
 {% block content %}
-<h2>Output Section</h2>
+<h1>{{ displayed_restaurant[0]["name"] }}</h1>
 
-<p>Name: {{ displayed_restaurant[0]["name"] }}</p>
-<p>Cuisine: {{ displayed_restaurant[0]["cuisine"] }}</p>
-<p>Dine in: {{ displayed_restaurant[0]["dineIn"] }}</p>
-<p>Drive time: {{ displayed_restaurant[0]["drive_time"] }}</p>
-<p>Opening: {{ displayed_restaurant[0]["is_open"] }}</p>
-<p>Price: {{ displayed_restaurant[0]["price_level"] }}</p>
-<p>Rating count: {{ displayed_restaurant[0]["rating_count"] }}</p>
-<p>Takeout: {{ displayed_restaurant[0]["takeout"] }}</p>
-<p>Vegan option: {{ displayed_restaurant[0]["vegan"] }}</p>
-<p>Rating: {{ displayed_restaurant[0]["rating"] }}</p>
+<p><strong>Cuisine:</strong> {{ displayed_restaurant[0]["cuisine"].title() }}</p>
+<p><strong>Rating:</strong> {{ displayed_restaurant[0]["rating"] }} stars ({{ displayed_restaurant[0]["rating_count"] }} reviews)</p>
+<p><strong>Price Level:</strong> {{ displayed_restaurant[0]["price_level"] }}</p>
+<p><strong>Drive Time:</strong> {{ (displayed_restaurant[0]["drive_time"] / 60) | round(1) }} minutes</p>
+
+<p><strong>Available Options:</strong></p>
+<ul>
+    {% if displayed_restaurant[0]["dineIn"] == 1 %}<li>Offers dine-in</li>{% endif %}
+    {% if displayed_restaurant[0]["takeout"] == 1 %}<li>Offers takeout</li>{% endif %}
+    {% if displayed_restaurant[0]["vegan"] == 1 %}<li>Vegan options available</li>{% endif %}
+</ul>
+
+<p><strong>Status:</strong> {% if displayed_restaurant[0]["is_open"] == 1 %}Currently open{% else %}Currently closed{% endif %}</p>
 
 <form action="{{ url_for('submission.process_response') }}" method="POST" style="display:inline;">
     <input type="hidden" name="response" value="1">

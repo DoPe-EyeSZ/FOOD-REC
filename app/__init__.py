@@ -19,7 +19,7 @@ def create_app():
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config["SESSION_PERMANENT"] = False
-    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=5)
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=15)
 
     #Initialize limiter
     limiter.init_app(app)

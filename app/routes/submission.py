@@ -145,6 +145,8 @@ def show_restaurant():
         index = session["index"]
 
         restaurant_to_display = suggestions[index]
+        restaurant_to_display[0]["cuisine"] = restaurant_to_display[0]["cuisine"].replace("_", " ").title()
+        print(restaurant_to_display)
         
         return render_template("display_restaurant.html", displayed_restaurant = restaurant_to_display)
     
@@ -206,10 +208,15 @@ def process_response():
             
             #Combines important feature data with acceptance probability
             for x in range(10):
-                restaurant = list(reccent_10_tuple[x])
+                restaurant = list(reccent_10_tuple[x])      #Retrieve individual restaurant 
+  
                 probability = suggestions[x][1]*100
-                restaurant.append(round(probability, 2))
-                restaurant[4] = price_map.get(restaurant[4], "N/A")
+                restaurant.append(round(probability, 2))        #Convert probability to percentage
+
+                restaurant[4] = price_map.get(restaurant[4], "N/A")     #Replace pricing number w '$'
+
+                restaurant[5] = restaurant[5].replace("_", " ").title()     #Formalize cuisine display
+
                 full_summary.append(restaurant)
                 
             keys = ["name", "dine_in", "take_out", "vegan", "price", "cuisine", 

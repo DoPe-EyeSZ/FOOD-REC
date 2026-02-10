@@ -305,6 +305,12 @@ Restaurant Recommendation ML System (for resume)
 - Model predicts user restaurant preferences with 50% improvement over random baseline
 - Deployed with Flask + PostgreSQL, serving personalized recommendations
 
+
+2/10/26 update
+- added flask limiter rate limit
+  - limited get suggestions the most
+- added password creation auth so user creates same pw
+
 ### Next Steps
 - add rate limit
 - fix some html formating for mvp

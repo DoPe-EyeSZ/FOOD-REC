@@ -1,20 +1,21 @@
 {% extends "logged_in_base.html" %}
 
-{% block title %} Places Near You {% endblock %}
+{% block title %}Find Restaurants{% endblock %}
 
 {% block content %}
-<h1>Put your parameters</h1>
+<h1>Find Restaurants Near You</h1>
 
 <div id="locationPrompt">
-    <p>This app needs your location to find places near you.</p>
-    <button onclick="getLocation()">Allow Location</button>
+    <p>This application requires your location to find restaurants in your area.</p>
+    <button onclick="getLocation()">Allow Location Access</button>
 </div>
 
 <form action="{{ url_for('submission.user_submission') }}" method="POST" id="locationForm" style="display: none;">
     <input type="hidden" name="lat" id="lat">
     <input type="hidden" name="lng" id="lng">
-    <input type="number" name="max_distance" placeholder="Enter Max Distance" max="30" required>
-    <button type="submit">Submit</button>
+    <p><strong>Maximum Distance (30 miles)</strong></p>
+    <input type="number" name="max_distance" placeholder="Enter Distance" max="30" required>
+    <p><button type="submit">Find Restaurants</button></p>
 </form>
 
 <script>
