@@ -310,6 +310,7 @@ Restaurant Recommendation ML System (for resume)
 - added flask limiter rate limit
   - limited get suggestions the most
 - added password creation auth so user creates same pw
+- added format for html
 
 ### Next Steps
 - add rate limit
