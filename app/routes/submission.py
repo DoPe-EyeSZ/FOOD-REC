@@ -27,7 +27,7 @@ scaler = pickle.load(open('ml/models/scaler.pkl', 'rb'))
 
 @submission.route("/", methods = ["POST", "GET"])
 @submission.route("/login", methods = ["POST", "GET"])
-@limiter.limit("3 per hour")
+@limiter.limit("5 per minute")
 def login():
     if request.method == "POST":
         connection = data_functions.get_connection("prod")
@@ -54,6 +54,7 @@ def login():
 
 
 @submission.route("/logout", methods = ["GET"])
+@limiter.limit("5 per minute")
 def logout():
     if "user_id" in session:
         session.clear()
@@ -67,6 +68,7 @@ def logout():
 
 
 @submission.route("/signup", methods = ["POST", "GET"])
+@limiter.limit("5 per minute")
 def signup():
 
     if "user_id" in session:
@@ -78,17 +80,25 @@ def signup():
         if request.method == "POST":
             username = request.form.get("username")
             password = request.form.get("password")
+            password_check = request.form.get("password_check")
             connection = data_functions.get_connection("prod")
 
             #Create new account if user does not exist
             if not user_data.fetch_user_credentials(connection, username):
-                pw_hash = generate_password_hash(password)
-                user_data.create_user(connection, username, pw_hash)
-                user_id = user_data.fetch_user_credentials(connection, username)[0]
-                session["user_id"] = user_id
-                flash("user created")
-                return redirect(url_for("submission.user_submission"))
 
+                #If user reenters password correctly
+                if password == password_check:
+                    pw_hash = generate_password_hash(password)
+                    user_data.create_user(connection, username, pw_hash)
+                    user_id = user_data.fetch_user_credentials(connection, username)[0]
+                    session["user_id"] = user_id
+                    flash("user created")
+                    return redirect(url_for("submission.user_submission"))
+                
+                else:
+                    flash("You password does not match", "warning")
+
+            #User name already exists
             else:
                 flash("Username already exists", "warning")
 
@@ -217,6 +227,7 @@ def process_response():
 
 
 @submission.route("/statistics", methods = ["GET"])
+@limiter.limit("5 per minute")
 def statistics():
     if "user_id" in session:
         connection = data_functions.get_connection("prod")

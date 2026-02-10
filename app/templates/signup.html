@@ -5,14 +5,18 @@ Signup
 {% endblock %}
 
 {% block content %}
-<h1>Sign Up Section</h1>
+<h1>Sign Up</h1>
 
 <form action="#" method="POST">
-    <p>Username</p>
-    <input type="text" name="username">
+    <p><strong>Username:</strong></p>
+    <input type="text" name="username" required>
 
-    <p>Password</p>
-    <input type="password" name="password">
-    <button type="submit">Signup</button>
+    <p><strong>Password:</strong></p>
+    <input type="password" name="password" required>
+    
+    <p><strong>Re-enter Password:</strong></p>
+    <input type="password" name="password_check" required>
+    
+    <p><button type="submit">Sign Up</button></p>
 </form>
 {% endblock %}
