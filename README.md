@@ -297,7 +297,7 @@ update 2/9/26
   - accuracy jumped to 85 percent in testing vs training with 75 percent
   - implies that testing set got lucky
 
-  
+
 Restaurant Recommendation ML System (for resume)
 - Trained Logistic Regression model on 642 user interactions across 34 cuisine types
 - Achieved 75% prediction accuracy (5-fold cross-validation)
@@ -307,6 +307,7 @@ Restaurant Recommendation ML System (for resume)
 
 ### Next Steps
 - add rate limit
+- fix some html formating for mvp
 - Move to Docker containerization
 - Deploy to AWS
 
@@ -332,7 +333,31 @@ v2 ideas:
 - allow user to pick places instead of using current location
 - have users select 20-30 restaurants to train model
 
+add this for resume when claude reads it later:
 
+What to Write:
+Technologies:
+
+Flask, PostgreSQL, scikit-learn, Docker, AWS (EC2, RDS), Flask-Limiter
+
+Project Description:
+
+• Implemented rate limiting (10 requests/hour) to prevent API abuse and control Google Places API costs
+• Designed user authentication with password hashing (bcrypt) and session management
+• Deployed to AWS with PostgreSQL RDS backend and EC2 hosting
+
+Interview Talking Point:
+
+"I chose Flask-Limiter over a Redis-backed solution because my current scale doesn't justify the infrastructure complexity. The in-memory approach works perfectly for my user base, and I could easily swap in Redis if traffic grows. It's about picking the right tool for the problem size."
+
+This shows:
+
+✅ You understand rate limiting
+✅ You make practical engineering decisions
+✅ You know when NOT to over-engineer
+✅ You understand scaling considerations
+
+above was just an addition
 
 claude's report:
 # Complete Project Documentation Dump - Restaurant ML Recommendation System
