@@ -16,8 +16,8 @@ def train_save_model(connection, user_id):
 
 
     #Gathers all feature data
-    feature_data = data_functions.join_interaction_restaurant(connection, user_id)
-    frequency = api_function.find_frequency(connection, user_id)
+    feature_data = data_functions.join_interaction_restaurant(connection, user_id)      #Get all interaction/restaurant data
+    frequency = api_function.find_frequency(connection, user_id)        #Calculates frequency of 
 
 
     #Separates feature data from user response
@@ -30,13 +30,13 @@ def train_save_model(connection, user_id):
 
     #Scaling feature data so all features are considered equally
     logistic_scaler = StandardScaler()
-    x_train_scaled = logistic_scaler.fit_transform(x_train)
-    x_test_scaled = logistic_scaler.transform(x_test)
+    x_train_scaled = logistic_scaler.fit_transform(x_train)     #Learns scaling
+    x_test_scaled = logistic_scaler.transform(x_test)       #Applies scaling from what it learned
 
 
     #LogisticRegression training
     logistic_model = LogisticRegression(max_iter=1000, C=1.0)        
-    logistic_model.fit(x_train_scaled, y_train)
+    logistic_model.fit(x_train_scaled, y_train)     #Train the LR
     
     
     #Get Accuracy Score
@@ -46,8 +46,8 @@ def train_save_model(connection, user_id):
 
     #Cross validation on new model
     scaler2 = StandardScaler()
-    all_x_scaled = scaler2.fit_transform(features)
-    cv_scores = cross_val_score(LogisticRegression(max_iter=1000, C=1.0), all_x_scaled, response, cv=5)
+    all_x_scaled = scaler2.fit_transform(features)      #Scales all feature data
+    cv_scores = cross_val_score(LogisticRegression(max_iter=1000, C=1.0), all_x_scaled, response, cv=5)     #Simulates 5 training sessions
     print(f"Accuracy scores of other tests: {cv_scores} \n")
 
 
@@ -64,6 +64,7 @@ def train_save_model(connection, user_id):
 
     feature_names = ["dine_in", "takeout", "vegan", "price", "cuisine_ratio", "rating", "rating_count", "open", "drive"]
 
+    #Same order as feature data (feature data is in order of join function)
     coef = logistic_model.coef_[0]
     importance = abs(coef)
 
