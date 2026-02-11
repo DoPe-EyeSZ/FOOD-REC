@@ -312,6 +312,11 @@ Restaurant Recommendation ML System (for resume)
 - added password creation auth so user creates same pw
 - added format for html
 
+2/11/26 update
+- fixed statistics error
+  - saved restaurant/cuisine information of all 20 restaurnants, even when user only sees 10
+  - moved data insert to when the user reponse is processed
+
 ### Next Steps
 - add training phase
 - Move to Docker containerization

@@ -111,19 +111,36 @@ def user_submission():
     if "user_id" in session:
         if request.method == "GET":     #For after user logs in
             connection = data_functions.get_connection("prod")
+            interaction_count = interact_data.fetch_user_interactions(connection, session["user_id"])
+            
+            if len(interaction_count) < 10:     #ADD MODEL TRAINING
+                flash("lets have you train some data so that we know a little bit about your preferences")
+                suggestions = reccomendation.get_recs(40.7580, -73.9855, 3, model, scaler, connection, session["user_id"], True)
+                print(len(suggestions))
+                print(suggestions)
+                session["suggestions"] = suggestions
+                session["index"] = 0
+                session["training"] = True
+
+                connection.close()
+                return redirect(url_for("submission.show_restaurant"))
+
+
             return render_template("submission.html")
 
         else:
 
             #Creating connection
             connection = data_functions.get_connection("prod")
+
+
             
             #User's Input
             lat = request.form.get('lat')
             lng = request.form.get('lng')
             max_distance = request.form.get("max_distance")
 
-            top10 = reccomendation.get_recs(lat, lng, max_distance, model, scaler, connection, user_id = session["user_id"])
+            top10 = reccomendation.get_recs(lat, lng, max_distance, model, scaler, connection, user_id = session["user_id"], training= False)
 
             if top10 is None:
                 connection.close()
@@ -145,8 +162,23 @@ def show_restaurant():
         suggestions = session["suggestions"]
         index = session["index"]
 
-        restaurant_to_display = suggestions[index]
-        restaurant_to_display[0]["cuisine"] = restaurant_to_display[0]["cuisine"].replace("_", " ").title()
+        price_map = {
+                    5: "$",
+                    4: "$$", 
+                    3: "$$$",
+                    2: "$$$$",
+                    1: "$$$$$"
+                }
+        
+
+        if "training" in session:
+            restaurant_to_display = suggestions[index]
+            restaurant_to_display["cuisine"] = restaurant_to_display["cuisine"].replace("_", " ").title()
+            restaurant_to_display["price_level"] = price_map.get(restaurant_to_display["price_level"], "N/A")
+        else:
+            restaurant_to_display = suggestions[index][0]
+            restaurant_to_display["cuisine"] = restaurant_to_display["cuisine"].replace("_", " ").title()
+            restaurant_to_display["price_level"] = price_map.get(restaurant_to_display["price_level"], "N/A")
         
         return render_template("display_restaurant.html", displayed_restaurant = restaurant_to_display)
     
@@ -157,28 +189,43 @@ def show_restaurant():
 @submission.route("/process_response", methods = ["POST"])
 def process_response():
     if "user_id" in session:
+
+        price_map = {
+                    "$": 5,
+                    "$$": 4, 
+                    "$$$": 3,
+                    "$$$$": 2,
+                    "$$$$$": 1
+                }
+        
+        
         connection = data_functions.get_connection("prod")
         session["index"] += 1
         
         response = request.form.get("response")
         place_id = request.form.get("place_id")
+
         cuisine = request.form.get("cuisine")
         cuisine = cuisine.replace(" ", "_").lower()
+
         rating = request.form.get("rating")
         rating_count = request.form.get("rating_count")
         opening = request.form.get("is_open")
         drive_time = request.form.get("drive_time")
         dine_in = request.form.get("dineIn")
         name = request.form.get("name")
+
         price_level = request.form.get("price_level")
+        price_level = price_map.get(str(price_level), 0)
+        print(price_level)
         takeout = request.form.get("takeout")
         vegan = request.form.get("vegan")
 
-        #Saving interaction
-        interact_data.insert_user_interaction(connection, place_id, rating, rating_count, opening, drive_time, response, user_id=session["user_id"])
-        
         #Saving Restaurant data
         restaurant_data.insert_restaurant(connection, place_id, dine_in, takeout, vegan, price_level, cuisine, name)
+        
+        #Saving interaction
+        interact_data.insert_user_interaction(connection, place_id, rating, rating_count, opening, drive_time, response, user_id=session["user_id"])
 
         #Saving cuisine
         cuisine_data.upsert_cuisine_stats(connection, cuisine, int(response), session["user_id"])
@@ -194,6 +241,11 @@ def process_response():
         
         #All restaurants has been shown
         else:
+            if "training" in session:
+                flash("training is done; accuracy will grow as you use more")
+                session.pop("training", None)
+                return redirect(url_for("submission.user_submission"))
+            
             #ORDER: name, dinein, takeout, vegan, price, cuisine, rating, rating count, opening, drive, acceptance
             reccent_10_tuple = data_functions.join_10_restaurant(connection, user_id = session["user_id"])[::-1]
             suggestions = session["suggestions"]

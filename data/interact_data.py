@@ -38,6 +38,7 @@ def insert_user_interaction(connection, place_id, rating, rating_count, is_open,
         cursor.execute(query, (user_id, place_id, rating, rating_count, is_open, drive_time, accepted))
         connection.commit()
         cursor.close()
+        print("interaction saved")
 
     except Exception as e:
         print(f"insert_interaction has an error: {e}")
