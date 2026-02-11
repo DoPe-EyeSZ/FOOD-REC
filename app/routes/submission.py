@@ -230,10 +230,6 @@ def process_response():
         #Saving cuisine
         cuisine_data.upsert_cuisine_stats(connection, cuisine, int(response), session["user_id"])
 
-        #Increment acceptance
-        if response == "1":
-            cuisine_data.increment_acceptance(connection, cuisine, user_id = session["user_id"])
-
         #Continue to show suggested restaurants
         if session["index"] < len(session["suggestions"]):
             connection.close()
@@ -304,6 +300,7 @@ def statistics():
         highest_acceptance = []
 
         for info in all_cuisines:
+            print(info)
             cuisine = info[1].replace("_", " ").title()
             appear = info[2]
             accept = info[3]
