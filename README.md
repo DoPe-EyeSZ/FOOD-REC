@@ -313,7 +313,6 @@ Restaurant Recommendation ML System (for resume)
 - added format for html
 
 ### Next Steps
-- add rate limit
 - fix some html formating for mvp
 - Move to Docker containerization
 - Deploy to AWS

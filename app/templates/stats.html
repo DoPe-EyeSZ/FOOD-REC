@@ -5,34 +5,28 @@ Your Stats
 {% endblock %}
 
 {% block content %}
-<h1>Statistics</h1>
+<h1>Your Statistics</h1>
 
-<h2>Most Appearances</h2>
+<h2>Most Frequent Cuisines</h2>
 {% for restaurant in frontend_data["highest_appearance"] %}
     {% if restaurant[0] == "Restaurant" %}
-        <p>Unspecified Restaurants have appeared {{restaurant[1]}}</p>
-    
+        <p>Unspecified restaurants have appeared <strong>{{restaurant[1]}} times</strong></p>
     {% else %}
-        <p>{{restaurant[0]}}s has appeared {{restaurant[1]}}</p>
-
+        <p>{{restaurant[0]}} restaurants have appeared <strong>{{restaurant[1]}} times</strong></p>
     {% endif %}
-    
 {% endfor %}
 
-<h2>We Believe You Like:</h2>
+<h2>Your Preferences</h2>
 {% for restaurant in frontend_data["highest_acceptance"] %}
     {% if restaurant[0] == "Restaurant" %}
-        <p>Unspecified Restaurants because you accepted it {{restaurant[1]}}% of the time</p>
-    
+        <p>You accepted unspecified restaurants <strong>{{restaurant[1]}}%</strong> of the time</p>
     {% else %}
-        <p>{{restaurant[0]}}s because you accepted it {{restaurant[1]}}% of the time</p>
-
+        <p>You accepted {{restaurant[0]}} restaurants <strong>{{restaurant[1]}}%</strong> of the time</p>
     {% endif %}
-    
 {% endfor %}
 
-<h2>You've seen {{frontend_data["all_cuisine_len"]}} different cuisines</h2>
-<h2>You've interacted with {{frontend_data["all_interaction_len"]}} food places</h2>
-
+<h2>Overall Activity</h2>
+<p>You've seen <strong>{{frontend_data["all_cuisine_len"]}}</strong> different cuisines</p>
+<p>You've interacted with <strong>{{frontend_data["all_interaction_len"]}}</strong> restaurants</p>
 
 {% endblock %}
