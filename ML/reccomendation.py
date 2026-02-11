@@ -8,8 +8,8 @@ load_dotenv()
 def get_recs(lat, long, distance, model, scaler, connection, user_id):
 
     #(1) Grab location/distance from user
-    response = api_function.use_api(lat, long, distance)        
-
+    response = api_function.use_api(lat, long, distance)      
+    print(response.status_code)
     #(2) Check if valid response
     if response.status_code == 200:
 

@@ -126,7 +126,7 @@ def user_submission():
 
             if top10 is None:
                 connection.close()
-                return "Error"
+                return render_template("error_page.html")
             
             session["suggestions"] = top10
             session["index"] = 0
@@ -146,7 +146,6 @@ def show_restaurant():
 
         restaurant_to_display = suggestions[index]
         restaurant_to_display[0]["cuisine"] = restaurant_to_display[0]["cuisine"].replace("_", " ").title()
-        print(restaurant_to_display)
         
         return render_template("display_restaurant.html", displayed_restaurant = restaurant_to_display)
     
