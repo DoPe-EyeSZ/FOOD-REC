@@ -5,7 +5,7 @@ from flask import Blueprint, redirect, url_for, render_template, request, sessio
 from werkzeug.security import generate_password_hash, check_password_hash
 
 #Data functions
-from data import data_functions, interact_data, cuisine_data, user_data
+from data import data_functions, interact_data, cuisine_data, user_data, restaurant_data
 
 #ML functions
 from ML import reccomendation
@@ -68,12 +68,12 @@ def logout():
 
 
 @submission.route("/signup", methods = ["POST", "GET"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 def signup():
 
     if "user_id" in session:
         flash("ur already logged in")
-        return redirect(url_for("submission.signup"))
+        return redirect(url_for("submission.user_submission"))
 
     else:
         #After user submits signup form
@@ -110,6 +110,7 @@ def signup():
 def user_submission():
     if "user_id" in session:
         if request.method == "GET":     #For after user logs in
+            connection = data_functions.get_connection("prod")
             return render_template("submission.html")
 
         else:
@@ -162,20 +163,25 @@ def process_response():
         response = request.form.get("response")
         place_id = request.form.get("place_id")
         cuisine = request.form.get("cuisine")
+        cuisine = cuisine.replace(" ", "_").lower()
         rating = request.form.get("rating")
         rating_count = request.form.get("rating_count")
         opening = request.form.get("is_open")
         drive_time = request.form.get("drive_time")
+        dine_in = request.form.get("dineIn")
+        name = request.form.get("name")
+        price_level = request.form.get("price_level")
+        takeout = request.form.get("takeout")
+        vegan = request.form.get("vegan")
 
         #Saving interaction
-        interact_data.insert_user_interaction(connection, 
-                                              place_id, 
-                                              rating, 
-                                              rating_count, 
-                                              opening, 
-                                              drive_time, 
-                                              response, 
-                                              user_id=session["user_id"])
+        interact_data.insert_user_interaction(connection, place_id, rating, rating_count, opening, drive_time, response, user_id=session["user_id"])
+        
+        #Saving Restaurant data
+        restaurant_data.insert_restaurant(connection, place_id, dine_in, takeout, vegan, price_level, cuisine, name)
+
+        #Saving cuisine
+        cuisine_data.upsert_cuisine_stats(connection, cuisine, int(response), session["user_id"])
 
         #Increment acceptance
         if response == "1":
@@ -233,7 +239,7 @@ def process_response():
 
 
 @submission.route("/statistics", methods = ["GET"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 def statistics():
     if "user_id" in session:
         connection = data_functions.get_connection("prod")
@@ -274,6 +280,22 @@ def statistics():
 
     else:
         return redirect(url_for("submission.login"))
+    
+
+@submission.route("/delete_user", methods = ["GET"])
+def delete_user():
+    if "user_id" in session:
+        x = input("y for delete; n for no")
+        if x == "y":
+            user_id = session["user_id"]
+            connection = data_functions.get_connection("prod")
+            interact_data.delete_user_interactions(connection, user_id)
+            cuisine_data.delete_cuisines(connection, user_id)
+            user_data.delete_user(connection, user_id)
+
+        session.clear()
+
+    return redirect(url_for("submission.login"))
         
         
         

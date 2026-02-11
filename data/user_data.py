@@ -68,3 +68,16 @@ def change_pw(connection, new_pw_hash, user_id):
     
     except Exception as e:
         print(f"change_pw has an error: {e}")
+
+
+def delete_user(connection, user_id):
+    query = "DELETE FROM users WHERE user_id = %s"
+
+    try:
+        cur = connection.cursor()
+        cur.execute(query, (user_id,))
+        connection.commit()
+        cur.close()
+
+    except Exception as e:
+        print(f"delete_user has an error: {e}")

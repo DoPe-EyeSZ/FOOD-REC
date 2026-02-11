@@ -6,27 +6,33 @@ Your Stats
 
 {% block content %}
 <h1>Your Statistics</h1>
+{% if frontend_data["highest_appearance"] %}
+    <h2>Most Frequent Cuisines</h2>
+    {% for restaurant in frontend_data["highest_appearance"] %}
+        {% if restaurant[0] == "Restaurant" %}
+            <p>Unspecified restaurants have appeared <strong>{{restaurant[1]}} times</strong></p>
+        {% else %}
+            <p>{{restaurant[0]}} restaurants have appeared <strong>{{restaurant[1]}} times</strong></p>
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
-<h2>Most Frequent Cuisines</h2>
-{% for restaurant in frontend_data["highest_appearance"] %}
-    {% if restaurant[0] == "Restaurant" %}
-        <p>Unspecified restaurants have appeared <strong>{{restaurant[1]}} times</strong></p>
-    {% else %}
-        <p>{{restaurant[0]}} restaurants have appeared <strong>{{restaurant[1]}} times</strong></p>
-    {% endif %}
-{% endfor %}
+{% if frontend_data["highest_acceptance"] %}
+    <h2>Your Preferences</h2>
+    {% for restaurant in frontend_data["highest_acceptance"] %}
+        {% if restaurant[0] == "Restaurant" %}
+            <p>You accepted unspecified restaurants <strong>{{restaurant[1]}}%</strong> of the time</p>
+        {% else %}
+            <p>You accepted {{restaurant[0]}} restaurants <strong>{{restaurant[1]}}%</strong> of the time</p>
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
-<h2>Your Preferences</h2>
-{% for restaurant in frontend_data["highest_acceptance"] %}
-    {% if restaurant[0] == "Restaurant" %}
-        <p>You accepted unspecified restaurants <strong>{{restaurant[1]}}%</strong> of the time</p>
-    {% else %}
-        <p>You accepted {{restaurant[0]}} restaurants <strong>{{restaurant[1]}}%</strong> of the time</p>
-    {% endif %}
-{% endfor %}
+{% if frontend_data["all_cuisine_len"] or frontend_data["all_interaction_len"] %}
+    <h2>Overall Activity</h2>
+    <p>You've seen <strong>{{frontend_data["all_cuisine_len"]}}</strong> different cuisines</p>
+    <p>You've interacted with <strong>{{frontend_data["all_interaction_len"]}}</strong> restaurants</p>
+{% endif %}
 
-<h2>Overall Activity</h2>
-<p>You've seen <strong>{{frontend_data["all_cuisine_len"]}}</strong> different cuisines</p>
-<p>You've interacted with <strong>{{frontend_data["all_interaction_len"]}}</strong> restaurants</p>
 
 {% endblock %}

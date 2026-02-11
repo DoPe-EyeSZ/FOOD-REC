@@ -77,7 +77,6 @@ def extract_api_data(data):
 def find_frequency(connection, user_id):       #Find how often user accept/skips food
     cuisine_dict = {}
     cuisine_stats = cuisine_data.fetch_all_cuisine(connection, user_id)
-    print(cuisine_stats)
 
     for cuisine in cuisine_stats:
         c = cuisine[1]
@@ -95,7 +94,7 @@ def insert_frequency(feature_data, freq_dict):       #Insert frequency into clea
         restaurant = list(place)
 
         #Replaces cuisine w frequency
-        restaurant[4] = freq_dict[restaurant[4]]        
+        restaurant[4] = freq_dict.get(restaurant[4], 0)        
         features.append(restaurant[:len(restaurant)-1])
         user_response.append(restaurant[-1])
 

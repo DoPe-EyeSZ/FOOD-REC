@@ -67,6 +67,18 @@ def delete_cuisine(connection, cuisine, user_id):
     except Exception as e:
         print(f"delete_cuisine has an error: {e}")
 
+def delete_cuisines(connection, user_id):
+    query = "DELETE FROM cuisine_stats WHERE user_id = %s"
+
+    try:
+        cursor = connection.cursor()
+        cursor.execute(query, (user_id,))
+        connection.commit()
+        cursor.close()
+        print('success')
+            
+    except Exception as e:
+        print(f"delete_cuisine has an error: {e}")
 
 
 #Upsert cuisine information

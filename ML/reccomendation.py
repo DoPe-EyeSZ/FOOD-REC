@@ -9,7 +9,6 @@ def get_recs(lat, long, distance, model, scaler, connection, user_id):
 
     #(1) Grab location/distance from user
     response = api_function.use_api(lat, long, distance)      
-    print(response.status_code)
     #(2) Check if valid response
     if response.status_code == 200:
 
@@ -22,8 +21,6 @@ def get_recs(lat, long, distance, model, scaler, connection, user_id):
         #(5) Clean data (remove name/id from feature data)
         clean_feature_data = []        
         for place_dict in feature_data:
-                place_id = place_dict["id"]
-                name = place_dict["name"]
 
                 dine_in = place_dict["dineIn"]
                 takeout = place_dict["takeout"]
@@ -37,11 +34,6 @@ def get_recs(lat, long, distance, model, scaler, connection, user_id):
 
                 restaurnt = [dine_in, takeout, vegan, price_level, cuisine, rating, rating_count, open, drive, "response_placeholder"]
                 clean_feature_data.append(restaurnt)
-
-                #Updating Restaurant DB     
-                restaurant_data.insert_restaurant(connection, place_id, dine_in, takeout, vegan, price_level, cuisine, name)
-                #UPDATE CUISINE TABLE HERE
-                cuisine_data.upsert_cuisine_stats(connection, cuisine, 0, user_id) 
                 
 
         #(6) Get frequency dictionary of all cuisine_stats

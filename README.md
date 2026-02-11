@@ -313,6 +313,7 @@ Restaurant Recommendation ML System (for resume)
 - added format for html
 
 ### Next Steps
+- add training phase
 - Move to Docker containerization
 - Deploy to AWS
 
