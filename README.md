@@ -319,8 +319,7 @@ Restaurant Recommendation ML System (for resume)
 
 ### Next Steps
 - add training phase
-- Move to Docker containerization
-- Deploy to AWS
+- deploy on render
 
 ```
 
@@ -2355,5 +2354,51 @@ This comprehensive documentation captures:
 - ✅ Complete metrics dashboard
 
 **Total Document Length:** ~12,000+ words of technical documentation
+
+
+
+
+
+ADDITIONAL README INFORMATION AND UPDATE:
+## Project Overview
+Personal restaurant recommendation system that learns my dining preferences
+over time. Built to solve the "where should I eat?" problem by tracking
+712+ restaurant interactions and predicting which new places I'd enjoy.
+
+## Multi-User Considerations
+While designed for personal use, the architecture supports multiple users:
+- User authentication system in place
+- Per-user model training pipeline implemented
+- Feature engineering generalizes to different preference profiles
+
+The same features (cuisine_ratio, price, distance) work universally,
+but model learns individual weights and values. For example, my model
+heavily weights cuisine type (1.36) and ignores distance (0.05), while
+another user might prioritize price and proximity instead.
+
+
+## Key Technical Achievements
+- Built fully personalized ML system that adapts to individual preferences
+- Feature importance analysis reveals behavioral insights:
+  * Cuisine preference > Availability > Price > Distance
+  * Willing to travel far for preferred cuisines
+  * Less influenced by crowd ratings than personal taste
+- Auto-retrain pipeline maintains model accuracy as preferences evolve
+- 77% prediction accuracy after 712 interactions
+
+
+
+decided to not store unique models for each user bc 3 reasons:
+1. time constraint
+  - wanna finish before spring semester
+
+2. financial constraint?
+  - have to store individual user models
+  - too much money maybe (didnt look into it yet)
+
+3. the way it works
+  - cuisine ratio already has greatest influence
+  - user has individual cuisine ratio (user1 chinese food is 50/55 and user2 chinese food is 1/10)
+    - individuality of user already considered
 
 **Ready for:** Copy-paste into README, then later send back for professional summary/resume/LinkedIn generation
