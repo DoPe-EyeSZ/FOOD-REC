@@ -1,4 +1,4 @@
-from data import data_functions, cuisine_data, interact_data, restaurant_data, user_data
+from data import data_functions, cuisine_data, interact_data, restaurant_data, user_data, user_model_data
 import sqlite3
 from api import api_function
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -7,7 +7,8 @@ try:
     test_connection = data_functions.get_connection("test")
     prod_connection = data_functions.get_connection("prod")
 
-    user_data.create_user_table(test_connection)
+    user_model_data.create_user_models_table(test_connection)
+    user_model_data.create_user_models_table(prod_connection)
     test_connection.commit()
 
 

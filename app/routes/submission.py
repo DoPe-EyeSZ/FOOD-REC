@@ -5,7 +5,7 @@ from flask import Blueprint, redirect, url_for, render_template, request, sessio
 from werkzeug.security import generate_password_hash, check_password_hash
 
 #Data functions
-from data import data_functions, interact_data, cuisine_data, user_data, restaurant_data
+from data import data_functions, interact_data, cuisine_data, user_data, restaurant_data, user_model_data
 
 #ML functions
 from ML import reccomendation, ml_model
@@ -116,7 +116,6 @@ def user_submission():
                 suggestions += reccomendation.get_recs(40.6815, -73.8365, 5, None, None, connection, session["user_id"], True)
                 suggestions += reccomendation.get_recs(37.3394, -121.8950, 5, None, None, connection, session["user_id"], True)
 
-                print(len(suggestions))
 
                 session["suggestions"] = suggestions
                 session["index"] = 0
@@ -141,8 +140,7 @@ def user_submission():
             max_distance = request.form.get("max_distance")
 
             #Load model
-            model = pickle.load(open(f'ml/models/model_user_{session["user_id"]}.pkl', 'rb'))
-            scaler = pickle.load(open(f'ml/models/scaler_user_{session["user_id"]}.pkl', 'rb'))
+            model, scaler = user_model_data.load_user_model(connection, session["user_id"])
 
             top10 = reccomendation.get_recs(lat, lng, max_distance, model, scaler, connection, user_id = session["user_id"], training= False)
 
@@ -221,7 +219,6 @@ def process_response():
 
         price_level = request.form.get("price_level")
         price_level = price_map.get(str(price_level), 0)
-        print(price_level)
         takeout = request.form.get("takeout")
         vegan = request.form.get("vegan")
 
@@ -244,7 +241,7 @@ def process_response():
             if "training" in session:
                 flash("training is done; accuracy will grow as you use more")
 
-                #ml_model.train_save_model(connection, session["user_id"], coldstart = True)
+                ml_model.train_save_model(connection, session["user_id"], True)
                 session.pop("training", None)
                 return redirect(url_for("submission.user_submission"))
             
@@ -306,7 +303,6 @@ def statistics():
         highest_acceptance = []
 
         for info in all_cuisines:
-            print(info)
             cuisine = info[1].replace("_", " ").title()
             appear = info[2]
             accept = info[3]
@@ -325,12 +321,6 @@ def statistics():
         frontend_data["all_interaction_len"] = len(all_interactions)        #Number of restaurants interacted with
 
         
-
-        '''
-        Cuisine not specified for cusind named "restuarnt"
-        show what we think they care about the most for restaurant
-        '''
-        
         return render_template("stats.html", frontend_data = frontend_data)
 
     else:
@@ -346,7 +336,10 @@ def delete_user():
             connection = data_functions.get_connection("prod")
             interact_data.delete_user_interactions(connection, user_id)
             cuisine_data.delete_cuisines(connection, user_id)
+            user_model_data.delete_user_model(connection, user_id)
             user_data.delete_user(connection, user_id)
+
+        
 
         session.clear()
 

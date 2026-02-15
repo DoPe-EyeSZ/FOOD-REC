@@ -1,0 +1,7 @@
+{
+  "user_id": 1,
+  "cv_mean": 0.7739190387077711,
+  "train_score": 0.7855887521968365,
+  "test_score": 0.8391608391608392,
+  "interaction_count": 712
+}

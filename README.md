@@ -2401,4 +2401,587 @@ decided to not store unique models for each user bc 3 reasons:
   - user has individual cuisine ratio (user1 chinese food is 50/55 and user2 chinese food is 1/10)
     - individuality of user already considered
 
+
+
+
+another update:
+## Session Summary - 2/6/26: Authentication, Rate Limiting & Production Deployment
+
+### Major Features Implemented
+
+#### **User Authentication System**
+- **Secure Password Management**
+  - Implemented `werkzeug.security` for password hashing
+  - `generate_password_hash()` creates salted hashes on signup (never store plaintext)
+  - `check_password_hash()` verifies passwords on login (compares hashes securely)
+  - Salt ensures same password → different hash each time (prevents rainbow table attacks)
+  
+- **Session Management**
+  - Flask session stores `user_id` after successful login
+  - Sessions persist across requests using encrypted cookies
+  - `app.secret_key` required for session encryption
+  - Session cleared on logout
+
+- **Authentication Flow**
+  - Login route: validates credentials → creates session → redirects to dashboard
+  - Signup route: validates input → hashes password → creates user → auto-login
+  - Logout route: clears session → redirects to login
+  - Protected routes: check `if 'user_id' not in session` before access
+
+- **User Feedback & UX**
+  - Error messages for invalid username/incorrect password
+  - Flash messages for user feedback
+  - Form data persistence on validation errors
+  - Redirect vs render patterns:
+    - Redirect after successful POST (prevents duplicate submissions)
+    - Render template for form validation errors (keeps user input)
+    - POST-Redirect-GET pattern for form submissions
+
+#### **Database Architecture Refactoring**
+
+- **Schema Changes for Security**
+  - Changed primary key from `username` to `user_id` (SERIAL, auto-incrementing)
+  - `username` now UNIQUE constraint (users log in with username, system uses ID internally)
+  - Added `password_hash` column (TEXT, stores hashed passwords)
+  - Updated all foreign keys to reference `user_id` instead of `username`
+  
+- **Database Helper Functions Created**
+```python
+  fetch_user_credentials(connection, username)  # Returns (user_id, password_hash)
+  create_user(connection, username, password_hash)  # Inserts new user
+  update_username(connection, new_username, user_id)  # Changes username
+  change_pw(connection, new_pw_hash, user_id)  # Updates password
+```
+  
+- **Best Practices Implemented**
+  - Parameterized queries (`%s`) to prevent SQL injection
+  - Try/except error handling for all database operations
+  - Return True/False for success/failure signaling
+  - Proper cursor management (cursor.close() after operations)
+
+#### **Per-User ML Model Architecture**
+
+- **Design Philosophy**
+  - One model per user (personalized recommendations)
+  - Each user's model trained only on their interaction data
+  - Models stored with user_id as identifier
+  - Independent training/retraining per user
+
+- **Why Per-User Models?**
+  - Fully personalized to individual preferences
+  - One user's data doesn't corrupt another's model
+  - User A loves Italian, User B hates Italian → different models learn different patterns
+  - Global model would average everyone's preferences (bad recommendations for all)
+
+- **Model Storage Evolution**
+  - **Development (local):** File-based storage
+    - `ml/models/model_user_{id}.pkl`
+    - `ml/models/scaler_user_{id}.pkl`
+    - `ml/models/metadata_user_{id}.json`
+    - Fast iteration, easy debugging, version control friendly
+  
+  - **Production (Render):** Database storage (PostgreSQL BYTEA)
+    - Models stored as binary data in `user_models` table
+    - Survives server restarts (filesystem is ephemeral on Render)
+    - No additional storage service needed
+    - Uses `pickle.dumps()` to serialize model → bytes → database
+    - Uses `pickle.loads()` to deserialize bytes → model
+
+- **Model Caching Strategy**
+  - In-memory cache (`_model_cache = {}`) for fast repeated access
+  - First request: loads from database (~50ms), stores in cache
+  - Subsequent requests: returns from cache (~0.1ms)
+  - Cache cleared after retraining to force reload of new model
+  - Reduces database queries for frequently-accessed models
+
+#### **Machine Learning Model Performance Tracking**
+
+- **Cross-Validation for Reliable Metrics**
+  - 5-fold CV provides more reliable accuracy estimate than single train/test split
+  - CV mean (e.g., 77.4%) is the model's true performance
+  - CV std (e.g., ±4.0%) shows consistency across different data splits
+  - Single test score can be misleading due to lucky/unlucky splits
+
+- **Understanding Train/Test Discrepancies**
+  - Test score higher than train score (e.g., 85.3% vs 76.8%) indicates lucky test set
+  - With small test sets (~128 examples), 10% variance is normal
+  - CV mean is more reliable than single test score
+  - Train score matching CV mean (76.8% vs 75.4%) confirms proper learning
+
+- **Model Performance Tracking**
+  - Current metrics: 712 interactions, 77.4% CV accuracy (±4.0%)
+  - Feature importance insights:
+    - `cuisine_ratio` (1.360) - Most important: historical cuisine preference dominates
+    - `open` (0.958) - Second: learned to deprioritize closed restaurants
+    - `drive` (0.049) - Least important: distance doesn't matter for this user
+  - Performance improves with more data: 540 → 642 → 712 interactions showed 75.4% → 77.4% accuracy
+
+- **Metadata Tracking**
+  - Save performance metrics with each model:
+    - `cv_mean`, `cv_std` - Cross-validation accuracy
+    - `train_score`, `test_score` - Single split performance
+    - `interaction_count` - Dataset size at training time
+    - `trained_at` - Timestamp for version tracking
+  - Enables comparison for auto-retrain decisions
+  - Stored in JSON (local) or database column (production)
+
+#### **Rate Limiting Architecture**
+
+- **Why Rate Limiting?**
+  - Protect Google Places API budget (costs money per request)
+  - Prevent abuse (malicious users making excessive requests)
+  - Manage server load
+  - Industry standard for production APIs
+
+- **Implementation Options Evaluated**
+  - **Redis:** Industry standard, fast, but requires separate service
+  - **PostgreSQL:** Uses existing database, no new dependencies, persistent
+  - **In-memory:** Simple but resets on restart, doesn't scale
+  - **Flask sessions:** Bypassable by clearing cookies, not secure
+  
+- **Chosen Approach: PostgreSQL-based**
+  - Leverages existing database infrastructure
+  - Persistent across restarts
+  - No additional services needed (works on Render free tier)
+  - Tracks by user_id (logged in) or IP address (anonymous)
+  
+- **Rate Limit Strategy**
+```python
+  # Different limits for different resource costs:
+  /search: 5 per hour (expensive - calls Google API)
+  /login: 10 per hour (prevent brute force)
+  /profile: 100 per hour (cheap - just database read)
+```
+
+- **Implementation Pattern**
+  - Decorator-based rate limiting for clean code
+  - Stores: identifier (user_id/IP), endpoint, request_count, window_start
+  - Automatic window expiration (e.g., after 1 hour)
+  - Returns HTTP 429 status code with retry-after information
+  - Multi-layer approach: per-user limits + per-IP limits
+
+#### **Cold Start Problem & Solutions**
+
+- **The Problem**
+  - New users have 0 interactions → can't train model (need 50+ for reliability)
+  - User rates 10 restaurants in first session → not enough for good model
+  - `cuisine_ratio` feature needs history (e.g., "Italian: 8/10 liked" vs "Italian: 1/2 liked")
+  
+- **Solution: Progressive Recommendation System**
+  - **Phase 1 (0-20 interactions):** Popularity-based
+    - Show highly-rated restaurants in area
+    - No personalization yet
+    - Message: "Rate 20 more for personalized picks"
+  
+  - **Phase 2 (20-50 interactions):** Heuristic-based
+    - Simple cuisine filtering based on observed preferences
+    - Calculate basic ratios: "User liked 4/5 Italian restaurants → show more Italian"
+    - Not full ML, but some personalization
+    - Message: "Rate 30 more for AI recommendations"
+  
+  - **Phase 3 (50+ interactions):** Full ML Model
+    - Train Logistic Regression model
+    - Cross-validation for performance validation
+    - Auto-retrain every 100 new interactions
+    - Message: "AI-powered recommendations"
+
+- **Onboarding Flow Design**
+  - 3 rounds of 10 restaurants each (30 total)
+  - Progress tracking: "10/30 ratings collected"
+  - Show emerging patterns: "Most loved: Italian (3/3 liked)"
+  - Build anticipation: "Almost ready for AI recommendations!"
+  - Don't show accuracy during onboarding (too noisy with small data)
+
+#### **Production Deployment Planning**
+
+- **Render vs Local Development**
+  - Local: Files work great (fast, easy to debug)
+  - Render: Ephemeral filesystem → files deleted on restart
+  - Solution: Migrate model storage from files to PostgreSQL
+
+- **Key Deployment Changes**
+  - **Environment Variables:**
+```python
+    DATABASE_URL = os.environ.get('DATABASE_URL')  # Render provides
+    GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    PORT = int(os.environ.get('PORT', 5000))
+```
+  
+  - **Database Connection:**
+```python
+    # Local: individual parameters
+    # Render: single DATABASE_URL string
+    connection = psycopg2.connect(DATABASE_URL)
+```
+  
+  - **Model Storage:**
+```python
+    # Local: pickle.dump(model, file)
+    # Render: pickle.dumps(model) → INSERT into database
+```
+
+- **Required Files for Deployment**
+  - `requirements.txt` - Python dependencies (Flask, scikit-learn, psycopg2, etc.)
+  - `Procfile` - Start command: `web: gunicorn app:app`
+  - `render.yaml` (optional) - Infrastructure as code configuration
+  - Database migration script for table creation
+
+- **Render Pricing**
+  - PostgreSQL: Free for 90 days, then $7/month (256 MB storage)
+  - Web service: Free (spins down after 15 min inactivity)
+  - Total: $0 for 3 months, then $7/month for database only
+  - Sufficient storage: 256 MB = ~4500 users worth of models
+
+#### **Auto-Retrain Logic (Designed but Optional for V1)**
+
+- **When to Retrain**
+  - Every 100 new interactions per user
+  - Check if new model improves on old model
+  - Only save if CV mean improves by 1%+ (meaningful threshold)
+  
+- **Decision Criteria**
+```python
+  if new_cv_mean > old_cv_mean + 0.01:  # 1% improvement
+      if new_cv_std < 0.06:  # Not too much variance
+          save_model()  # Model improved significantly
+      else:
+          skip_save()  # Improved but unstable
+  else:
+      skip_save()  # No meaningful improvement
+```
+
+- **Why These Thresholds?**
+  - 1% improvement = meaningful (not just noise)
+  - 6% std = reasonable variance for this dataset size
+  - Prevents saving models that barely improved or are unstable
+
+- **Can Model Get Worse?**
+  - Unlikely but possible scenarios:
+    - User preferences changed (loved Italian, now hates it)
+    - Data quality degraded (random swiping)
+    - Dataset became too diverse (too many cuisines to learn well)
+  - Solution: Weight recent interactions more, monitor performance trends
+
+### Technical Concepts Learned
+
+#### **Password Security**
+- **Hashing vs Encryption**
+  - Hashing = one-way (can't reverse: hash → password)
+  - Each hash uses random salt → same password = different hash
+  - `check_password_hash()` extracts salt from stored hash, re-hashes input with same salt, compares
+  
+- **Why Not Manual Comparison?**
+```python
+  # ❌ WRONG - generates new salt each time
+  if generate_password_hash(input) == stored_hash:  # Never matches!
+  
+  # ✅ CORRECT - uses existing salt from stored hash
+  if check_password_hash(stored_hash, input):  # Works!
+```
+
+#### **Sessions vs Cookies**
+- **Session:** Server-side data associated with user
+- **Cookie:** Small data stored in browser (contains session ID)
+- **Flask sessions:** Encrypted cookies (data in cookie, but signed/encrypted)
+- **Session stores:** user_id, preferences, temporary data
+- **Don't store:** Large objects like models (use database instead)
+
+#### **Redirect vs Render**
+- **Render:** Shows template, URL doesn't change
+  - Use for: Form errors, showing different view of same page
+  - Example: Login fails → render login.html with error message
+  
+- **Redirect:** Changes URL, makes new request
+  - Use for: After POST, changing pages, state changes
+  - Example: Login succeeds → redirect to dashboard
+  - Prevents form resubmission on refresh (POST-Redirect-GET pattern)
+
+#### **Pickle Serialization**
+- **pickle.dump(obj, file)** - Serialize object to file
+- **pickle.dumps(obj)** - Serialize object to bytes (returns bytes, doesn't create file)
+- **pickle.load(file)** - Deserialize from file
+- **pickle.loads(bytes)** - Deserialize from bytes
+- **Use cases:**
+  - Local dev: `dump()`/`load()` with files
+  - Production: `dumps()`/`loads()` with database
+  - Same serialization, different destination
+
+#### **JSON vs Pickle**
+- **JSON:**
+  - Human-readable text format
+  - Works across languages (Python, JavaScript, etc.)
+  - Good for: Metadata, config, simple data
+  - Example: `{"cv_mean": 0.77, "trained_at": "2026-02-07"}`
+  
+- **Pickle:**
+  - Binary format (not human-readable)
+  - Python-specific (can't use in JavaScript)
+  - Good for: Complex Python objects (models, scalers)
+  - Example: `\x80\x04\x95\x1a\x00\x00...` (binary gibberish)
+
+#### **File I/O Patterns**
+- **`with open()` Statement**
+  - Auto-closes file (even if error occurs)
+  - Prevents file handle leaks
+```python
+  # ✅ GOOD - auto-closes
+  with open('file.txt', 'w') as f:
+      f.write('hello')
+  
+  # ❌ BAD - must remember to close
+  f = open('file.txt', 'w')
+  f.write('hello')
+  f.close()  # Easy to forget!
+```
+
+- **File Modes**
+  - `'r'` - Read text
+  - `'w'` - Write text (overwrites)
+  - `'a'` - Append text
+  - `'rb'` - Read binary (for pickle)
+  - `'wb'` - Write binary (for pickle)
+
+#### **Database BYTEA Type**
+- PostgreSQL's binary data type
+- Stores pickle binary data efficiently
+- Can store any size (up to 1 GB per field)
+- Perfect for storing serialized ML models
+- Retrieved as bytes in Python, deserialized with pickle.loads()
+
+#### **HTTP Status Codes**
+- **200** - OK (success)
+- **401** - Unauthorized (not logged in)
+- **429** - Too Many Requests (rate limited)
+- **500** - Internal Server Error (something broke)
+- Status codes communicate what happened without parsing response
+
+#### **Model Performance Metrics**
+- **Accuracy** - Percent of predictions that are correct
+- **Train accuracy** - Performance on training data (can overfit)
+- **Test accuracy** - Performance on unseen data (more realistic)
+- **CV accuracy** - Average across multiple train/test splits (most reliable)
+- **CV std** - Variance across CV folds (measures consistency)
+
+#### **Overfitting Detection**
+- Training on same data you test on = 100% accuracy (meaningless)
+- Model memorizes examples instead of learning patterns
+- Solution: Always use separate test set or cross-validation
+- Warning signs:
+  - Train accuracy much higher than test (e.g., 95% vs 70%)
+  - Model performs great on training, terrible on new data
+
+### Architecture Decisions & Trade-offs
+
+#### **Per-User Models vs Global Model**
+- **Per-User (chosen):**
+  - Pros: Fully personalized, learns individual preferences
+  - Cons: Need data per user (50+ interactions), more models to store
+  - Good for: Recommendation systems with diverse user preferences
+  
+- **Global (rejected):**
+  - Pros: Works for new users immediately, only one model
+  - Cons: Not personalized, averages everyone's preferences (bad for all)
+  - Good for: When all users have similar preferences (not this case)
+
+#### **PostgreSQL vs Redis for Rate Limiting**
+- **PostgreSQL (chosen):**
+  - Pros: No new services, persistent, free on Render
+  - Cons: Slightly slower than Redis (negligible for this scale)
+  
+- **Redis (alternative):**
+  - Pros: Faster, industry standard for rate limiting
+  - Cons: Requires separate service, costs extra on Render
+
+#### **File Storage vs Database Storage**
+- **Files (local dev):**
+  - Pros: Fast, easy to debug, version control friendly
+  - Cons: Ephemeral on Render (deleted on restart)
+  
+- **Database (production):**
+  - Pros: Persistent, survives restarts, no extra service
+  - Cons: Slightly more complex code, binary data less debuggable
+
+#### **Onboarding: 30 vs 50 Interactions**
+- Could train model after 30 interactions (3 rounds)
+- Chose 50 for better accuracy (less noisy)
+- Trade-off: User waits longer vs model quality
+- Progressive system bridges gap (heuristics for 20-50)
+
+### Problems Solved & Debugging
+
+#### **Test Accuracy Higher Than Train**
+- **Problem:** Test: 85.3%, Train: 76.8% (seems backwards)
+- **Cause:** Small test set (128 examples), got lucky with easy examples
+- **Solution:** Trust CV mean (77.4%) over single test score
+- **Learning:** Single split can be misleading, CV is more reliable
+
+#### **Password Hash Never Matches**
+- **Problem:** Storing hash, re-hashing input, comparing with `==` → never matches
+- **Cause:** Each hash uses new salt, so same password → different hash
+- **Solution:** Use `check_password_hash()` which extracts salt from stored hash
+- **Learning:** Can't manually compare password hashes
+
+#### **Model Files Disappear on Render**
+- **Problem:** Models saved to filesystem, gone after restart
+- **Cause:** Render filesystem is ephemeral (temporary)
+- **Solution:** Store models in PostgreSQL database instead
+- **Learning:** Cloud platforms often have ephemeral filesystems
+
+#### **Session Doesn't Persist**
+- **Problem:** User logs in, next request they're logged out
+- **Cause:** Missing `app.secret_key`
+- **Solution:** Set `app.secret_key = 'random-string'`
+- **Learning:** Flask sessions require secret key for encryption
+
+#### **Model Overfitting on Small Data**
+- **Problem:** 10 interactions → 100% training accuracy → terrible on new data
+- **Cause:** Model memorized the 10 examples
+- **Solution:** Wait for 50+ interactions before training
+- **Learning:** Need minimum viable dataset size for generalization
+
+### Development Workflow & Best Practices
+
+#### **Test-Driven Incremental Development**
+- Build feature → Test locally → Verify works → Move to next feature
+- Don't build everything before testing (integration hell)
+- Example workflow:
+  1. Add password hashing → Test signup → Verify hash stored
+  2. Add login check → Test with correct/wrong password → Verify works
+  3. Add protected routes → Test without login → Verify redirect
+  4. Move to next feature
+
+#### **Error Handling Patterns**
+```python
+# Always wrap database operations in try/except
+try:
+    cursor.execute(query, params)
+    connection.commit()
+    return True  # Signal success
+except Exception as e:
+    print(f"Error: {e}")
+    connection.rollback()  # Important for database integrity
+    return False  # Signal failure
+```
+
+#### **Separation of Concerns**
+- Database functions in `data_functions.py`
+- ML functions in `ml_model.py`
+- API calls in `api_function.py`
+- Routes in `routes.py` or `app.py`
+- Each file has single responsibility
+
+#### **Documentation Habits**
+- Function docstrings explain purpose, args, return values
+- Comments explain "why" not "what" (code shows what)
+- README documents setup, features, architecture
+- Keep session notes for progress tracking (like this summary!)
+
+#### **Version Control with Git**
+- Commit after each working feature
+- Descriptive commit messages
+- Don't commit secrets (use .gitignv, environment variables)
+- Branch for experiments, merge when stable
+
+### Next Steps & Future Enhancements
+
+#### **Immediate (This Week)**
+- [ ] Finish Food Wrapped feature (analytics dashboard)
+- [ ] Migrate model storage from files to PostgreSQL
+- [ ] Add environment variable support
+- [ ] Create requirements.txt and Procfile
+- [ ] Deploy to Render
+- [ ] Test deployed app end-to-end
+
+#### **Post-Deployment (Later)**
+- [ ] Implement auto-retrain logic (every 100 interactions)
+- [ ] Add model performance monitoring dashboard
+- [ ] Optimize rate limiting (fine-tune thresholds)
+- [ ] Add "save for later" / favorites feature
+- [ ] Implement A/B testing (test different recommendation strategies)
+- [ ] Add social features (share recommendations with friends)
+- [ ] Mobile responsiveness improvements
+- [ ] Add analytics (track user behavior, popular cuisines)
+
+#### **Advanced Features (Future)**
+- [ ] Hybrid recommendation system (collaborative filtering + content-based)
+- [ ] Multi-model ensemble (combine multiple algorithms)
+- [ ] Real-time model updates (online learning)
+- [ ] Explainable AI (show why restaurant was recommended)
+- [ ] Integration with reservation systems (OpenTable API)
+- [ ] Dietary restriction filtering (vegan, gluten-free, kosher)
+- [ ] Time-based recommendations (breakfast vs dinner)
+- [ ] Weather-aware recommendations (comfort food on rainy days)
+
+### Key Takeaways
+
+1. **File-based development → Database production is normal workflow** - Not wasted effort, proper development pattern
+2. **Cross-validation is more reliable than single train/test split** - Especially with small datasets
+3. **Per-user models enable true personalization** - Global models average preferences (bad for everyone)
+4. **Security is fundamental, not optional** - Password hashing, sessions, rate limiting from day one
+5. **Start simple, iterate** - MVP with core features → deploy → add complexity
+6. **Production platforms have constraints** - Ephemeral filesystems, environment variables, port configuration
+7. **Model performance improves with data** - 75.4% → 77.4% with 70 more interactions
+8. **Cold start is a real problem** - Need progressive system (popularity → heuristics → ML)
+9. **Rate limiting protects budget and prevents abuse** - Essential for any API-dependent app
+10. **Documentation as you go** - Much easier than retroactive documentation
+
+### Technologies & Tools Used
+
+- **Backend:** Flask (Python web framework)
+- **Database:** PostgreSQL (relational database)
+- **ML:** scikit-learn (Logistic Regression, StandardScaler, cross-validation)
+- **Auth:** werkzeug.security (password hashing)
+- **Serialization:** pickle (model storage), json (metadata)
+- **API:** Google Places API (restaurant data)
+- **Deployment:** Render (cloud platform)
+- **Version Control:** Git & GitHub
+- **Server:** gunicorn (production WSGI server)
+
+### Code Statistics (Approximate)
+
+- **Total Functions Written:** 25+
+  - Authentication: 5 (login, signup, logout, password hashing, session check)
+  - Database: 10 (create tables, CRUD operations, queries)
+  - ML: 6 (train, save, load, predict, evaluate, delete)
+  - API: 3 (fetch restaurants, calculate distance, filter results)
+  - Routes: 8+ (home, login, signup, recommendations, profile, etc.)
+
+- **Database Tables:** 4-5
+  - users (authentication)
+  - user_interactions (swipe history)
+  - cuisine_stats (cuisine preference tracking)
+  - user_models (ML model storage)
+  - restaurants (cached restaurant data - optional)
+
+- **Lines of Code:** ~1500-2000 (estimated)
+  - Python: ~1200
+  - HTML/CSS: ~300
+  - SQL: ~100
+
+### Personal Growth & Learning
+
+- **From Theory to Practice:**
+  - Learned password security isn't just "hash it" - salts, comparison functions matter
+  - Understood why cross-validation beats single train/test split
+  - Realized cloud platforms have different constraints than local development
+
+- **Problem-Solving Skills:**
+  - Debugged test > train accuracy paradox (lucky test set)
+  - Solved Render ephemeral filesystem issue (database storage)
+  - Fixed password hash comparison (can't use ==)
+
+- **Architecture Thinking:**
+  - Per-user vs global models - understood trade-offs
+  - File vs database storage - context matters
+  - Redirect vs render - subtle but important UX impact
+
+- **Production Readiness:**
+  - Environment variables for secrets
+  - Rate limiting for API protection
+  - Error handling for robustness
+  - Documentation for maintainability
+
+This project demonstrates full-stack ML engineering: from data collection → model training → secure authentication → production deployment. Every decision has trade-offs, and understanding those trade-offs is what separates good engineering from just writing code.
+
 **Ready for:** Copy-paste into README, then later send back for professional summary/resume/LinkedIn generation

@@ -1,12 +1,13 @@
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+import json
 
 import matplotlib.pyplot as plt
 
 
 from api import api_function
-from data import data_functions
+from data import data_functions, user_model_data
 
 import pickle
 from pathlib import Path
@@ -48,6 +49,7 @@ def train_save_model(connection, user_id, coldstart):
     scaler2 = StandardScaler()
     all_x_scaled = scaler2.fit_transform(features)      #Scales all feature data
     cv_scores = cross_val_score(LogisticRegression(max_iter=1000, C=1.0), all_x_scaled, response, cv=5)     #Simulates 5 training sessions
+    cv_mean = cv_scores.mean()
     print(f"Accuracy scores of other tests: {cv_scores} \n")
 
 
@@ -93,31 +95,23 @@ def train_save_model(connection, user_id, coldstart):
         plt.grid(True, alpha=0.3)
         plt.show()
 
-    answer = input("Do you want to save model? (yes/no): ").lower()
+    if coldstart:
+        save_model = True
+    else:
+        answer = input("Do you want to save model? (yes/no): ").lower()
+        save_model = (answer == "yes")
 
-    if answer == "yes" or coldstart:
-        #Saving model and scaler to ML file
-        models_dir = Path(__file__).parent.parent / 'ml' / 'models'
-        models_dir.mkdir(parents=True, exist_ok=True)
+    if save_model:
+        #Saving model and scaler 
 
+        user_model_data.save_user_model(connection, user_id, logistic_model, logistic_scaler, float(cv_mean), len(feature_data))
 
-        # Save model
-        model_path = models_dir / f'model_user_{user_id}.pkl'
-        pickle.dump(logistic_model, open(model_path, 'wb'))
-        print(f"Model saved to {model_path}")
+        metadata = {
+            "user_id": user_id,
+            "cv_mean": float(cv_mean),
+            "train_score": train_score,
+            "test_score": test_score, 
+            "interaction_count": len(feature_data)
+        }
 
-
-        # Save scaler
-        scaler_path = models_dir / f'scaler_user_{user_id}.pkl'
-        pickle.dump(logistic_scaler, open(scaler_path, 'wb'))
-        print(f"Scaler saved to {scaler_path}")
-
-        print("Save complete!")
-
-
-
-    
-
-    
-
-    return logistic_model, logistic_scaler, score
+    return metadata
