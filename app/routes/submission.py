@@ -109,7 +109,7 @@ def user_submission():
             connection = data_functions.get_connection("prod")
             interaction_count = interact_data.fetch_user_interactions(connection, session["user_id"])
             
-            if len(interaction_count) < 10:     #ADD MODEL TRAINING
+            if len(interaction_count) < 10:     #Cold start
                 flash("Let’s train on a bit of data so we can learn your preferences.")
 
                 suggestions = reccomendation.get_recs(34.0961, -118.1058, 5, None, None, connection, session["user_id"], True)
@@ -124,6 +124,15 @@ def user_submission():
                 connection.close()
                 return redirect(url_for("submission.show_restaurant"))
 
+
+            interactions = len(interact_data.fetch_user_interactions(connection, session["user_id"]))
+            old_interaction_count = user_model_data.fetch_model_data(connection, session["user_id"])[4]
+
+            print(interactions)
+            print(old_interaction_count)
+            if (interactions - old_interaction_count) >= 50:
+                ml_model.train_save_model(connection, session.get("user_id"), False)
+                print("training")
 
             return render_template("submission.html")
 
@@ -182,7 +191,7 @@ def show_restaurant():
             restaurant_to_display["cuisine"] = restaurant_to_display["cuisine"].replace("_", " ").title()
             restaurant_to_display["price_level"] = price_map.get(restaurant_to_display["price_level"], "N/A")
         
-        return render_template("display_restaurant.html", displayed_restaurant = restaurant_to_display, training = session["training"])
+        return render_template("display_restaurant.html", displayed_restaurant = restaurant_to_display, training = session.get("training", False))
     
     else:
         return redirect(url_for("submission.login"))

@@ -93,3 +93,18 @@ def delete_user_model(connection, user_id):
     
     except Exception as e:
         print(f"delete_user_model has an error: {e}")
+
+
+def fetch_model_data(connection, user_id):
+    query = "SELECT * FROM user_models WHERE user_id = %s"
+
+    try:
+        cur = connection.cursor()
+        cur.execute(query, (user_id,))
+        data = cur.fetchone()
+        cur.close()
+
+        return data
+
+    except Exception as e:
+        print(f"fetch_model_data has an error: {e}")
