@@ -36,7 +36,7 @@ def login():
         if user_credentials and check_password_hash(user_credentials[1], password):
             session["user_id"] = user_credentials[0]
             connection.close()
-            flash("succesffuly logged in")
+            flash("Login Successful")
             return redirect(url_for("submission.user_submission"))
             
         else:
@@ -54,7 +54,7 @@ def login():
 def logout():
     if "user_id" in session:
         session.clear()
-        flash("Successfully logged out!", "success")
+        flash("Logout Successful", "success")
     
     else:
         flash("You're not logged in", "warning")
@@ -68,7 +68,7 @@ def logout():
 def signup():
 
     if "user_id" in session:
-        flash("ur already logged in")
+        flash("You're already logged in")
         return redirect(url_for("submission.user_submission"))
 
     else:
@@ -88,7 +88,7 @@ def signup():
                     user_data.create_user(connection, username, pw_hash)
                     user_id = user_data.fetch_user_credentials(connection, username)[0]
                     session["user_id"] = user_id
-                    flash("user created")
+                    flash("Account successfully created")
                     return redirect(url_for("submission.user_submission"))
                 
                 else:
@@ -110,7 +110,7 @@ def user_submission():
             interaction_count = interact_data.fetch_user_interactions(connection, session["user_id"])
             
             if len(interaction_count) < 10:     #ADD MODEL TRAINING
-                flash("lets have you train some data so that we know a little bit about your preferences")
+                flash("Let’s train on a bit of data so we can learn your preferences.")
 
                 suggestions = reccomendation.get_recs(34.0961, -118.1058, 5, None, None, connection, session["user_id"], True)
                 suggestions += reccomendation.get_recs(40.6815, -73.8365, 5, None, None, connection, session["user_id"], True)
@@ -182,7 +182,7 @@ def show_restaurant():
             restaurant_to_display["cuisine"] = restaurant_to_display["cuisine"].replace("_", " ").title()
             restaurant_to_display["price_level"] = price_map.get(restaurant_to_display["price_level"], "N/A")
         
-        return render_template("display_restaurant.html", displayed_restaurant = restaurant_to_display)
+        return render_template("display_restaurant.html", displayed_restaurant = restaurant_to_display, training = session["training"])
     
     else:
         return redirect(url_for("submission.login"))

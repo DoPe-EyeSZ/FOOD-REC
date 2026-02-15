@@ -8,7 +8,9 @@
 <p><strong>Cuisine:</strong> {{ displayed_restaurant["cuisine"].title() }}</p>
 <p><strong>Rating:</strong> {{ displayed_restaurant["rating"] }} stars ({{ displayed_restaurant["rating_count"] }} reviews)</p>
 <p><strong>Price Level:</strong> {{ displayed_restaurant["price_level"] }}</p>
-<p><strong>Drive Time:</strong> {{ (displayed_restaurant["drive_time"] / 60) | round(1) }} minutes</p>
+{% if not training%}
+    <p><strong>Drive Time:</strong> {{ (displayed_restaurant["drive_time"] / 60) | round(1) }} minutes</p>
+{% endif %}
 
 <p><strong>Available Options:</strong></p>
 <ul>
