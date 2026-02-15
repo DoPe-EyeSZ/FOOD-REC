@@ -10,9 +10,9 @@ Your Stats
     <h2>Most Frequent Cuisines</h2>
     {% for restaurant in frontend_data["highest_appearance"] %}
         {% if restaurant[0] == "Restaurant" %}
-            <p>Unspecified restaurants have appeared <strong>{{restaurant[1]}} times</strong></p>
+            <p>Unspecified Restaurants have appeared <strong>{{restaurant[1]}} times</strong></p>
         {% else %}
-            <p>{{restaurant[0]}} restaurants have appeared <strong>{{restaurant[1]}} times</strong></p>
+            <p>{{restaurant[0]}} have appeared <strong>{{restaurant[1]}} times</strong></p>
         {% endif %}
     {% endfor %}
 {% endif %}
@@ -21,9 +21,9 @@ Your Stats
     <h2>Your Preferences</h2>
     {% for restaurant in frontend_data["highest_acceptance"] %}
         {% if restaurant[0] == "Restaurant" %}
-            <p>You accepted unspecified restaurants <strong>{{restaurant[1]}}%</strong> of the time</p>
+            <p>You accepted Unspecified Restaurants <strong>{{restaurant[1]}}%</strong> of the time</p>
         {% else %}
-            <p>You accepted {{restaurant[0]}} restaurants <strong>{{restaurant[1]}}%</strong> of the time</p>
+            <p>You accepted {{restaurant[0]}} <strong>{{restaurant[1]}}%</strong> of the time</p>
         {% endif %}
     {% endfor %}
 {% endif %}
