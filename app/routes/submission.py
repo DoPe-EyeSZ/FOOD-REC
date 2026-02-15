@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from data import data_functions, interact_data, cuisine_data, user_data, restaurant_data
 
 #ML functions
-from ML import reccomendation
+from ML import reccomendation, ml_model
 import pickle
 
 from app import limiter
@@ -19,10 +19,6 @@ load_dotenv()
 
 
 submission = Blueprint("submission", __name__, template_folder="templates")
-
-#Updated model/scaler
-model = pickle.load(open('ml/models/model.pkl', 'rb'))
-scaler = pickle.load(open('ml/models/scaler.pkl', 'rb'))
 
 
 @submission.route("/", methods = ["POST", "GET"])
@@ -115,9 +111,13 @@ def user_submission():
             
             if len(interaction_count) < 10:     #ADD MODEL TRAINING
                 flash("lets have you train some data so that we know a little bit about your preferences")
-                suggestions = reccomendation.get_recs(40.7580, -73.9855, 3, model, scaler, connection, session["user_id"], True)
+
+                suggestions = reccomendation.get_recs(34.0961, -118.1058, 5, None, None, connection, session["user_id"], True)
+                suggestions += reccomendation.get_recs(40.6815, -73.8365, 5, None, None, connection, session["user_id"], True)
+                suggestions += reccomendation.get_recs(37.3394, -121.8950, 5, None, None, connection, session["user_id"], True)
+
                 print(len(suggestions))
-                print(suggestions)
+
                 session["suggestions"] = suggestions
                 session["index"] = 0
                 session["training"] = True
@@ -139,6 +139,10 @@ def user_submission():
             lat = request.form.get('lat')
             lng = request.form.get('lng')
             max_distance = request.form.get("max_distance")
+
+            #Load model
+            model = pickle.load(open(f'ml/models/model_user_{session["user_id"]}.pkl', 'rb'))
+            scaler = pickle.load(open(f'ml/models/scaler_user_{session["user_id"]}.pkl', 'rb'))
 
             top10 = reccomendation.get_recs(lat, lng, max_distance, model, scaler, connection, user_id = session["user_id"], training= False)
 
@@ -239,6 +243,8 @@ def process_response():
         else:
             if "training" in session:
                 flash("training is done; accuracy will grow as you use more")
+
+                #ml_model.train_save_model(connection, session["user_id"], coldstart = True)
                 session.pop("training", None)
                 return redirect(url_for("submission.user_submission"))
             

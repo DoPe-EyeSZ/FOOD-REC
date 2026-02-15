@@ -12,7 +12,7 @@ import pickle
 from pathlib import Path
 
 
-def train_save_model(connection, user_id):
+def train_save_model(connection, user_id, coldstart):
 
 
     #Gathers all feature data
@@ -56,59 +56,59 @@ def train_save_model(connection, user_id):
     test_score = logistic_model.score(x_test_scaled, y_test)
     print(f"Train: {train_score:.1%}, Test: {test_score:.1%}, Diff: {abs(train_score-test_score):.1%} \n")
 
+    if not coldstart:
+        #LOGISTIC REGRESSION FEATURE IMPORTANCE
+        print(f"\n{'='*60}")
+        print("FEATURE IMPORTANCE")
+        print(f"{'='*60}")
 
-    #LOGISTIC REGRESSION FEATURE IMPORTANCE
-    print(f"\n{'='*60}")
-    print("FEATURE IMPORTANCE")
-    print(f"{'='*60}")
+        feature_names = ["dine_in", "takeout", "vegan", "price", "cuisine_ratio", "rating", "rating_count", "open", "drive"]
 
-    feature_names = ["dine_in", "takeout", "vegan", "price", "cuisine_ratio", "rating", "rating_count", "open", "drive"]
+        #Same order as feature data (feature data is in order of join function)
+        coef = logistic_model.coef_[0]
+        importance = abs(coef)
 
-    #Same order as feature data (feature data is in order of join function)
-    coef = logistic_model.coef_[0]
-    importance = abs(coef)
+        sorted_pairs = sorted(zip(feature_names, importance), key=lambda x: x[1], reverse=True)
 
-    sorted_pairs = sorted(zip(feature_names, importance), key=lambda x: x[1], reverse=True)
+        for name, imp in sorted_pairs:
+            bar = '█' * int(imp * 100)
+            print(f"{name:15} {imp:.3f} {bar} \n")
+            
+            
+        prediction = logistic_model.predict(x_test_scaled)
+        # VISUALIZATION
+        print(f"\n{'='*60}")
+        print("CREATING VISUALIZATIONS")
+        print(f"{'='*60}")
 
-    for name, imp in sorted_pairs:
-        bar = '█' * int(imp * 100)
-        print(f"{name:15} {imp:.3f} {bar} \n")
-        
-        
-    prediction = logistic_model.predict(x_test_scaled)
-    # VISUALIZATION
-    print(f"\n{'='*60}")
-    print("CREATING VISUALIZATIONS")
-    print(f"{'='*60}")
-
-    # Scatter plot
-    plt.figure(figsize=(10, 6))
-    plt.scatter(range(len(y_test)), y_test, label='Actual', alpha=0.6, color='blue')
-    plt.scatter(range(len(prediction)), prediction, label='Predicted', alpha=0.6, color='red')
-    plt.axhline(y=0.5, color='green', linestyle='--', label='Decision Boundary (0.5)')
-    plt.xlabel('Test Sample Index')
-    plt.ylabel('Value')
-    plt.title('Predictions vs Actual Values')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.show()
+        # Scatter plot
+        plt.figure(figsize=(10, 6))
+        plt.scatter(range(len(y_test)), y_test, label='Actual', alpha=0.6, color='blue')
+        plt.scatter(range(len(prediction)), prediction, label='Predicted', alpha=0.6, color='red')
+        plt.axhline(y=0.5, color='green', linestyle='--', label='Decision Boundary (0.5)')
+        plt.xlabel('Test Sample Index')
+        plt.ylabel('Value')
+        plt.title('Predictions vs Actual Values')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.show()
 
     answer = input("Do you want to save model? (yes/no): ").lower()
 
-    if answer == "yes":
+    if answer == "yes" or coldstart:
         #Saving model and scaler to ML file
         models_dir = Path(__file__).parent.parent / 'ml' / 'models'
         models_dir.mkdir(parents=True, exist_ok=True)
 
 
         # Save model
-        model_path = models_dir / 'model.pkl'
+        model_path = models_dir / f'model_user_{user_id}.pkl'
         pickle.dump(logistic_model, open(model_path, 'wb'))
         print(f"Model saved to {model_path}")
 
 
         # Save scaler
-        scaler_path = models_dir / 'scaler.pkl'
+        scaler_path = models_dir / f'scaler_user_{user_id}.pkl'
         pickle.dump(logistic_scaler, open(scaler_path, 'wb'))
         print(f"Scaler saved to {scaler_path}")
 
