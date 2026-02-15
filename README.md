@@ -317,8 +317,16 @@ Restaurant Recommendation ML System (for resume)
   - saved restaurant/cuisine information of all 20 restaurnants, even when user only sees 10
   - moved data insert to when the user reponse is processed
 
+
+2/15/26
+- added auto training
+- save scalar/model into db as binary so it can be converted
+  - no use pickle any more
+  - created new db that stores model, cv mean, interaction count
+
+
 ### Next Steps
-- add training phase
+- add production param to remove charts/feature importance
 - deploy on render
 
 ```
