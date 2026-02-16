@@ -109,7 +109,8 @@ def user_submission():
             connection = data_functions.get_connection("prod")
             interaction_count = interact_data.fetch_user_interactions(connection, session["user_id"])
             
-            if len(interaction_count) < 10:     #Cold start
+            #Cold start
+            if len(interaction_count) < 10:     
                 flash("Let’s train on a bit of data so we can learn your preferences.")
 
                 suggestions = reccomendation.get_recs(34.0961, -118.1058, 5, None, None, connection, session["user_id"], True)
@@ -128,10 +129,9 @@ def user_submission():
             interactions = len(interact_data.fetch_user_interactions(connection, session["user_id"]))
             old_interaction_count = user_model_data.fetch_model_data(connection, session["user_id"])[4]
 
-            print(interactions)
-            print(old_interaction_count)
+            #Retrain after 50 data sets
             if (interactions - old_interaction_count) >= 50:
-                ml_model.train_save_model(connection, session.get("user_id"), False)
+                ml_model.train_save_model(connection, session.get("user_id"), coldstart=False, prod_mode=False)
                 print("training")
 
             return render_template("submission.html")
@@ -250,7 +250,7 @@ def process_response():
             if "training" in session:
                 flash("training is done; accuracy will grow as you use more")
 
-                ml_model.train_save_model(connection, session["user_id"], True)
+                ml_model.train_save_model(connection, session["user_id"], coldstart=True, prod_mode=True)
                 session.pop("training", None)
                 return redirect(url_for("submission.user_submission"))
             

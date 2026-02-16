@@ -13,7 +13,7 @@ import pickle
 from pathlib import Path
 
 
-def train_save_model(connection, user_id, coldstart):
+def train_save_model(connection, user_id, coldstart, prod_mode):
 
 
     #Gathers all feature data
@@ -58,7 +58,7 @@ def train_save_model(connection, user_id, coldstart):
     test_score = logistic_model.score(x_test_scaled, y_test)
     print(f"Train: {train_score:.1%}, Test: {test_score:.1%}, Diff: {abs(train_score-test_score):.1%} \n")
 
-    if not coldstart:
+    if not (coldstart or prod_mode):
         #LOGISTIC REGRESSION FEATURE IMPORTANCE
         print(f"\n{'='*60}")
         print("FEATURE IMPORTANCE")

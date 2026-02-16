@@ -12,7 +12,7 @@ load_dotenv()
 
 connection = data_functions.get_connection("prod")
 
-data = ml_model.train_save_model(connection, user_id=1, coldstart=False)
+data = ml_model.train_save_model(connection, user_id=1, coldstart=False, prod_mode=False)
 
 
 
