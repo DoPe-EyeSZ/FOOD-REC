@@ -1,8 +1,12 @@
 import psycopg2
-from config import POSTGRES_HOST, POSTGRES_DB_TEST, POSTGRES_DB_PROD, POSTGRES_USER, POSTGRES_PASSWORD
+from config import POSTGRES_HOST, POSTGRES_DB_TEST, POSTGRES_DB_PROD, POSTGRES_USER, POSTGRES_PASSWORD, DATABASE_URL
 
 def get_connection(db_type = "test"):
 
+    if DATABASE_URL and not DATABASE_URL.startswith("postgresql://localhost"):
+        return psycopg2.connect(DATABASE_URL)
+
+    #For local testing
     if db_type == "test":
         database = POSTGRES_DB_TEST
     else:
