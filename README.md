@@ -345,18 +345,17 @@ skills:
 v2 ideas:
 - show image of restaurant
 - show description of restaurant
-- show predicted probability to user
-   - allow user to train data
-- auto retrain
 - allow user to pick places instead of using current location
-- have users select 20-30 restaurants to train model
+- dont show same restaurant name
+- present url to go to restaurant
+- ai categorizer
 
 add this for resume when claude reads it later:
 
 What to Write:
 Technologies:
 
-Flask, PostgreSQL, scikit-learn, Docker, AWS (EC2, RDS), Flask-Limiter
+Flask, sqlite, PostgreSQL, scikit-learn, Flask-Limiter
 
 Project Description:
 
