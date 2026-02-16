@@ -27,6 +27,14 @@ submission = Blueprint("submission", __name__, template_folder="templates")
 def login():
     if request.method == "POST":
         connection = data_functions.get_connection("prod")
+
+        #Creating table
+        user_data.create_user_table(connection)
+        restaurant_data.create_restaurant_table(connection)
+        user_model_data.create_user_models_table(connection)
+        interact_data.create_interact_table(connection)
+        cuisine_data.create_cuisine_table(connection)
+
         user_name = request.form.get("username")
         password = request.form.get("password")
 
