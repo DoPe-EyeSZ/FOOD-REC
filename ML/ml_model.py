@@ -3,12 +3,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 import json
 
-try:
-    import matplotlib.pyplot as plt
-    HAS_MATPLOTLIB = True
-except ImportError:
-    HAS_MATPLOTLIB = False
-    plt = None
+import matplotlib.pyplot as plt
 
 
 from api import api_function
@@ -88,18 +83,17 @@ def train_save_model(connection, user_id, coldstart, prod_mode):
         print("CREATING VISUALIZATIONS")
         print(f"{'='*60}")
 
-        if HAS_MATPLOTLIB:
-            # Scatter plot
-            plt.figure(figsize=(10, 6))
-            plt.scatter(range(len(y_test)), y_test, label='Actual', alpha=0.6, color='blue')
-            plt.scatter(range(len(prediction)), prediction, label='Predicted', alpha=0.6, color='red')
-            plt.axhline(y=0.5, color='green', linestyle='--', label='Decision Boundary (0.5)')
-            plt.xlabel('Test Sample Index')
-            plt.ylabel('Value')
-            plt.title('Predictions vs Actual Values')
-            plt.legend()
-            plt.grid(True, alpha=0.3)
-            plt.show()
+        # Scatter plot
+        plt.figure(figsize=(10, 6))
+        plt.scatter(range(len(y_test)), y_test, label='Actual', alpha=0.6, color='blue')
+        plt.scatter(range(len(prediction)), prediction, label='Predicted', alpha=0.6, color='red')
+        plt.axhline(y=0.5, color='green', linestyle='--', label='Decision Boundary (0.5)')
+        plt.xlabel('Test Sample Index')
+        plt.ylabel('Value')
+        plt.title('Predictions vs Actual Values')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.show()
 
     if coldstart:
         save_model = True
