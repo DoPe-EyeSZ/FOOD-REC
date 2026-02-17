@@ -181,6 +181,7 @@ def user_submission():
     
 
 @submission.route("/show_restaurant")
+@limiter.limit("30 per minute")
 def show_restaurant():
     if "user_id" in session:
         suggestions = session["suggestions"]
