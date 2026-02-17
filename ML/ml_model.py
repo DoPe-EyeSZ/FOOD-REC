@@ -95,7 +95,7 @@ def train_save_model(connection, user_id, coldstart, prod_mode):
         plt.grid(True, alpha=0.3)
         plt.show()
 
-    if coldstart:
+    if coldstart or prod_mode:
         save_model = True
     else:
         answer = input("Do you want to save model? (yes/no): ").lower()

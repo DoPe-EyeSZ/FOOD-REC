@@ -349,21 +349,25 @@ def statistics():
         return redirect(url_for("submission.login"))
     
 
-@submission.route("/delete_user", methods = ["GET"])
+@submission.route("/delete_user", methods = ["GET", "POST"])
 def delete_user():
     if "user_id" in session:
-        x = input("y for delete; n for no")
-        if x == "y":
-            user_id = session["user_id"]
+        if request.method == "POST":
             connection = data_functions.get_connection("prod")
-            interact_data.delete_user_interactions(connection, user_id)
-            cuisine_data.delete_cuisines(connection, user_id)
-            user_model_data.delete_user_model(connection, user_id)
-            user_data.delete_user(connection, user_id)
+            user_id = session["user_id"]
+            user_info = user_data.fetch_user_id_credentials(connection, user_id)
+            input_pw = request.form.get("password")
 
+            if check_password_hash(user_info[1], input_pw):
+
+                interact_data.delete_user_interactions(connection, user_id)
+                cuisine_data.delete_cuisines(connection, user_id)
+                user_model_data.delete_user_model(connection, user_id)
+                user_data.delete_user(connection, user_id)
+                session.clear()
         
-
-        session.clear()
+        else:
+            render_template("delete_account.html")
 
     return redirect(url_for("submission.login"))
         

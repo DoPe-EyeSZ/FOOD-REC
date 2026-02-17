@@ -32,6 +32,22 @@ def fetch_user_credentials(connection, username):
     except Exception as e:
         print(f"fetch_all_user_id has an error: {e}")
 
+
+def fetch_user_id_credentials(connection, user_id):
+    query = '''
+        SELECT username, password_hash FROM users WHERE user_id = %s
+    '''
+
+    try:
+        cur = connection.cursor()
+        cur.execute(query, (user_id,))
+        data = cur.fetchone()
+        cur.close()
+        return data
+    
+    except Exception as e:
+        print(f"fetch_all_user_id has an error: {e}")
+
 def create_user(connection, username, password_hash):
     query = "INSERT INTO users (username, password_hash) VALUES (%s, %s)"
 

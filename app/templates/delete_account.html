@@ -1,0 +1,14 @@
+{% extends "logged_in_base.html" %}
+
+{% block title %}Delete Account{% endblock %}
+
+{% block content %}
+<h1>You are going to delete your account</h1>
+
+<form action="#" method="POST">
+    <p>Enter password to confirm delete</p>
+    <input type="password" name="password" required>
+    
+    <p><button type="submit">Log In</button></p>
+</form>
+{% endblock %}
