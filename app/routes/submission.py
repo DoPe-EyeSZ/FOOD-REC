@@ -23,7 +23,7 @@ submission = Blueprint("submission", __name__, template_folder="templates")
 
 @submission.route("/", methods = ["POST", "GET"])
 @submission.route("/login", methods = ["POST", "GET"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 def login():
     if request.method == "POST":
         connection = data_functions.get_connection("prod")
@@ -83,7 +83,11 @@ def signup():
             username = request.form.get("username")
             password = request.form.get("password")
             password_check = request.form.get("password_check")
+
             connection = data_functions.get_connection("prod")
+            user_data.create_user_table(connection)
+            restaurant_data.create_restaurant_table(connection)
+            connection.commit()
 
             #Create new account if user does not exist
             if not user_data.fetch_user_credentials(connection, username):
