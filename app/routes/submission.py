@@ -211,6 +211,7 @@ def show_restaurant():
 
 
 @submission.route("/process_response", methods = ["POST"])
+@limiter.limit("30 per minute")
 def process_response():
     if "user_id" in session:
 
@@ -312,7 +313,7 @@ def process_response():
 
 
 @submission.route("/statistics", methods = ["GET"])
-@limiter.limit("10 per minute")
+@limiter.limit("30 per minute")
 def statistics():
     if "user_id" in session:
         connection = data_functions.get_connection("prod")
@@ -350,6 +351,7 @@ def statistics():
     
 
 @submission.route("/delete_user", methods = ["GET", "POST"])
+@limiter.limit("3 per hour")
 def delete_user():
     if "user_id" in session:
         if request.method == "POST":
