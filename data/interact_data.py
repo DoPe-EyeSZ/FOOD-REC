@@ -3,7 +3,7 @@ def create_interact_table(connection):
     query = '''
         CREATE TABLE IF NOT EXISTS user_interactions(
             id SERIAL PRIMARY KEY,
-            user_id TEXT DEFAULT 'test_user',
+            user_id INTEGER,
             place_id TEXT,
             rating REAL,
             rating_count INTEGER,

@@ -31,9 +31,7 @@ def login():
         #Creating table
         user_data.create_user_table(connection)
         restaurant_data.create_restaurant_table(connection)
-        user_model_data.create_user_models_table(connection)
-        interact_data.create_interact_table(connection)
-        cuisine_data.create_cuisine_table(connection)
+        connection.commit()
 
         user_name = request.form.get("username")
         password = request.form.get("password")
@@ -113,6 +111,13 @@ def signup():
 @limiter.limit("10 per hour")
 def user_submission():
     if "user_id" in session:
+
+        connection = data_functions.get_connection("prod")
+        user_model_data.create_user_models_table(connection)
+        interact_data.create_interact_table(connection)
+        cuisine_data.create_cuisine_table(connection)
+        connection.commit()
+
         if request.method == "GET":     #For after user logs in
             connection = data_functions.get_connection("prod")
             interaction_count = interact_data.fetch_user_interactions(connection, session["user_id"])

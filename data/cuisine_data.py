@@ -3,7 +3,7 @@
 def create_cuisine_table(connection):
     query = f'''
         CREATE TABLE IF NOT EXISTS cuisine_stats(
-            user_id INTEGER DEFAULT 'test_user',
+            user_id INTEGER,
             cuisine TEXT,
             shown INTEGER DEFAULT 0,
             accepted INTEGER DEFAULT 0,
