@@ -349,6 +349,7 @@ v2 ideas:
 - dont show same restaurant name
 - present url to go to restaurant
 - ai categorizer
+- stricter retrain (use overfitting checks and cv mean change before retrain)
 
 add this for resume when claude reads it later:
 

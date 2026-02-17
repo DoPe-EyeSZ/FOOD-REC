@@ -14,7 +14,7 @@ limiter = Limiter(
 
 def create_app():
     load_dotenv()
-    app = Flask(__name__, static_folder="../static", template_folder="templates")
+    app = Flask(__name__, static_folder="static", template_folder="templates")
     app.secret_key = os.environ.get("SECRET_KEY")
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
