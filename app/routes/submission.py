@@ -108,7 +108,7 @@ def signup():
 
 
 @submission.route("/user_submission", methods = ["POST", "GET"])
-@limiter.limit("10 per hour")
+@limiter.limit("5 per hour")
 def user_submission():
     if "user_id" in session:
 
@@ -261,7 +261,7 @@ def process_response():
         #All restaurants has been shown
         else:
             if "training" in session:
-                flash("training is done; accuracy will grow as you use more")
+                flash("Training is done. Our accuracy will improve as you continue")
 
                 ml_model.train_save_model(connection, session["user_id"], coldstart=True, prod_mode=True)
                 session.pop("training", None)
@@ -365,9 +365,10 @@ def delete_user():
                 user_model_data.delete_user_model(connection, user_id)
                 user_data.delete_user(connection, user_id)
                 session.clear()
+                flash("Account successfully deleted")
         
         else:
-            render_template("delete_account.html")
+            return render_template("delete_account.html")
 
     return redirect(url_for("submission.login"))
         

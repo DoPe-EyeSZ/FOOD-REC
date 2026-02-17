@@ -3,12 +3,14 @@
 {% block title %}Delete Account{% endblock %}
 
 {% block content %}
-<h1>You are going to delete your account</h1>
+<h1>Delete Account</h1>
+
+<p><strong>Warning:</strong> This action cannot be undone. All your data will be permanently deleted.</p>
 
 <form action="#" method="POST">
-    <p>Enter password to confirm delete</p>
+    <p><strong>Enter password to confirm:</strong></p>
     <input type="password" name="password" required>
     
-    <p><button type="submit">Log In</button></p>
+    <p><button type="submit">Delete Account</button></p>
 </form>
 {% endblock %}
