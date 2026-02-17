@@ -132,10 +132,13 @@ def user_submission():
                 
                 suggestions = reccomendation.get_recs(34.0961, -118.1058, 5, None, None, connection, session["user_id"], True)
                 print(suggestions)
+                print("reached1")
                 suggestions += reccomendation.get_recs(40.6815, -73.8365, 5, None, None, connection, session["user_id"], True)
                 print(suggestions)
+                print("reached2")
                 suggestions += reccomendation.get_recs(37.3394, -121.8950, 5, None, None, connection, session["user_id"], True)
                 print(suggestions)
+                print("reached3")
 
                 session["suggestions"] = suggestions
                 session["index"] = 0
