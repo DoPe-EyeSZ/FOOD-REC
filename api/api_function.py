@@ -111,7 +111,7 @@ def remove_nameid(feature_data):        #Converts all the values of a restaurant
 
 #Calls on API and returns data from fieldmask
 def use_api(lat, lng, max_distance):
-    GOOGLE_API_KEY = os.environ.get("google_api_key")
+    GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
     url = 'https://places.googleapis.com/v1/places:searchNearby'        #Url for Google Places
 
     distance = round((1609.34 * int(max_distance)), 2)      #Convert from miles to meters
