@@ -25,7 +25,7 @@ def create_app():
     limiter.init_app(app)
 
 
-    from app.routes import register_blueprint
+    from app.routes.submission import register_blueprint
     register_blueprint(app)
 
     return app
