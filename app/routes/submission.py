@@ -27,28 +27,34 @@ submission = Blueprint("submission", __name__, template_folder="templates")
 def login():
     if request.method == "POST":
         connection = data_functions.get_connection("prod")
+        try:
+            #Creating table
+            user_data.create_user_table(connection)
+            restaurant_data.create_restaurant_table(connection)
+            connection.commit()
 
-        #Creating table
-        user_data.create_user_table(connection)
-        restaurant_data.create_restaurant_table(connection)
-        connection.commit()
+            user_name = request.form.get("username")
+            password = request.form.get("password")
 
-        user_name = request.form.get("username")
-        password = request.form.get("password")
+            user_credentials = user_data.fetch_user_credentials(connection, user_name)
+            
 
-        user_credentials = user_data.fetch_user_credentials(connection, user_name)
+            if user_credentials and check_password_hash(user_credentials[1], password):
+                session["user_id"] = user_credentials[0]
+                flash("Login Successful")
+                return redirect(url_for("submission.user_submission"))
+                
+            else:
+                flash("Wrong username or password", "warning")
+                return redirect(url_for("submission.login"))
+            
+        except Exception as e:
+            print(f"Error: {e}")
+            return render_template("error_page.html")
         
-
-        if user_credentials and check_password_hash(user_credentials[1], password):
-            session["user_id"] = user_credentials[0]
-            connection.close()
-            flash("Login Successful")
-            return redirect(url_for("submission.user_submission"))
-            
-        else:
-            flash("Wrong username or password", "warning")
-            return redirect(url_for("submission.login"))
-            
+        finally:
+            if 'connection' in locals():
+                    connection.close()
 
     else:
 
@@ -78,37 +84,49 @@ def signup():
         return redirect(url_for("submission.user_submission"))
 
     else:
-        #After user submits signup form
-        if request.method == "POST":
-            username = request.form.get("username")
-            password = request.form.get("password")
-            password_check = request.form.get("password_check")
+        connection = data_functions.get_connection("prod")
+        try:
+            #After user submits signup form
+            if request.method == "POST":
 
-            connection = data_functions.get_connection("prod")
-            user_data.create_user_table(connection)
-            restaurant_data.create_restaurant_table(connection)
-            connection.commit()
+                username = request.form.get("username")
+                password = request.form.get("password")
+                password_check = request.form.get("password_check")
 
-            #Create new account if user does not exist
-            if not user_data.fetch_user_credentials(connection, username):
+                user_data.create_user_table(connection)
+                restaurant_data.create_restaurant_table(connection)
+                connection.commit()
 
-                #If user reenters password correctly
-                if password == password_check:
-                    pw_hash = generate_password_hash(password)
-                    user_data.create_user(connection, username, pw_hash)
-                    user_id = user_data.fetch_user_credentials(connection, username)[0]
-                    session["user_id"] = user_id
-                    flash("Account successfully created")
-                    return redirect(url_for("submission.user_submission"))
-                
+                #Create new account if user does not exist
+                if not user_data.fetch_user_credentials(connection, username):
+
+                    #If user reenters password correctly
+                    if password == password_check:
+                        pw_hash = generate_password_hash(password)
+                        user_data.create_user(connection, username, pw_hash)
+                        user_id = user_data.fetch_user_credentials(connection, username)[0]
+                        session["user_id"] = user_id
+                        flash("Account successfully created")
+                        return redirect(url_for("submission.user_submission"))
+                    
+                    else:
+                        flash("Your password does not match", "warning")
+
+                #User name already exists
                 else:
-                    flash("You password does not match", "warning")
+                    flash("Username already exists", "warning")
+                
 
-            #User name already exists
-            else:
-                flash("Username already exists", "warning")
+            return render_template("signup.html")
+        
+        except Exception as e:
+            print(f"Error: {e}")
 
-        return render_template("signup.html")
+        finally:
+            if connection:
+                connection.close()
+
+
 
 
 @submission.route("/user_submission", methods = ["POST", "GET"])
@@ -117,69 +135,71 @@ def user_submission():
     if "user_id" in session:
 
         connection = data_functions.get_connection("prod")
-        user_model_data.create_user_models_table(connection)
-        interact_data.create_interact_table(connection)
-        cuisine_data.create_cuisine_table(connection)
-        connection.commit()
+        try:
+            user_model_data.create_user_models_table(connection)
+            interact_data.create_interact_table(connection)
+            cuisine_data.create_cuisine_table(connection)
+            connection.commit()
 
-        if request.method == "GET":     #For after user logs in
-            connection = data_functions.get_connection("prod")
-            interaction_count = interact_data.fetch_user_interactions(connection, session["user_id"])
-            
-            #Cold start
-            if len(interaction_count) < 10:     
-                flash("Let’s train on a bit of data so we can learn your preferences.")
+            if request.method == "GET":     #For after user logs in
+                interaction_count = interact_data.fetch_user_interactions(connection, session["user_id"])
                 
-                suggestions = reccomendation.get_recs(34.0961, -118.1058, 5, None, None, connection, session["user_id"], True)
+                #Cold start
+                if len(interaction_count) < 10:     
+                    flash("Let’s train on a bit of data so we can learn your preferences.")
+                    
+                    suggestions = reccomendation.get_recs(34.0961, -118.1058, 5, None, None, connection, session["user_id"], True)
 
-                suggestions += reccomendation.get_recs(40.6815, -73.8365, 5, None, None, connection, session["user_id"], True)
+                    suggestions += reccomendation.get_recs(40.6815, -73.8365, 5, None, None, connection, session["user_id"], True)
 
-                suggestions += reccomendation.get_recs(37.3394, -121.8950, 5, None, None, connection, session["user_id"], True)
+                    suggestions += reccomendation.get_recs(37.3394, -121.8950, 5, None, None, connection, session["user_id"], True)
 
 
-                session["suggestions"] = suggestions
+                    session["suggestions"] = suggestions
+                    session["index"] = 0
+                    session["training"] = True
+
+                    return redirect(url_for("submission.show_restaurant"))
+
+
+                #Retrain after 50 data sets
+                interactions = len(interact_data.fetch_user_interactions(connection, session["user_id"]))
+                old_interaction_count = user_model_data.fetch_model_data(connection, session["user_id"])[4]
+                if (interactions - old_interaction_count) >= 50:
+                    ml_model.train_save_model(connection, session.get("user_id"), coldstart=False, prod_mode=True)        
+
+
+                return render_template("submission.html")
+
+            else:
+            
+                #User's Input
+                lat = request.form.get('lat')
+                lng = request.form.get('lng')
+                max_distance = request.form.get("max_distance")
+
+                #Load model
+                model, scaler = user_model_data.load_user_model(connection, session["user_id"])
+
+                top10 = reccomendation.get_recs(lat, lng, max_distance, model, scaler, connection, user_id = session["user_id"], training= False)
+
+                if top10 is None:
+                    return render_template("error_page.html")
+                
+                session["suggestions"] = top10
                 session["index"] = 0
-                session["training"] = True
-
-                connection.close()
+                    
                 return redirect(url_for("submission.show_restaurant"))
-
-
-            interactions = len(interact_data.fetch_user_interactions(connection, session["user_id"]))
-            old_interaction_count = user_model_data.fetch_model_data(connection, session["user_id"])[4]
-
-            #Retrain after 50 data sets
-            if (interactions - old_interaction_count) >= 50:
-                ml_model.train_save_model(connection, session.get("user_id"), coldstart=False, prod_mode=True)
-
-            return render_template("submission.html")
-
-        else:
-
-            #Creating connection
-            connection = data_functions.get_connection("prod")
-
-
             
-            #User's Input
-            lat = request.form.get('lat')
-            lng = request.form.get('lng')
-            max_distance = request.form.get("max_distance")
 
-            #Load model
-            model, scaler = user_model_data.load_user_model(connection, session["user_id"])
+        except Exception as e:
+            print(f"Error: {e}")
+            return render_template("error_page.html")
 
-            top10 = reccomendation.get_recs(lat, lng, max_distance, model, scaler, connection, user_id = session["user_id"], training= False)
-
-            if top10 is None:
+        finally:
+            if 'connection' in locals():
                 connection.close()
-                return render_template("error_page.html")
             
-            session["suggestions"] = top10
-            session["index"] = 0
-                
-            connection.close()    
-            return redirect(url_for("submission.show_restaurant"))
     
     else:
         return redirect(url_for("submission.login"))
@@ -200,18 +220,22 @@ def show_restaurant():
                     1: "$$$$$"
                 }
         
-
-        if "training" in session:
-            restaurant_to_display = suggestions[index]
-            restaurant_to_display["cuisine"] = restaurant_to_display["cuisine"].replace("_", " ").title()
-            restaurant_to_display["price_level"] = price_map.get(restaurant_to_display["price_level"], "N/A")
-        else:
-            restaurant_to_display = suggestions[index][0]
-            restaurant_to_display["cuisine"] = restaurant_to_display["cuisine"].replace("_", " ").title()
-            restaurant_to_display["price_level"] = price_map.get(restaurant_to_display["price_level"], "N/A")
+        try:
+            if "training" in session:
+                restaurant_to_display = suggestions[index]
+                restaurant_to_display["cuisine"] = restaurant_to_display["cuisine"].replace("_", " ").title()
+                restaurant_to_display["price_level"] = price_map.get(restaurant_to_display["price_level"], "N/A")
+            else:
+                restaurant_to_display = suggestions[index][0]
+                restaurant_to_display["cuisine"] = restaurant_to_display["cuisine"].replace("_", " ").title()
+                restaurant_to_display["price_level"] = price_map.get(restaurant_to_display["price_level"], "N/A")
+            
+            return render_template("display_restaurant.html", displayed_restaurant = restaurant_to_display, training = session.get("training", False))
         
-        return render_template("display_restaurant.html", displayed_restaurant = restaurant_to_display, training = session.get("training", False))
-    
+        except Exception as e:
+            print(f"Error: {e}")
+            return render_template("error_page.html")
+        
     else:
         return redirect(url_for("submission.login"))
 
@@ -221,17 +245,12 @@ def show_restaurant():
 def process_response():
     if "user_id" in session:
 
-        price_map = {
-                    "$": 5,
-                    "$$": 4, 
-                    "$$$": 3,
-                    "$$$$": 2,
-                    "$$$$$": 1
-                }
+        price_to_num = {"$": 5, "$$": 4, "$$$": 3, "$$$$": 2, "$$$$$": 1}
+        num_to_price = {5: "$",4: "$$", 3: "$$$", 2: "$$$$", 1: "$$$$$"}
         
         
         connection = data_functions.get_connection("prod")
-        session["index"] += 1
+        session["index"] = session.get("index", 0) + 1
         
         response = request.form.get("response")
         place_id = request.form.get("place_id")
@@ -247,72 +266,72 @@ def process_response():
         name = request.form.get("name")
 
         price_level = request.form.get("price_level")
-        price_level = price_map.get(str(price_level), 0)
+        price_level = price_to_num.get(str(price_level), 0)
         takeout = request.form.get("takeout")
         vegan = request.form.get("vegan")
 
-        #Saving Restaurant data
-        restaurant_data.insert_restaurant(connection, place_id, dine_in, takeout, vegan, price_level, cuisine, name)
+        try:
+            #Saving Restaurant data
+            restaurant_data.insert_restaurant(connection, place_id, dine_in, takeout, vegan, price_level, cuisine, name)
+            
+            #Saving interaction
+            interact_data.insert_user_interaction(connection, place_id, rating, rating_count, opening, drive_time, response, user_id=session["user_id"])
+
+            #Saving cuisine
+            cuisine_data.upsert_cuisine_stats(connection, cuisine, int(response), session["user_id"])
         
-        #Saving interaction
-        interact_data.insert_user_interaction(connection, place_id, rating, rating_count, opening, drive_time, response, user_id=session["user_id"])
 
-        #Saving cuisine
-        cuisine_data.upsert_cuisine_stats(connection, cuisine, int(response), session["user_id"])
 
-        #Continue to show suggested restaurants
-        if session["index"] < len(session["suggestions"]):
-            connection.close()
-            return redirect(url_for("submission.show_restaurant"))
-        
-        #All restaurants has been shown
-        else:
-            if "training" in session:
-                flash("Training is done. Our accuracy will improve as you continue")
-
-                ml_model.train_save_model(connection, session["user_id"], coldstart=True, prod_mode=True)
-                session.pop("training", None)
-                return redirect(url_for("submission.user_submission"))
+            #Continue to show suggested restaurants
+            if session["index"] < len(session["suggestions"]):
+                return redirect(url_for("submission.show_restaurant"))
             
-            #ORDER: name, dinein, takeout, vegan, price, cuisine, rating, rating count, opening, drive, acceptance
-            reccent_10_tuple = data_functions.join_10_restaurant(connection, user_id = session["user_id"])[::-1]
-            suggestions = session["suggestions"]
+            #All restaurants has been shown
+            else:
+                if "training" in session:
+                    flash("Training is done. Our accuracy will improve as you continue")
 
-            #Stores all data for front end
-            full_summary = []
-
-            
-            
-            price_map = {
-                    5: "$",
-                    4: "$$", 
-                    3: "$$$",
-                    2: "$$$$",
-                    1: "$$$$$"
-                }
-            
-            #Combines important feature data with acceptance probability
-            for x in range(10):
-                restaurant = list(reccent_10_tuple[x])      #Retrieve individual restaurant 
-  
-                probability = suggestions[x][1]*100
-                restaurant.append(round(probability, 2))        #Convert probability to percentage
-
-                restaurant[4] = price_map.get(restaurant[4], "N/A")     #Replace pricing number w '$'
-
-                restaurant[5] = restaurant[5].replace("_", " ").title()     #Formalize cuisine display
-
-                full_summary.append(restaurant)
+                    ml_model.train_save_model(connection, session["user_id"], coldstart=True, prod_mode=True)
+                    session.pop("training", None)
+                    return redirect(url_for("submission.user_submission"))
                 
-            keys = ["name", "dine_in", "take_out", "vegan", "price", "cuisine", 
-                "rating", "rating_count", "open", "drive", "accept", "accept_prob"]
+                #ORDER: name, dinein, takeout, vegan, price, cuisine, rating, rating count, opening, drive, acceptance
+                reccent_10_tuple = data_functions.join_10_restaurant(connection, user_id = session["user_id"])[::-1]
+                suggestions = session["suggestions"]
 
-            #Convert to dictionary
-            suggested_restaurant = [dict(zip(keys, place)) for place in full_summary]
+                #Stores all data for front end
+                full_summary = []
+
                 
+                #Combines important feature data with acceptance probability
+                for x in range(10):
+                    restaurant = list(reccent_10_tuple[x])      #Retrieve individual restaurant 
+    
+                    probability = suggestions[x][1]*100
+                    restaurant.append(round(probability, 2))        #Convert probability to percentage
 
-            connection.close()
-            return render_template("summary.html", displayed_restaurants = suggested_restaurant)
+                    restaurant[4] = num_to_price.get(restaurant[4], "N/A")     #Replace pricing number w '$'
+
+                    restaurant[5] = restaurant[5].replace("_", " ").title()     #Formalize cuisine display
+
+                    full_summary.append(restaurant)
+                    
+                keys = ["name", "dine_in", "take_out", "vegan", "price", "cuisine", 
+                    "rating", "rating_count", "open", "drive", "accept", "accept_prob"]
+
+                #Convert to dictionary
+                suggested_restaurant = [dict(zip(keys, place)) for place in full_summary]
+                    
+
+                return render_template("summary.html", displayed_restaurants = suggested_restaurant)
+            
+        except Exception as e:
+            print(f"Error: {e}")
+            return render_template("error_page.html")
+
+        finally:
+            if 'connection' in locals():
+                connection.close()
         
     else:
         return redirect(url_for("submission.login"))
@@ -321,8 +340,11 @@ def process_response():
 @submission.route("/statistics", methods = ["GET"])
 @limiter.limit("30 per minute")
 def statistics():
-    if "user_id" in session:
-        connection = data_functions.get_connection("prod")
+    if "user_id" not in session:
+        return redirect(url_for("submission.login"))
+    
+    connection = data_functions.get_connection("prod")
+    try:
         frontend_data = {}
 
         all_cuisines = cuisine_data.fetch_all_cuisine(connection, session["user_id"])
@@ -351,37 +373,50 @@ def statistics():
 
         
         return render_template("stats.html", frontend_data = frontend_data)
+    
+    except Exception as e:
+        print(f"Error: {e}")
+        return render_template("error_page.html")
 
-    else:
-        return redirect(url_for("submission.login"))
+    finally:
+        if connection:
+            connection.close()
+
+        
     
 
-@submission.route("/delete_user", methods = ["GET", "POST"])
+@submission.route("/delete_user", methods=["GET", "POST"])
 @limiter.limit("3 per hour")
 def delete_user():
-    if "user_id" in session:
-        if request.method == "POST":
-            connection = data_functions.get_connection("prod")
-            user_id = session["user_id"]
-            user_info = user_data.fetch_user_id_credentials(connection, user_id)
-            input_pw = request.form.get("password")
+    if "user_id" not in session:
+        return redirect(url_for("submission.login"))
 
-            if check_password_hash(user_info[1], input_pw):
+    if request.method == "GET":
+        return render_template("delete_account.html")
 
-                interact_data.delete_user_interactions(connection, user_id)
-                cuisine_data.delete_cuisines(connection, user_id)
-                user_model_data.delete_user_model(connection, user_id)
-                user_data.delete_user(connection, user_id)
-                session.clear()
-                flash("Account successfully deleted")
-        
+    connection = data_functions.get_connection("prod")
+    try:
+        user_id = session["user_id"]
+        user_info = user_data.fetch_user_id_credentials(connection, user_id)
+        input_pw = request.form.get("password")
+
+        if user_info and check_password_hash(user_info[1], input_pw):
+            interact_data.delete_user_interactions(connection, user_id)
+            cuisine_data.delete_cuisines(connection, user_id)
+            user_model_data.delete_user_model(connection, user_id)
+            user_data.delete_user(connection, user_id)
+            session.clear()
+            flash("Account successfully deleted")
         else:
-            return render_template("delete_account.html")
+            flash("Incorrect password", "warning")
+            return redirect(url_for("submission.delete_user"))
+
+    except Exception as e:
+        print(f"Error deleting user: {e}")
+        return render_template("error_page.html")
+
+    finally:
+        if connection:
+            connection.close()
 
     return redirect(url_for("submission.login"))
-        
-        
-        
-    
-
-
