@@ -66,4 +66,4 @@ def get_recs(lat, long, distance, model, scaler, connection, user_id, training):
             return random_sample
     
     else:
-         return "error"
+         return response.status_code
