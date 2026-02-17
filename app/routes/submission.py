@@ -129,14 +129,13 @@ def user_submission():
             #Cold start
             if len(interaction_count) < 10:     
                 flash("Let’s train on a bit of data so we can learn your preferences.")
-
-                try:
-                    suggestions = reccomendation.get_recs(34.0961, -118.1058, 5, None, None, connection, session["user_id"], True)
-                    suggestions += reccomendation.get_recs(40.6815, -73.8365, 5, None, None, connection, session["user_id"], True)
-                    suggestions += reccomendation.get_recs(37.3394, -121.8950, 5, None, None, connection, session["user_id"], True)
-                except Exception as e:
-                    print(e)
-
+                
+                suggestions = reccomendation.get_recs(34.0961, -118.1058, 5, None, None, connection, session["user_id"], True)
+                print(suggestions)
+                suggestions += reccomendation.get_recs(40.6815, -73.8365, 5, None, None, connection, session["user_id"], True)
+                print(suggestions)
+                suggestions += reccomendation.get_recs(37.3394, -121.8950, 5, None, None, connection, session["user_id"], True)
+                print(suggestions)
 
                 session["suggestions"] = suggestions
                 session["index"] = 0
