@@ -151,7 +151,6 @@ def user_submission():
             #Retrain after 50 data sets
             if (interactions - old_interaction_count) >= 50:
                 ml_model.train_save_model(connection, session.get("user_id"), coldstart=False, prod_mode=True)
-                print("training")
 
             return render_template("submission.html")
 
