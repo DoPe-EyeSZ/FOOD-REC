@@ -206,36 +206,30 @@ def user_submission():
 @submission.route("/show_restaurant")
 @limiter.limit("30 per minute")
 def show_restaurant():
-    if "user_id" in session:
-        suggestions = session["suggestions"]
-        index = session["index"]
-
-        price_map = {
-                    5: "$",
-                    4: "$$", 
-                    3: "$$$",
-                    2: "$$$$",
-                    1: "$$$$$"
-                }
-        
-        try:
-            if "training" in session:
-                restaurant_to_display = suggestions[index]
-                restaurant_to_display["cuisine"] = restaurant_to_display["cuisine"].replace("_", " ").title()
-                restaurant_to_display["price_level"] = price_map.get(restaurant_to_display["price_level"], "N/A")
-            else:
-                restaurant_to_display = suggestions[index][0]
-                restaurant_to_display["cuisine"] = restaurant_to_display["cuisine"].replace("_", " ").title()
-                restaurant_to_display["price_level"] = price_map.get(restaurant_to_display["price_level"], "N/A")
-            
-            return render_template("display_restaurant.html", displayed_restaurant = restaurant_to_display, training = session.get("training", False))
-        
-        except Exception as e:
-            print(f"Error: {e}")
-            return render_template("error_page.html")
-        
-    else:
+    if "user_id" not in session:
         return redirect(url_for("submission.login"))
+    
+    suggestions = session["suggestions"]
+    index = session["index"]
+    num_to_price = {5: "$", 4: "$$", 3: "$$$", 2: "$$$$", 1: "$$$$$"}
+    
+    try:
+        if "training" in session:
+            restaurant_to_display = suggestions[index]
+            restaurant_to_display["cuisine"] = restaurant_to_display["cuisine"].replace("_", " ").title()   #Add proper format
+            restaurant_to_display["price_level"] = num_to_price.get(restaurant_to_display["price_level"], "N/A")    #Add $ signs
+
+        else:
+            restaurant_to_display = suggestions[index][0]
+            restaurant_to_display["cuisine"] = restaurant_to_display["cuisine"].replace("_", " ").title()
+            restaurant_to_display["price_level"] = num_to_price.get(restaurant_to_display["price_level"], "N/A")
+        
+        return render_template("display_restaurant.html", displayed_restaurant = restaurant_to_display, training = session.get("training", False))
+    
+    except Exception as e:
+        print(f"Error: {e}")
+        return render_template("error_page.html")
+        
 
 
 @submission.route("/process_response", methods = ["POST"])
