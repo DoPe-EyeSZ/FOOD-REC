@@ -121,10 +121,29 @@
 .flash-message {
     padding: 12px 20px;
     margin-bottom: 10px;
-    background-color: #d1ecf1;
-    border: 1px solid #bee5eb;
     border-radius: 4px;
+    border-left: 4px solid;
+}
+
+/* Info message (default/blue) */
+.flash-message-info {
+    background-color: #d1ecf1;
+    border-color: #17a2b8;
     color: #0c5460;
+}
+
+/* Success message (green) */
+.flash-message-success {
+    background-color: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+}
+
+/* Error message (red) */
+.flash-message-error {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
 }
 
 /* Danger Box (for warnings) */

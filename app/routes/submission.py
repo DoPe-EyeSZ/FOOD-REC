@@ -41,11 +41,11 @@ def login():
 
             if user_credentials and check_password_hash(user_credentials[1], password):
                 session["user_id"] = user_credentials[0]
-                flash("Login Successful")
+                flash("Login Successful", "success")
                 return redirect(url_for("submission.user_submission"))
                 
             else:
-                flash("Wrong username or password", "warning")
+                flash("Wrong username or password", "error")
                 return redirect(url_for("submission.login"))
             
         except Exception as e:
@@ -69,7 +69,7 @@ def logout():
         flash("Logout Successful", "success")
     
     else:
-        flash("You're not logged in", "warning")
+        flash("You're not logged in", "error")
 
     return redirect(url_for("submission.login"))
 
@@ -80,7 +80,7 @@ def logout():
 def signup():
 
     if "user_id" in session:
-        flash("You're already logged in")
+        flash("You're already logged in", "info")
         return redirect(url_for("submission.user_submission"))
 
     connection = data_functions.get_connection("prod")
@@ -105,15 +105,15 @@ def signup():
                     user_data.create_user(connection, username, pw_hash)
                     user_id = user_data.fetch_user_credentials(connection, username)[0]
                     session["user_id"] = user_id
-                    flash("Account successfully created")
+                    flash("Account successfully created", "success")
                     return redirect(url_for("submission.user_submission"))
                 
                 else:
-                    flash("Your password does not match", "warning")
+                    flash("Your password does not match", "error")
 
             #User name already exists
             else:
-                flash("Username already exists", "warning")
+                flash("Username already exists", "error")
             
 
         return render_template("signup.html")
@@ -148,7 +148,7 @@ def user_submission():
             
             #Cold start with NO interactions
             if len(curr_interactions) < 10:     
-                flash("Let’s train on a bit of data so we can learn your preferences.")
+                flash("Help us personalize your suggestions by rating 30 restaurants.", "info")
                 
                 suggestions = reccomendation.get_recs(34.0961, -118.1058, 5, None, None, connection, session["user_id"], True)
                 suggestions += reccomendation.get_recs(40.6815, -73.8365, 5, None, None, connection, session["user_id"], True)
@@ -283,7 +283,7 @@ def process_response():
         #All restaurants has been shown
         else:
             if "training" in session:
-                flash("Training is done. Our accuracy will improve as you continue")
+                flash("Training complete. Recommendations will improve as you continue using the app.", "success")
 
                 ml_model.train_save_model(connection, session["user_id"], coldstart=True, prod_mode=True)
                 session.pop("training", None)
@@ -397,9 +397,9 @@ def delete_user():
             user_model_data.delete_user_model(connection, user_id)
             user_data.delete_user(connection, user_id)
             session.clear()
-            flash("Account successfully deleted")
+            flash("Account successfully deleted", "success")
         else:
-            flash("Incorrect password", "warning")
+            flash("Incorrect password", "error")
             return redirect(url_for("submission.delete_user"))
 
     except Exception as e:
