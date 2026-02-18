@@ -132,77 +132,75 @@ def signup():
 @submission.route("/user_submission", methods = ["POST", "GET"])
 @limiter.limit("5 per hour")
 def user_submission():
-    if "user_id" in session:
+    if "user_id" not in session:
+        return redirect(url_for("submission.login"))
 
-        connection = data_functions.get_connection("prod")
-        try:
-            user_model_data.create_user_models_table(connection)
-            interact_data.create_interact_table(connection)
-            cuisine_data.create_cuisine_table(connection)
-            connection.commit()
+    connection = data_functions.get_connection("prod")
+    try:
+        
+        user_model_data.create_user_models_table(connection)
+        interact_data.create_interact_table(connection)
+        cuisine_data.create_cuisine_table(connection)
+        connection.commit()
 
-            if request.method == "GET":     #For after user logs in
-                interaction_count = interact_data.fetch_user_interactions(connection, session["user_id"])
-                
-                #Cold start
-                if len(interaction_count) < 10:     
-                    flash("Let’s train on a bit of data so we can learn your preferences.")
-                    
-                    suggestions = reccomendation.get_recs(34.0961, -118.1058, 5, None, None, connection, session["user_id"], True)
-
-                    suggestions += reccomendation.get_recs(40.6815, -73.8365, 5, None, None, connection, session["user_id"], True)
-
-                    suggestions += reccomendation.get_recs(37.3394, -121.8950, 5, None, None, connection, session["user_id"], True)
-
-
-                    session["suggestions"] = suggestions
-                    session["index"] = 0
-                    session["training"] = True
-
-                    return redirect(url_for("submission.show_restaurant"))
-
-
-                #Retrain after 50 data sets
-                interactions = len(interact_data.fetch_user_interactions(connection, session["user_id"]))
-                old_interaction_count = user_model_data.fetch_model_data(connection, session["user_id"])[4]
-                if (interactions - old_interaction_count) >= 50:
-                    ml_model.train_save_model(connection, session.get("user_id"), coldstart=False, prod_mode=True)        
-
-
-                return render_template("submission.html")
-
-            else:
+        #For after user logs in
+        if request.method == "GET":     
+            curr_interactions = interact_data.fetch_user_interactions(connection, session["user_id"])
             
-                #User's Input
-                lat = request.form.get('lat')
-                lng = request.form.get('lng')
-                max_distance = request.form.get("max_distance")
-
-                #Load model
-                model, scaler = user_model_data.load_user_model(connection, session["user_id"])
-
-                top10 = reccomendation.get_recs(lat, lng, max_distance, model, scaler, connection, user_id = session["user_id"], training= False)
-
-                if top10 is None:
-                    return render_template("error_page.html")
+            #Cold start with NO interactions
+            if len(curr_interactions) < 10:     
+                flash("Let’s train on a bit of data so we can learn your preferences.")
                 
-                session["suggestions"] = top10
+                suggestions = reccomendation.get_recs(34.0961, -118.1058, 5, None, None, connection, session["user_id"], True)
+                suggestions += reccomendation.get_recs(40.6815, -73.8365, 5, None, None, connection, session["user_id"], True)
+                suggestions += reccomendation.get_recs(37.3394, -121.8950, 5, None, None, connection, session["user_id"], True)
+
+
+                session["suggestions"] = suggestions
                 session["index"] = 0
-                    
+                session["training"] = True
+
                 return redirect(url_for("submission.show_restaurant"))
+
+
+            #Retrain after 50 data sets
+            old_interaction_count = user_model_data.fetch_model_data(connection, session["user_id"])[4]
+            if (len(curr_interactions) - old_interaction_count) >= 50:       #50 or more new interactions
+                ml_model.train_save_model(connection, session.get("user_id"), coldstart=False, prod_mode=True)        
+
+
+            return render_template("submission.html")
+
+        else:
+        
+            #User's Input
+            lat = request.form.get('lat')
+            lng = request.form.get('lng')
+            max_distance = request.form.get("max_distance")
+
+            #Load model
+            model, scaler = user_model_data.load_user_model(connection, session["user_id"])
+
+            top10 = reccomendation.get_recs(lat, lng, max_distance, model, scaler, connection, user_id = session["user_id"], training= False)
+
+            if top10 is None:
+                return render_template("error_page.html")
             
+            session["suggestions"] = top10
+            session["index"] = 0
+                
+            return redirect(url_for("submission.show_restaurant"))
+        
 
-        except Exception as e:
-            print(f"Error: {e}")
-            return render_template("error_page.html")
+    except Exception as e:
+        print(f"Error: {e}")
+        return render_template("error_page.html")
 
-        finally:
-            if 'connection' in locals():
-                connection.close()
+    finally:
+        if 'connection' in locals():
+            connection.close()
             
     
-    else:
-        return redirect(url_for("submission.login"))
     
 
 @submission.route("/show_restaurant")
