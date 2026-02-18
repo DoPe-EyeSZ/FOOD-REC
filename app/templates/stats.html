@@ -50,6 +50,7 @@ Your Stats
             {% if frontend_data["highest_acceptance"] %}
                 <div class="stats-section">
                     <h2 class="stats-section-title">Your Acceptance Rate</h2>
+                    <p class="stats-note">Only cuisines that have appeared more than 3 times are shown</p>
                     <div class="stats-list">
                         {% for restaurant in frontend_data["highest_acceptance"] %}
                             <div class="stats-item">

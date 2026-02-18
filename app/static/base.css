@@ -491,3 +491,13 @@
     opacity: 0.9;
     font-weight: 500;
 }
+
+.stats-note {
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
