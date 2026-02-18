@@ -3,20 +3,24 @@
 {% block title %}Find Restaurants{% endblock %}
 
 {% block content %}
-<h1>Find Restaurants Near You</h1>
+<div class="signup-container">
+    <h1 class="signup-title">Find Restaurants Near You</h1>
 
-<div id="locationPrompt">
-    <p>This application requires your location to find restaurants in your area.</p>
-    <button onclick="getLocation()">Allow Location Access</button>
+    <div id="locationPrompt" class="info-box">
+        <p>This application requires your location to find restaurants in your area.</p>
+        <button onclick="getLocation()" class="btn-primary">Allow Location Access</button>
+    </div>
+
+    <form action="{{ url_for('submission.user_submission') }}" method="POST" id="locationForm" style="display: none;" class="signup-form">
+        <input type="hidden" name="lat" id="lat">
+        <input type="hidden" name="lng" id="lng">
+        
+        <p class="form-label"><strong>Maximum Distance (miles):</strong></p>
+        <input type="number" name="max_distance" placeholder="Enter distance (up to 30 miles)" max="30" required class="form-input">
+        
+        <p><button type="submit" class="btn-primary">Find Restaurants</button></p>
+    </form>
 </div>
-
-<form action="{{ url_for('submission.user_submission') }}" method="POST" id="locationForm" style="display: none;">
-    <input type="hidden" name="lat" id="lat">
-    <input type="hidden" name="lng" id="lng">
-    <p><strong>Maximum Distance (30 miles)</strong></p>
-    <input type="number" name="max_distance" placeholder="Enter Distance" max="30" required>
-    <p><button type="submit">Find Restaurants</button></p>
-</form>
 
 <script>
 function getLocation() {

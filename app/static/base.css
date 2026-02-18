@@ -153,3 +153,18 @@
 .btn-danger:hover {
     background-color: #c82333;
 }
+
+/* Info Box (for informational messages) */
+.info-box {
+    background-color: #d1ecf1;
+    padding: 20px;
+    border-radius: 4px;
+    border-left: 4px solid #17a2b8;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.info-box p {
+    margin-bottom: 15px;
+    color: #0c5460;
+}
