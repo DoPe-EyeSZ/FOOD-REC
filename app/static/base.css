@@ -71,3 +71,58 @@
 .link-primary:hover {
     text-decoration: underline;
 }
+
+/* Navigation Bar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 15px 30px;
+    border-bottom: 1px solid #ddd;
+}
+
+.nav-left {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-right {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-link {
+    color: #333;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.nav-link:hover {
+    background-color: #e9ecef;
+}
+
+.nav-link-danger {
+    color: #dc3545;
+}
+
+.nav-link-danger:hover {
+    background-color: #f8d7da;
+}
+
+/* Flash Messages */
+.flash-messages {
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.flash-message {
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    border-radius: 4px;
+    color: #0c5460;
+}

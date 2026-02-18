@@ -11,16 +11,23 @@
 
 <body>
 
-    <nav>
-        <a href="{{url_for('submission.signup')}}">Sign up</a>
-        <a href="{{url_for('submission.login')}}">Login</a>
+    <nav class="navbar">
+        <div class="nav-left">
+            <!-- Empty to push links to the right -->
+        </div>
+        <div class="nav-right">
+            <a href="{{url_for('submission.signup')}}" class="nav-link">Sign up</a>
+            <a href="{{url_for('submission.login')}}" class="nav-link">Login</a>
+        </div>
     </nav>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
+        <div class="flash-messages">
           {% for message in messages %}
-            {{ message }}
+            <div class="flash-message">{{ message }}</div>
           {% endfor %}
+        </div>
       {% endif %}
     {% endwith %}
     

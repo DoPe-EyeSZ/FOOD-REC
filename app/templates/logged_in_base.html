@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,19 +11,24 @@
 
 <body>
 
-    <nav>
-        <a href="{{url_for('submission.statistics')}}">Statistics</a>
-        <a href="{{url_for('submission.user_submission')}}">Fetch Suggestions</a>
-        <a href="{{url_for('submission.logout')}}">Logout</a>
-        <a href="{{url_for('submission.delete_user')}}">Delete Account</a>
-        
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="{{url_for('submission.statistics')}}" class="nav-link">Statistics</a>
+            <a href="{{url_for('submission.user_submission')}}" class="nav-link">Fetch Suggestions</a>
+        </div>
+        <div class="nav-right">
+            <a href="{{url_for('submission.logout')}}" class="nav-link">Logout</a>
+            <a href="{{url_for('submission.delete_user')}}" class="nav-link nav-link-danger">Delete Account</a>
+        </div>
     </nav>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
+        <div class="flash-messages">
           {% for message in messages %}
-            {{ message }}
+            <div class="flash-message">{{ message }}</div>
           {% endfor %}
+        </div>
       {% endif %}
     {% endwith %}
 
