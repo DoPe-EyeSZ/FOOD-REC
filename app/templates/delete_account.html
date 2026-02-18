@@ -3,14 +3,18 @@
 {% block title %}Delete Account{% endblock %}
 
 {% block content %}
-<h1>Delete Account</h1>
+<div class="signup-container">
+    <h1 class="signup-title">Delete Account</h1>
 
-<p><strong>Warning:</strong> This action cannot be undone. All your data will be permanently deleted.</p>
+    <div class="danger-box">
+        <strong>Warning:</strong> This action cannot be undone. All your data will be permanently deleted.
+    </div>
 
-<form action="#" method="POST">
-    <p><strong>Enter password to confirm:</strong></p>
-    <input type="password" name="password" required>
-    
-    <p><button type="submit">Delete Account</button></p>
-</form>
+    <form action="#" method="POST" class="signup-form">
+        <p class="form-label"><strong>Enter password to confirm:</strong></p>
+        <input type="password" name="password" required class="form-input">
+        
+        <p><button type="submit" class="btn-danger">Delete Account</button></p>
+    </form>
+</div>
 {% endblock %}
