@@ -5,20 +5,26 @@ Signup
 {% endblock %}
 
 {% block content %}
-<h1>Sign Up</h1>
-
-<form action="#" method="POST">
-    <p><strong>Username:</strong></p>
-    <input type="text" name="username" required>
-
-    <p><strong>Password:</strong></p>
-    <input type="password" name="password" required>
+<div class="signup-container">
+    <h1 class="signup-title">Sign Up</h1>
     
-    <p><strong>Re-enter Password:</strong></p>
-    <input type="password" name="password_check" required>
+    <form action="#" method="POST" class="signup-form">
+        <p class="form-label"><strong>Username:</strong></p>
+        <input type="text" name="username" required class="form-input">
 
-    <p><em>No email recovery available. Remember your password!</em></p>
+        <p class="form-label"><strong>Password:</strong></p>
+        <input type="password" name="password" required class="form-input">
+        
+        <p class="form-label"><strong>Re-enter Password:</strong></p>
+        <input type="password" name="password_check" required class="form-input">
+
+        <p class="warning-box"><em>No email recovery available. Remember your password!</em></p>
+        
+        <p><button type="submit" class="btn-primary">Sign Up</button></p>
+    </form>
     
-    <p><button type="submit">Sign Up</button></p>
-</form>
+    <p class="signup-footer">
+        Already have an account? <a href="{{ url_for('submission.login') }}" class="link-primary">Log in</a>
+    </p>
+</div>
 {% endblock %}
