@@ -5,30 +5,50 @@ Summary
 {% endblock %}
 
 {% block content %}
-<h1>Decision Summary</h1>
+<div class="summary-container">
+    <h1 class="summary-title">Decision Summary</h1>
+    
+    <p class="summary-note">This summary shows your decisions from a completed suggestion cycle. It will only appear after you've gone through all available restaurant options.</p>
 
-{% for restaurant in displayed_restaurants %}
-    <h2>{{ restaurant["name"] }}</h2>
-    
-    <p><strong>Cuisine:</strong> {{ restaurant["cuisine"].title() }}</p>
-    <p><strong>Rating:</strong> {{ restaurant["rating"] }} stars ({{ restaurant["rating_count"] }} reviews)</p>
-    <p><strong>Price Level:</strong> {{restaurant["price"] }}</p>
-    <p><strong>Drive Time:</strong> {{ (restaurant["drive"] / 60) | round(1) }} minutes</p>
-    
-    <p><strong>Available Options:</strong></p>
-    <ul>
-        {% if restaurant["dine_in"] == 1 %}<li>Offers dine-in</li>{% endif %}
-        {% if restaurant["take_out"] == 1 %}<li>Offers takeout</li>{% endif %}
-        {% if restaurant["vegan"] == 1 %}<li>Vegan options available</li>{% endif %}
-    </ul>
-    
-    <p><strong>Status:</strong> {% if restaurant["open"] == 1 %}Currently open{% else %}Currently closed{% endif %}</p>
-    
-    <p><strong>Your Decision:</strong> {% if restaurant["accept"] == 1 %}Accepted{% else %}Rejected{% endif %}</p>
-    <p>You had a {{ restaurant["accept_prob"] }}% chance of accepting this restaurant</p>
-    
-    <hr>
-{% endfor %}
+    <div class="summary-grid">
+        {% for restaurant in displayed_restaurants %}
+            <div class="summary-card">
+                <h2 class="summary-card-title">{{ restaurant["name"] }}</h2>
+                
+                <p><strong>Cuisine:</strong> {{ restaurant["cuisine"].title() }}</p>
+                <p><strong>Rating:</strong> {{ restaurant["rating"] }} stars ({{ restaurant["rating_count"] }} reviews)</p>
+                <p><strong>Price Level:</strong> {{restaurant["price"] }}</p>
+                <p><strong>Drive Time:</strong> {{ (restaurant["drive"] / 60) | round(1) }} minutes</p>
+                
+                <p><strong>Available Options:</strong></p>
+                <ul class="options-list">
+                    {% if restaurant["dine_in"] == 1 %}<li>Offers dine-in</li>{% endif %}
+                    {% if restaurant["take_out"] == 1 %}<li>Offers takeout</li>{% endif %}
+                    {% if restaurant["vegan"] == 1 %}<li>Vegan options available</li>{% endif %}
+                </ul>
+                
+                <p><strong>Status:</strong> 
+                    {% if restaurant["open"] == 1 %}
+                        <span class="status-open">Currently open</span>
+                    {% else %}
+                        <span class="status-closed">Currently closed</span>
+                    {% endif %}
+                </p>
+                
+                <p><strong>Your Decision:</strong> 
+                    {% if restaurant["accept"] == 1 %}
+                        <span class="decision-accept">Accepted</span>
+                    {% else %}
+                        <span class="decision-reject">Rejected</span>
+                    {% endif %}
+                </p>
+                <p class="probability-text">You had a {{ restaurant["accept_prob"] }}% chance of accepting this restaurant</p>
+            </div>
+        {% endfor %}
+    </div>
 
-<a href="{{ url_for('submission.user_submission') }}">Go back</a>
+    <div class="summary-footer">
+        <a href="{{ url_for('submission.user_submission') }}" class="btn-back">Go back</a>
+    </div>
+</div>
 {% endblock %}
