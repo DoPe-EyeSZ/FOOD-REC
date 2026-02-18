@@ -83,48 +83,47 @@ def signup():
         flash("You're already logged in")
         return redirect(url_for("submission.user_submission"))
 
-    else:
-        connection = data_functions.get_connection("prod")
-        try:
-            #After user submits signup form
-            if request.method == "POST":
+    connection = data_functions.get_connection("prod")
+    try:
+        #After user submits signup form
+        if request.method == "POST":
 
-                username = request.form.get("username")
-                password = request.form.get("password")
-                password_check = request.form.get("password_check")
+            username = request.form.get("username")
+            password = request.form.get("password")
+            password_check = request.form.get("password_check")
 
-                user_data.create_user_table(connection)
-                restaurant_data.create_restaurant_table(connection)
-                connection.commit()
+            user_data.create_user_table(connection)
+            restaurant_data.create_restaurant_table(connection)
+            connection.commit()
 
-                #Create new account if user does not exist
-                if not user_data.fetch_user_credentials(connection, username):
+            #Create new account if user does not exist
+            if not user_data.fetch_user_credentials(connection, username):
 
-                    #If user reenters password correctly
-                    if password == password_check:
-                        pw_hash = generate_password_hash(password)
-                        user_data.create_user(connection, username, pw_hash)
-                        user_id = user_data.fetch_user_credentials(connection, username)[0]
-                        session["user_id"] = user_id
-                        flash("Account successfully created")
-                        return redirect(url_for("submission.user_submission"))
-                    
-                    else:
-                        flash("Your password does not match", "warning")
-
-                #User name already exists
-                else:
-                    flash("Username already exists", "warning")
+                #If user reenters password correctly
+                if password == password_check:
+                    pw_hash = generate_password_hash(password)
+                    user_data.create_user(connection, username, pw_hash)
+                    user_id = user_data.fetch_user_credentials(connection, username)[0]
+                    session["user_id"] = user_id
+                    flash("Account successfully created")
+                    return redirect(url_for("submission.user_submission"))
                 
+                else:
+                    flash("Your password does not match", "warning")
 
-            return render_template("signup.html")
-        
-        except Exception as e:
-            print(f"Error: {e}")
+            #User name already exists
+            else:
+                flash("Username already exists", "warning")
+            
 
-        finally:
-            if connection:
-                connection.close()
+        return render_template("signup.html")
+    
+    except Exception as e:
+        print(f"Error: {e}")
+
+    finally:
+        if connection:
+            connection.close()
 
 
 
