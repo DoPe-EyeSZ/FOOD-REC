@@ -1,0 +1,12 @@
+{% extends "logged_in_base.html" %}
+
+{% block title %}Rate Limit Exceeded{% endblock %}
+
+{% block content %}
+<div class="signup-container">
+    <h1 class="signup-title">Too Many Requests</h1>
+    <div class="danger-box">
+        <strong>Rate Limit Exceeded:</strong> You've made too many requests. Please wait before trying again.
+    </div>
+</div>
+{% endblock %}

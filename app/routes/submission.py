@@ -411,3 +411,11 @@ def delete_user():
             connection.close()
 
     return redirect(url_for("submission.login"))
+
+
+@submission.errorhandler(429)
+def ratelimit_handler(e):
+    if "user_id" in session:
+        return render_template("ratelim_login.html")
+
+    return render_template("ratelim_logout.html")
