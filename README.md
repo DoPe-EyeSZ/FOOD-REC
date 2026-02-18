@@ -350,6 +350,7 @@ v2 ideas:
 - present url to go to restaurant
 - ai categorizer
 - stricter retrain (use overfitting checks and cv mean change before retrain)
+- add more to summary
 
 add this for resume when claude reads it later:
 
