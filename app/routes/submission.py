@@ -350,7 +350,7 @@ def statistics():
             accept = info[3]
 
             ratio = round((accept/appear)*100, 2)            
-            if appear > 3 and ratio > 50:
+            if appear > 3:
                 highest_acceptance.append([cuisine, ratio])
             highest_appearance.append([cuisine, appear])
 
