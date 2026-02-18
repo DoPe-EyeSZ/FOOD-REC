@@ -3,53 +3,65 @@
 {% block title %}Restaurant Display{% endblock %}
 
 {% block content %}
-<h1>{{ displayed_restaurant["name"] }}</h1>
+<div class="restaurant-card">
+    <h1 class="restaurant-name">{{ displayed_restaurant["name"] }}</h1>
 
-<p><strong>Cuisine:</strong> {{ displayed_restaurant["cuisine"].title() }}</p>
-<p><strong>Rating:</strong> {{ displayed_restaurant["rating"] }} stars ({{ displayed_restaurant["rating_count"] }} reviews)</p>
-<p><strong>Price Level:</strong> {{ displayed_restaurant["price_level"] }}</p>
-{% if not training%}
-    <p><strong>Drive Time:</strong> {{ (displayed_restaurant["drive_time"] / 60) | round(1) }} minutes</p>
-{% endif %}
+    <div class="restaurant-details">
+        <p><strong>Cuisine:</strong> {{ displayed_restaurant["cuisine"].title() }}</p>
+        <p><strong>Rating:</strong> {{ displayed_restaurant["rating"] }} stars ({{ displayed_restaurant["rating_count"] }} reviews)</p>
+        <p><strong>Price Level:</strong> {{ displayed_restaurant["price_level"] }}</p>
+        {% if not training%}
+            <p><strong>Drive Time:</strong> {{ (displayed_restaurant["drive_time"] / 60) | round(1) }} minutes</p>
+        {% endif %}
 
-<p><strong>Available Options:</strong></p>
-<ul>
-    {% if displayed_restaurant["dineIn"] == 1 %}<li>Offers dine-in</li>{% endif %}
-    {% if displayed_restaurant["takeout"] == 1 %}<li>Offers takeout</li>{% endif %}
-    {% if displayed_restaurant["vegan"] == 1 %}<li>Vegan options available</li>{% endif %}
-</ul>
+        <p><strong>Available Options:</strong></p>
+        <ul class="options-list">
+            {% if displayed_restaurant["dineIn"] == 1 %}<li>Offers dine-in</li>{% endif %}
+            {% if displayed_restaurant["takeout"] == 1 %}<li>Offers takeout</li>{% endif %}
+            {% if displayed_restaurant["vegan"] == 1 %}<li>Vegan options available</li>{% endif %}
+        </ul>
 
-<p><strong>Status:</strong> {% if displayed_restaurant["is_open"] == 1 %}Currently open{% else %}Currently closed{% endif %}</p>
+        <p><strong>Status:</strong> 
+            {% if displayed_restaurant["is_open"] == 1 %}
+                <span class="status-open">Currently open</span>
+            {% else %}
+                <span class="status-closed">Currently closed</span>
+            {% endif %}
+        </p>
+    </div>
 
-<form action="{{ url_for('submission.process_response') }}" method="POST" style="display:inline;">
-    <input type="hidden" name="response" value="1">
-    <input type="hidden" name="place_id" value="{{ displayed_restaurant['id'] }}">
-    <input type="hidden" name="cuisine" value="{{ displayed_restaurant['cuisine'] }}">
-    <input type="hidden" name="rating" value="{{ displayed_restaurant['rating'] }}">
-    <input type="hidden" name="rating_count" value="{{ displayed_restaurant['rating_count'] }}">
-    <input type="hidden" name="is_open" value="{{ displayed_restaurant['is_open'] }}">
-    <input type="hidden" name="drive_time" value="{{ displayed_restaurant['drive_time'] }}">
-    <input type="hidden" name="dineIn" value="{{ displayed_restaurant['dineIn'] }}">
-    <input type="hidden" name="name" value="{{ displayed_restaurant['name'] }}">
-    <input type="hidden" name="price_level" value="{{ displayed_restaurant['price_level'] }}">
-    <input type="hidden" name="takeout" value="{{ displayed_restaurant['takeout'] }}">
-    <input type="hidden" name="vegan" value="{{ displayed_restaurant['vegan'] }}">
-    <button type="submit">Accept</button>
-</form>
+    <div class="action-buttons">
+        <form action="{{ url_for('submission.process_response') }}" method="POST" style="display:inline;">
+            <input type="hidden" name="response" value="1">
+            <input type="hidden" name="place_id" value="{{ displayed_restaurant['id'] }}">
+            <input type="hidden" name="cuisine" value="{{ displayed_restaurant['cuisine'] }}">
+            <input type="hidden" name="rating" value="{{ displayed_restaurant['rating'] }}">
+            <input type="hidden" name="rating_count" value="{{ displayed_restaurant['rating_count'] }}">
+            <input type="hidden" name="is_open" value="{{ displayed_restaurant['is_open'] }}">
+            <input type="hidden" name="drive_time" value="{{ displayed_restaurant['drive_time'] }}">
+            <input type="hidden" name="dineIn" value="{{ displayed_restaurant['dineIn'] }}">
+            <input type="hidden" name="name" value="{{ displayed_restaurant['name'] }}">
+            <input type="hidden" name="price_level" value="{{ displayed_restaurant['price_level'] }}">
+            <input type="hidden" name="takeout" value="{{ displayed_restaurant['takeout'] }}">
+            <input type="hidden" name="vegan" value="{{ displayed_restaurant['vegan'] }}">
+            <button type="submit" class="btn-accept">Accept</button>
+        </form>
 
-<form action="{{ url_for('submission.process_response') }}" method="POST" style="display:inline;">
-    <input type="hidden" name="response" value="0">
-    <input type="hidden" name="place_id" value="{{ displayed_restaurant['id'] }}">
-    <input type="hidden" name="cuisine" value="{{ displayed_restaurant['cuisine'] }}">
-    <input type="hidden" name="rating" value="{{ displayed_restaurant['rating'] }}">
-    <input type="hidden" name="rating_count" value="{{ displayed_restaurant['rating_count'] }}">
-    <input type="hidden" name="is_open" value="{{ displayed_restaurant['is_open'] }}">
-    <input type="hidden" name="drive_time" value="{{ displayed_restaurant['drive_time'] }}">
-    <input type="hidden" name="dineIn" value="{{ displayed_restaurant['dineIn'] }}">
-    <input type="hidden" name="name" value="{{ displayed_restaurant['name'] }}">
-    <input type="hidden" name="price_level" value="{{ displayed_restaurant['price_level'] }}">
-    <input type="hidden" name="takeout" value="{{ displayed_restaurant['takeout'] }}">
-    <input type="hidden" name="vegan" value="{{ displayed_restaurant['vegan'] }}">
-    <button type="submit">Reject</button>
-</form>
+        <form action="{{ url_for('submission.process_response') }}" method="POST" style="display:inline;">
+            <input type="hidden" name="response" value="0">
+            <input type="hidden" name="place_id" value="{{ displayed_restaurant['id'] }}">
+            <input type="hidden" name="cuisine" value="{{ displayed_restaurant['cuisine'] }}">
+            <input type="hidden" name="rating" value="{{ displayed_restaurant['rating'] }}">
+            <input type="hidden" name="rating_count" value="{{ displayed_restaurant['rating_count'] }}">
+            <input type="hidden" name="is_open" value="{{ displayed_restaurant['is_open'] }}">
+            <input type="hidden" name="drive_time" value="{{ displayed_restaurant['drive_time'] }}">
+            <input type="hidden" name="dineIn" value="{{ displayed_restaurant['dineIn'] }}">
+            <input type="hidden" name="name" value="{{ displayed_restaurant['name'] }}">
+            <input type="hidden" name="price_level" value="{{ displayed_restaurant['price_level'] }}">
+            <input type="hidden" name="takeout" value="{{ displayed_restaurant['takeout'] }}">
+            <input type="hidden" name="vegan" value="{{ displayed_restaurant['vegan'] }}">
+            <button type="submit" class="btn-reject">Reject</button>
+        </form>
+    </div>
+</div>
 {% endblock %}
