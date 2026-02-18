@@ -235,98 +235,98 @@ def show_restaurant():
 @submission.route("/process_response", methods = ["POST"])
 @limiter.limit("30 per minute")
 def process_response():
-    if "user_id" in session:
+    if "user_id" not in session:
+            return redirect(url_for("submission.login"))
 
-        price_to_num = {"$": 5, "$$": 4, "$$$": 3, "$$$$": 2, "$$$$$": 1}
-        num_to_price = {5: "$",4: "$$", 3: "$$$", 2: "$$$$", 1: "$$$$$"}
-        
-        
-        connection = data_functions.get_connection("prod")
-        session["index"] = session.get("index", 0) + 1
-        
-        response = request.form.get("response")
-        place_id = request.form.get("place_id")
-
-        cuisine = request.form.get("cuisine")
-        cuisine = cuisine.replace(" ", "_").lower()
-
-        rating = request.form.get("rating")
-        rating_count = request.form.get("rating_count")
-        opening = request.form.get("is_open")
-        drive_time = request.form.get("drive_time")
-        dine_in = request.form.get("dineIn")
-        name = request.form.get("name")
-
-        price_level = request.form.get("price_level")
-        price_level = price_to_num.get(str(price_level), 0)
-        takeout = request.form.get("takeout")
-        vegan = request.form.get("vegan")
-
-        try:
-            #Saving Restaurant data
-            restaurant_data.insert_restaurant(connection, place_id, dine_in, takeout, vegan, price_level, cuisine, name)
-            
-            #Saving interaction
-            interact_data.insert_user_interaction(connection, place_id, rating, rating_count, opening, drive_time, response, user_id=session["user_id"])
-
-            #Saving cuisine
-            cuisine_data.upsert_cuisine_stats(connection, cuisine, int(response), session["user_id"])
-        
-
-
-            #Continue to show suggested restaurants
-            if session["index"] < len(session["suggestions"]):
-                return redirect(url_for("submission.show_restaurant"))
-            
-            #All restaurants has been shown
-            else:
-                if "training" in session:
-                    flash("Training is done. Our accuracy will improve as you continue")
-
-                    ml_model.train_save_model(connection, session["user_id"], coldstart=True, prod_mode=True)
-                    session.pop("training", None)
-                    return redirect(url_for("submission.user_submission"))
-                
-                #ORDER: name, dinein, takeout, vegan, price, cuisine, rating, rating count, opening, drive, acceptance
-                reccent_10_tuple = data_functions.join_10_restaurant(connection, user_id = session["user_id"])[::-1]
-                suggestions = session["suggestions"]
-
-                #Stores all data for front end
-                full_summary = []
-
-                
-                #Combines important feature data with acceptance probability
-                for x in range(10):
-                    restaurant = list(reccent_10_tuple[x])      #Retrieve individual restaurant 
+    price_to_num = {"$": 5, "$$": 4, "$$$": 3, "$$$$": 2, "$$$$$": 1}
+    num_to_price = {5: "$",4: "$$", 3: "$$$", 2: "$$$$", 1: "$$$$$"}
     
-                    probability = suggestions[x][1]*100
-                    restaurant.append(round(probability, 2))        #Convert probability to percentage
+    
+    connection = data_functions.get_connection("prod")
 
-                    restaurant[4] = num_to_price.get(restaurant[4], "N/A")     #Replace pricing number w '$'
+    session["index"] = session.get("index", 0) + 1      #Increment index to next restaurant
 
-                    restaurant[5] = restaurant[5].replace("_", " ").title()     #Formalize cuisine display
+    #Retrieve all necessary restaurant information
+    response = request.form.get("response")
+    place_id = request.form.get("place_id")
 
-                    full_summary.append(restaurant)
-                    
-                keys = ["name", "dine_in", "take_out", "vegan", "price", "cuisine", 
-                    "rating", "rating_count", "open", "drive", "accept", "accept_prob"]
+    cuisine = request.form.get("cuisine")
+    cuisine = cuisine.replace(" ", "_").lower()
 
-                #Convert to dictionary
-                suggested_restaurant = [dict(zip(keys, place)) for place in full_summary]
-                    
+    rating = request.form.get("rating")
+    rating_count = request.form.get("rating_count")
+    opening = request.form.get("is_open")
+    drive_time = request.form.get("drive_time")
+    dine_in = request.form.get("dineIn")
+    name = request.form.get("name")
 
-                return render_template("summary.html", displayed_restaurants = suggested_restaurant)
-            
-        except Exception as e:
-            print(f"Error: {e}")
-            return render_template("error_page.html")
+    price_level = request.form.get("price_level")
+    price_level = price_to_num.get(str(price_level), 0)
+    takeout = request.form.get("takeout")
+    vegan = request.form.get("vegan")
 
-        finally:
-            if 'connection' in locals():
-                connection.close()
+    try:
+        #Saving Restaurant data
+        restaurant_data.insert_restaurant(connection, place_id, dine_in, takeout, vegan, price_level, cuisine, name)
         
-    else:
-        return redirect(url_for("submission.login"))
+        #Saving interaction
+        interact_data.insert_user_interaction(connection, place_id, rating, rating_count, opening, drive_time, response, user_id=session["user_id"])
+
+        #Saving cuisine
+        cuisine_data.upsert_cuisine_stats(connection, cuisine, int(response), session["user_id"])
+    
+
+
+        #Continue to show suggested restaurants
+        if session["index"] < len(session["suggestions"]):
+            return redirect(url_for("submission.show_restaurant"))
+        
+        #All restaurants has been shown
+        else:
+            if "training" in session:
+                flash("Training is done. Our accuracy will improve as you continue")
+
+                ml_model.train_save_model(connection, session["user_id"], coldstart=True, prod_mode=True)
+                session.pop("training", None)
+                return redirect(url_for("submission.user_submission"))
+            
+            #ORDER: name, dinein, takeout, vegan, price, cuisine, rating, rating count, opening, drive, acceptance
+            reccent_10_tuple = data_functions.join_10_restaurant(connection, user_id = session["user_id"])[::-1]
+            suggestions = session["suggestions"]
+
+            #Stores all data for front end
+            full_summary = []
+            
+            #Combines important feature data with acceptance probability
+            for x in range(10):
+                restaurant = list(reccent_10_tuple[x])      #Retrieve individual restaurant 
+
+                probability = suggestions[x][1]*100
+                restaurant.append(round(probability, 2))        #Convert probability to percentage
+
+                restaurant[4] = num_to_price.get(restaurant[4], "N/A")     #Replace pricing number w '$'
+
+                restaurant[5] = restaurant[5].replace("_", " ").title()     #Formalize cuisine display
+
+                full_summary.append(restaurant)
+                
+            keys = ["name", "dine_in", "take_out", "vegan", "price", "cuisine", 
+                "rating", "rating_count", "open", "drive", "accept", "accept_prob"]
+
+            #Convert to dictionary
+            suggested_restaurant = [dict(zip(keys, place)) for place in full_summary]
+                
+
+            return render_template("summary.html", displayed_restaurants = suggested_restaurant)
+        
+    except Exception as e:
+        print(f"Error: {e}")
+        return render_template("error_page.html")
+
+    finally:
+        if 'connection' in locals():
+            connection.close()
+        
 
 
 @submission.route("/statistics", methods = ["GET"])
