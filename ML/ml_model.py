@@ -114,4 +114,7 @@ def train_save_model(connection, user_id, coldstart, prod_mode):
             "interaction_count": len(feature_data)
         }
 
-    return metadata
+        return metadata
+    
+    else:
+        return "Not saved"
