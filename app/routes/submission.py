@@ -129,7 +129,7 @@ def signup():
 
 
 @submission.route("/user_submission", methods = ["POST", "GET"])
-@limiter.limit("5 per hour")
+@limiter.limit("10 per hour")
 def user_submission():
     if "user_id" not in session:
         return redirect(url_for("submission.login"))
