@@ -20,7 +20,7 @@ Deciding where to eat is tough when you're overwhelmed by endless Google Maps or
 ## Technologies
 - **Backend**: Python (Flask)
 - **Database**: SQLite (development), PostgreSQL (production)
-- **ML**: scikit-learn (Logistic Regression, StandardScaler, cross-validation)
+- **ML**: scikit-learn (Logistic Regression, StandardScaler, cross-validation), pickle (serialize model)
 - **Visualization**: Matplotlib (Testing)
 - **Frontend**: HTML/CSS, JavaScript, Jinja2
 - **API**: Google Places (New) API

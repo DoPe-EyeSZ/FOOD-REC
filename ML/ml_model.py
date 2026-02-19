@@ -42,7 +42,7 @@ def train_save_model(connection, user_id, coldstart, prod_mode):
     
     #Get Accuracy Score
     score = logistic_model.score(x_test_scaled, y_test)
-    print(f"Model is {round(score * 100, 2)}% accurate \n")
+    print(f"Model is {round(score * 100, 2)}% accurate during testing\n")
 
 
     #Cross validation on new model
@@ -50,7 +50,7 @@ def train_save_model(connection, user_id, coldstart, prod_mode):
     all_x_scaled = scaler2.fit_transform(features)      #Scales all feature data
     cv_scores = cross_val_score(LogisticRegression(max_iter=1000, C=1.0), all_x_scaled, response, cv=5)     #Simulates 5 training sessions
     cv_mean = cv_scores.mean()
-    print(f"Accuracy scores of other tests: {cv_scores} \n")
+    print(f"CV score results: {[str(float(round(cv*100, 2))) + "%" for cv in cv_scores]} \n")
 
 
     #Check for overfitting
@@ -64,7 +64,7 @@ def train_save_model(connection, user_id, coldstart, prod_mode):
         print("FEATURE IMPORTANCE")
         print(f"{'='*60}")
 
-        feature_names = ["dine_in", "takeout", "vegan", "price", "cuisine_ratio", "rating", "rating_count", "open", "drive"]
+        feature_names = ["Dine in Options", "Takeout options", "Vegan options", "Price level", "Cuisine", "Rating", "Rating Count", "Open status", "Drive time"]
 
         #Same order as feature data (feature data is in order of join function)
         coef = logistic_model.coef_[0]
