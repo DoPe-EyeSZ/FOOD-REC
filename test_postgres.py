@@ -56,7 +56,6 @@ try:
     print(len(restaurant2))
     print(len(interact2))
 
-    pw = "test_pw_hash"
     
     
 
