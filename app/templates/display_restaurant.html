@@ -44,7 +44,7 @@
             <input type="hidden" name="price_level" value="{{ displayed_restaurant['price_level'] }}">
             <input type="hidden" name="takeout" value="{{ displayed_restaurant['takeout'] }}">
             <input type="hidden" name="vegan" value="{{ displayed_restaurant['vegan'] }}">
-            <button type="submit" class="btn-accept">Accept</button>
+            <button type="submit" class="btn-accept">Would Go</button>
         </form>
 
         <form action="{{ url_for('submission.process_response') }}" method="POST" style="display:inline;">
@@ -60,7 +60,7 @@
             <input type="hidden" name="price_level" value="{{ displayed_restaurant['price_level'] }}">
             <input type="hidden" name="takeout" value="{{ displayed_restaurant['takeout'] }}">
             <input type="hidden" name="vegan" value="{{ displayed_restaurant['vegan'] }}">
-            <button type="submit" class="btn-reject">Reject</button>
+            <button type="submit" class="btn-reject">Wouldn't Go</button>
         </form>
     </div>
 </div>
