@@ -3,15 +3,25 @@
 {% block title %}Find Restaurants{% endblock %}
 
 {% block content %}
-<div class="signup-container">
+<div class="find-restaurants-container">
     <h1 class="signup-title">Find Restaurants Near You</h1>
+
+    <div class="how-it-works-box">
+        <h3 class="how-it-works-title">How It Works</h3>
+        <ul class="how-it-works-list">
+            <li>We'll show you 10 restaurant suggestions based on your location</li>
+            <li>Decide whether you'd "Try" or "Pass" based on the features shown (cuisine, price, distance, etc.)</li>
+            <li>Your choices help us learn what you like</li>
+            <li>The more you rate, the better your recommendations become</li>
+        </ul>
+    </div>
 
     <div id="locationPrompt" class="info-box">
         <p>This application requires your location to find restaurants in your area.</p>
         <button onclick="getLocation()" class="btn-primary">Allow Location Access</button>
     </div>
 
-    <form action="{{ url_for('submission.user_submission') }}" method="POST" id="locationForm" style="display: none;" class="signup-form">
+    <form action="{{ url_for('submission.user_submission') }}" method="POST" id="locationForm" class="signup-form location-form-hidden">
         <input type="hidden" name="lat" id="lat">
         <input type="hidden" name="lng" id="lng">
         
