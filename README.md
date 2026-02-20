@@ -168,6 +168,7 @@ Feature importance reveals behavioral patterns:
 - Use AI to categorize restaurants with unspecified cuisines
 - Stricter retrain conditions with overfitting checks
 - Expand statistics page (add feature importance visualizations)
+- Rate limit unique to user not general I.P. address
 
 ---
 
